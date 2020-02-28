@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Arrival.iml" filepath="$PROJECT_DIR$/Arrival.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Arrival-code-Arrival.iml" filepath="$PROJECT_DIR$/Arrival-code-Arrival.iml" group="Arrival" />
+      <module fileurl="file://$PROJECT_DIR$/app/Arrival-code-app.iml" filepath="$PROJECT_DIR$/app/Arrival-code-app.iml" group="Arrival/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/code-Arrival.iml" filepath="$PROJECT_DIR$/code-Arrival.iml" group="Arrival" />
       <module fileurl="file://$PROJECT_DIR$/app/code-app.iml" filepath="$PROJECT_DIR$/app/code-app.iml" group="Arrival/app" />
