@@ -11,6 +11,8 @@ import com.example.android.arrival.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "main-activity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openMaps();
-
             }
         });
     }
