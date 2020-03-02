@@ -10,12 +10,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Open Scanner"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:id="@+id/scanner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/text_to_convert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:hint="Type Something"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scanner" />
 
     <Button
         android:id="@+id/map_button"
@@ -24,14 +35,14 @@
         android:text="Map"
         tools:ignore="MissingConstraints"/>
 
-    <TextView
+    <Button
+        android:id="@+id/genQR"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Empty"
-        android:textSize="20sp"
+        android:text="generate QR"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scanner"
-        android:id="@+id/barcodeText"/>
+        app:layout_constraintTop_toBottomOf="@+id/text_to_convert" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

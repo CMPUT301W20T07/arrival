@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class ScanQRDialog extends DialogFragment {
 
@@ -97,14 +100,19 @@ public class ScanQRDialog extends DialogFragment {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() > 0) {
                     result = barcodes.valueAt(0).displayValue;
+                    showQRTV.setText(result);
                     showQRTV.post(new Runnable() {
                         @Override
                         public void run() {
-                            Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-                            vibrator.vibrate(1000);
+                            Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            if (Build.VERSION.SDK_INT >= 26) {
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vibrator.vibrate(200);
+                            }
                         }
                     });
-                    showQRTV.setText(result);
+
                 }
             }
         });
@@ -121,6 +129,17 @@ public class ScanQRDialog extends DialogFragment {
                     }
                 }).create();
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof  OnFragmentInteractionListener){
+            listener = (OnFragmentInteractionListener) context;
+        }
+        else {
+            throw new RuntimeException(context.toString() + "must implement OnFragmentInteractionListener");
+        }
     }
 
     public interface OnFragmentInteractionListener{
