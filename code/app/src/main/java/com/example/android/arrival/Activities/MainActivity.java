@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.android.arrival.Model.GeoLocation;
+import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.RequestManager;
+import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
                 openMaps();
             }
         });
+
+        // FireStore test
+        RequestManager rm = new RequestManager();
+
+        // Create new request and open it using the RequestManager
+        Request req = new Request(new Rider("user", "pass"), new GeoLocation(), new GeoLocation(), 6.9f);
+        rm.openRequest(req);
     }
 
     public void openMaps(){
