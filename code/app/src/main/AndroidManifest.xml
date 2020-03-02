@@ -28,7 +28,8 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="@string/google_maps_key"
+        />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -36,7 +37,9 @@
 
         <activity
             android:name=".Activities.MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps">
+
+        </activity>
         <activity android:name=".Activities.LoginActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
