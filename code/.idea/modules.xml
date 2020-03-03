@@ -3,11 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Arrival.iml" filepath="$PROJECT_DIR$/Arrival.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GitFiles-arrival-code-Arrival.iml" filepath="$PROJECT_DIR$/GitFiles-arrival-code-Arrival.iml" group="Arrival" />
+      <module fileurl="file://$PROJECT_DIR$/GitFiles-arrival-code-Arrival~1.iml" filepath="$PROJECT_DIR$/GitFiles-arrival-code-Arrival~1.iml" group="Arrival" />
+      <module fileurl="file://$PROJECT_DIR$/app/GitFiles-arrival-code-app.iml" filepath="$PROJECT_DIR$/app/GitFiles-arrival-code-app.iml" group="Arrival/app" />
+      <module fileurl="file://$PROJECT_DIR$/app/GitFiles-arrival-code-app~1.iml" filepath="$PROJECT_DIR$/app/GitFiles-arrival-code-app~1.iml" group="Arrival/app" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/arrival-code-Arrival.iml" filepath="$PROJECT_DIR$/arrival-code-Arrival.iml" group="Arrival" />
       <module fileurl="file://$PROJECT_DIR$/app/arrival-code-app.iml" filepath="$PROJECT_DIR$/app/arrival-code-app.iml" group="Arrival/app" />
-      <module fileurl="file://$PROJECT_DIR$/GitFiles-arrival-code-Arrival.iml" filepath="$PROJECT_DIR$/GitFiles-arrival-code-Arrival.iml" group="Arrival" />
-      <module fileurl="file://$PROJECT_DIR$/app/GitFiles-arrival-code-app.iml" filepath="$PROJECT_DIR$/app/GitFiles-arrival-code-app.iml" group="Arrival/app" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/code-Arrival.iml" filepath="$PROJECT_DIR$/code-Arrival.iml" group="Arrival" />
       <module fileurl="file://$PROJECT_DIR$/app/code-app.iml" filepath="$PROJECT_DIR$/app/code-app.iml" group="Arrival/app" />
     </modules>
