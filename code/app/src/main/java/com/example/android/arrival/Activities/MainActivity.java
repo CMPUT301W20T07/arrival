@@ -13,6 +13,8 @@ import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "main-activity";
@@ -34,11 +36,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // FireStore test
-        RequestManager rm = new RequestManager();
+        RequestManager rm = RequestManager.getInstance();
 
         // Create new request and open it using the RequestManager
         Request req = new Request(new Rider("user", "pass"), new GeoLocation(), new GeoLocation(), 6.9f);
         rm.openRequest(req);
+
+        List l = rm.getOpenRequests();
     }
 
     public void openMaps(){

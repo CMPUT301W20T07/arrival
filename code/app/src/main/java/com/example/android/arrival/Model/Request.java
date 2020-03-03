@@ -14,7 +14,12 @@ public class Request {
     private Rider rider;
     private Driver driver;
 
+    public Request(){
+        // Must have a constructor with no params to be pulled as Object from FireStore.
+    }
+
     public Request(Rider rider, GeoLocation start, GeoLocation end, float fare) {
+        this.status = this.STATUS_OPEN;
         this.rider = rider;
         this.driver = null;
         this.startLocation = start;
