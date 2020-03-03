@@ -7,7 +7,7 @@ public class User {
     private String name;
 
     public User() {
-
+        // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
     public User(String username, String password) {

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  */
 public class RequestManager {
 
@@ -47,25 +47,29 @@ public class RequestManager {
      * Opens a Request in the FireStore Cloud Database.
      * @param req a Request object to be opened in FireStore.
      */
-    public void openRequest(Request req) {
+    public void openNewRequest(Request req) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("requests").document().set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG, "Successfully opened new request in FireStore.");
+                getOpenRequests(); // Update current list of open requests
             }
         });
     }
 
     public void updateRequest() {
-
+        getOpenRequests(); // Update current list of open requests
     }
 
     public void cancelRequest() {
-
+        getOpenRequests(); // Update current list of open requests
     }
 
+    /**
+     * Update the list of open requests from the FireStore Cloud Database.
+     */
     public void getOpenRequests() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference requestsRef = db.collection(REQUESTS);
@@ -75,6 +79,8 @@ public class RequestManager {
                 Log.d(TAG, "Successfully retrieved from DB");
                 openRequests = queryDocumentSnapshots.toObjects(Request.class);
                 Log.d(TAG, openRequests.toString());
+
+                // Notify dataset changed
             }
         });
     }

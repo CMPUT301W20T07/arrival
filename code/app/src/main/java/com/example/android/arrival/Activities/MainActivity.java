@@ -40,9 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create new request and open it using the RequestManager
         Request req = new Request(new Rider("user", "pass"), new GeoLocation(), new GeoLocation(), 6.9f);
-        rm.openRequest(req);
-
-        List l = rm.getOpenRequests();
+        rm.openNewRequest(req);
     }
 
     public void openMaps(){
