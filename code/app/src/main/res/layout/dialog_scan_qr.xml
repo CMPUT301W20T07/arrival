@@ -5,9 +5,10 @@
 
     <SurfaceView
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="500dp"
         android:id="@+id/camera_view"
-        android:padding="5dp"/>
+        android:layout_alignParentTop="true"
+        android:layout_margin="5dp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

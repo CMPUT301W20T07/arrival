@@ -27,7 +27,7 @@ public class DisplayQRDialog extends DialogFragment {
     ImageView imageView;
     String textToConvert;
     Thread thread ;
-    public final static int QRcodeWidth = 700 ;
+    public final static int QRcodeWidth = 800 ;
 
 
     public static DisplayQRDialog newInstance(String s) {
@@ -93,7 +93,7 @@ public class DisplayQRDialog extends DialogFragment {
         }
         Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);
 
-        bitmap.setPixels(pixels, 0, 700, 0, 0, bitMatrixWidth, bitMatrixHeight);
+        bitmap.setPixels(pixels, 0, 800, 0, 0, bitMatrixWidth, bitMatrixHeight);
         return bitmap;
     }
 
