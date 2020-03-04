@@ -1,9 +1,14 @@
 package com.example.android.arrival.Activities;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -23,13 +28,17 @@ public class MainActivity extends AppCompatActivity implements ScanQRDialog.OnFr
     private Button openScannerBTN;
     private Button genQRBTN;
     private EditText inputText;
+    private static final int CAMERA_REQUEST = 100;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkPermissions(getApplicationContext());
+        // bind views
         openScannerBTN = findViewById(R.id.scanner);
         genQRBTN = findViewById(R.id.genQR);
         inputText = findViewById(R.id.text_to_convert);
@@ -61,5 +70,15 @@ public class MainActivity extends AppCompatActivity implements ScanQRDialog.OnFr
     @Override
     public void onDonePressed(String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void checkPermissions(Context context){
+
+        if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
+        }
+
+
     }
 }

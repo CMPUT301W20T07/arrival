@@ -45,6 +45,7 @@ public class ScanQRDialog extends DialogFragment {
     private String result;
 
 
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
