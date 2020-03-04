@@ -20,56 +20,38 @@ import com.example.android.arrival.R;
 public class MainActivity extends AppCompatActivity implements ScanQRDialog.OnFragmentInteractionListener {
 
     private static final String TAG = "main-activity";
-    Button openScannerBTN;
-    Button genQRBTN;
-    EditText inputText;
-    Button map_Button;
+    private Button openScannerBTN;
+    private Button genQRBTN;
+    private EditText inputText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        map_Button = findViewById(R.id.map_button);
         openScannerBTN = findViewById(R.id.scanner);
         genQRBTN = findViewById(R.id.genQR);
         inputText = findViewById(R.id.text_to_convert);
 
 
-        genQRBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (inputText.getText().toString().isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Input Text to convert", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Log.d("generateClicked", "onClick: failed");
-                    FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
-                    DisplayQRDialog displayQRDialog = DisplayQRDialog.newInstance(inputText.getText().toString());
-                    displayQRDialog.show(fm, "generate");
-                }
+        genQRBTN.setOnClickListener(view -> {
+            if (inputText.getText().toString().isEmpty()) {
+                Toast.makeText(getApplicationContext(), "Input Text to convert", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Log.d("generateClicked", "onClick: failed");
+                FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
+                DisplayQRDialog displayQRDialog = DisplayQRDialog.newInstance(inputText.getText().toString());
+                displayQRDialog.show(fm, "generate");
             }
         });
 
-        openScannerBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openScanner();
-            }
-        });
+        openScannerBTN.setOnClickListener(view -> openScanner());
 
-        map_Button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openMaps();
-            }
-        });
+
     }
 
-    public void openMaps(){
-        Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
-    }
 
     public void openScanner() {
         ScanQRDialog scanQRDialog = new ScanQRDialog();
