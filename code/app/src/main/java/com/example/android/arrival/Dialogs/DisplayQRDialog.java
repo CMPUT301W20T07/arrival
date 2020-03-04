@@ -2,9 +2,7 @@ package com.example.android.arrival.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +18,19 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
+/* Citation:
+    Name: Juned Mughal
+    Title: Generate QR code in android using Zxing library in Android Studio example tutorial
+    Link: https://www.android-examples.com/generate-qr-code-in-android-using-zxing-library-in-android-studio/
+ */
+
 public class DisplayQRDialog extends DialogFragment {
 
 
-    Bitmap bitmap;
-    ImageView imageView;
-    String textToConvert;
-    Thread thread ;
-    public final static int QRcodeWidth = 800 ;
+    private Bitmap bitmap;
+    private ImageView imageView;
+    private String textToConvert;
+    private final static int QRCodeWidth = 800 ;
 
 
     public static DisplayQRDialog newInstance(String s) {
@@ -63,13 +66,20 @@ public class DisplayQRDialog extends DialogFragment {
 
     }
 
-    Bitmap TextToImageEncode(String Value) throws WriterException {
+    /**
+     * This encodes the input string into a QR code bitmap
+     * @param Value String
+     * @return Bitmap
+     * @throws WriterException
+     */
+
+    private Bitmap TextToImageEncode(String Value) throws WriterException {
         BitMatrix bitMatrix;
         try {
             bitMatrix = new MultiFormatWriter().encode(
                     Value,
-                    BarcodeFormat.DATA_MATRIX.QR_CODE,
-                    QRcodeWidth, QRcodeWidth, null
+                    BarcodeFormat.QR_CODE,
+                    QRCodeWidth, QRCodeWidth, null
             );
 
         } catch (IllegalArgumentException Illegalargumentexception) {

@@ -50,7 +50,9 @@ public class ScanQRDialog extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_scan_qr, null);
-        SurfaceView cameraView = view.findViewById(R.id.camera_view);
+
+
+        cameraView = view.findViewById(R.id.camera_view);
         cameraView.setZOrderMediaOverlay(true);
         holder = cameraView.getHolder();
         showQRTV = view.findViewById(R.id.fragment_tv);
