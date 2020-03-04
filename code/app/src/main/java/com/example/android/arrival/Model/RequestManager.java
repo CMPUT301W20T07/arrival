@@ -13,7 +13,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 /**
- *
+ * Pushes, pulls, and updates Requests to a FireBase FireStore Cloud Database.
  */
 public class RequestManager {
 
