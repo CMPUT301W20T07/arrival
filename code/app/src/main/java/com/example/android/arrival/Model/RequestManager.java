@@ -9,13 +9,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -26,8 +21,6 @@ public class RequestManager {
     public static final String TAG = "RequestManager";
 
     public static RequestManager instance;
-
-    private List<Request> openRequests; // Available to Drivers
 
     /**
      * Returns the RequestManager object associated with the current Android application.
@@ -43,28 +36,49 @@ public class RequestManager {
     }
 
     private RequestManager() {
-        openRequests = new ArrayList<>();
+
     }
 
     /**
-     * Opens a Request in the FireStore Cloud Database.
+     * Opens a request in the FireStore Cloud Database.
      * @param req a Request object to be opened in FireStore.
      */
-    public void openNewRequest(Request req) {
+    public void openRequest(Request req) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("requests").document(req.getID()).set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + "in FireStore.");
+                Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + " in FireStore.");
                 getOpenRequests(); // Update current list of open requests
             }
         });
     }
 
     /**
-     * Update a Request in the Cloud FireStore Database. Can be used
-     * to change the status of a request.
+     * Deletes a request from the FireStore CLoud Database. Used for testing.
+     * @param id
+     */
+    public void deleteRequest(String id) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("requests").document(id).delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG + "-delete", "Successfully deleted request " + id + " from FireStore.");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG + "-delete", "Failed to delete deleted request " + id + " from FireStore: " + e.toString());
+                    }
+                });
+    }
+
+    /**
+     * Updates a request in the FireStore Cloud Database. For example, can be used
+     * to change the status of a request, or to assign a driver.
      * @param req
      */
     public void updateRequest(Request req) {
@@ -88,7 +102,7 @@ public class RequestManager {
     }
 
     /**
-     * Update the list of open requests from the FireStore Cloud Database.
+     * Retrieves all currently open requests from the FireStore Cloud Database.
      */
     public void getOpenRequests() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -97,14 +111,14 @@ public class RequestManager {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");
-                openRequests = queryDocumentSnapshots.toObjects(Request.class);
+                List<Request> openRequests = queryDocumentSnapshots.toObjects(Request.class);
                 Log.d(TAG + "-getOpen", openRequests.toString());
             }
         });
     }
 
     /**
-     *
+     * Retrieves all the requests made by the rider from the FireStore Cloud Database.
      */
     public void getRiderRequests(String rider) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -124,7 +138,7 @@ public class RequestManager {
     }
 
     /**
-     *
+     * Retrieves all the requests accepted by the driver from the FireStore Cloud Database.
      */
     public void getDriverRequests(String driver) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -142,5 +156,4 @@ public class RequestManager {
             }
         });
     }
-
 }
