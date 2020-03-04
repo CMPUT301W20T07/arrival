@@ -13,14 +13,26 @@ public class Request {
     private float fare;
     private GeoLocation startLocation;
     private GeoLocation endLocation;
-    private Rider rider;
-    private Driver driver;
+//    private Rider rider;
+//    private Driver driver;
+    private String rider;
+    private String driver;
 
     public Request(){
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-    public Request(Rider rider, GeoLocation start, GeoLocation end, float fare) {
+//    public Request(Rider rider, GeoLocation start, GeoLocation end, float fare) {
+//        this.id = generateID();
+//        this.status = this.STATUS_OPEN;
+//        this.rider = rider;
+//        this.driver = null;
+//        this.startLocation = start;
+//        this.endLocation = end;
+//        this.fare = fare;
+//    }
+
+    public Request(String rider, GeoLocation start, GeoLocation end, float fare) {
         this.id = generateID();
         this.status = this.STATUS_OPEN;
         this.rider = rider;
@@ -29,6 +41,7 @@ public class Request {
         this.endLocation = end;
         this.fare = fare;
     }
+
 
     public String getID() {
         return id;
@@ -74,15 +87,27 @@ public class Request {
         this.endLocation = endLocation;
     }
 
-    public Rider getRider() {
+//    public Rider getRider() {
+//        return rider;
+//    }
+//
+//    public Driver getDriver() {
+//        return driver;
+//    }
+//
+//    public void setDriver(Driver driver) {
+//        this.driver = driver;
+//    }
+
+    public String getRider() {
         return rider;
     }
 
-    public Driver getDriver() {
+    public String getDriver() {
         return driver;
     }
 
-    public void setDriver(Driver driver) {
+    public void setDriver(String driver) {
         this.driver = driver;
     }
 

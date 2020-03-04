@@ -27,7 +27,7 @@ public class RequestManager {
 
     public static RequestManager instance;
 
-    private List<Request> openRequests;
+    private List<Request> openRequests; // Available to Drivers
 
     /**
      * Returns the RequestManager object associated with the current Android application.
@@ -56,12 +56,17 @@ public class RequestManager {
         db.collection("requests").document(req.getID()).set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Successfully opened new request in FireStore.");
+                Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + "in FireStore.");
                 getOpenRequests(); // Update current list of open requests
             }
         });
     }
 
+    /**
+     * Update a Request in the Cloud FireStore Database. Can be used
+     * to change the status of a request.
+     * @param req
+     */
     public void updateRequest(Request req) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference requestRef = db.collection(REQUESTS).document(req.getID());
@@ -71,7 +76,7 @@ public class RequestManager {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Successfully updated");
+                        Log.d(TAG + "-update", "Successfully updated request " + req.getID() + "in FireStore.");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -80,10 +85,6 @@ public class RequestManager {
                         Log.d(TAG, "Failed");
                     }
                 });
-    }
-
-    public void cancelRequest(String id) {
-
     }
 
     /**
@@ -95,11 +96,49 @@ public class RequestManager {
         requestsRef.whereEqualTo("status", Request.STATUS_OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                Log.d(TAG, "Successfully retrieved from DB");
+                Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");
                 openRequests = queryDocumentSnapshots.toObjects(Request.class);
-                Log.d(TAG, openRequests.toString());
+                Log.d(TAG + "-getOpen", openRequests.toString());
+            }
+        });
+    }
 
-                // Notify dataset changed
+    /**
+     *
+     */
+    public void getRiderRequests(String rider) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference requestsRef = db.collection(REQUESTS);
+        requestsRef.whereEqualTo("rider", rider).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d(TAG + "-getRider", "Successfully retrieved rider " + rider + "+'s requests from DB. ");
+                List<Request> userRequests = queryDocumentSnapshots.toObjects(Request.class);
+                if(userRequests.size() > 0) {
+                    Log.d(TAG + "-getRider", userRequests.toString());
+                } else {
+                    Log.d(TAG + "-getRider", "No Requests matched the username provided. ");
+                }
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    public void getDriverRequests(String driver) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference requestsRef = db.collection(REQUESTS);
+        requestsRef.whereEqualTo("driver", driver).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d(TAG + "-getDriv", "Successfully retrieved driver " + driver + "'s requests from DB. ");
+                List<Request> userRequests = queryDocumentSnapshots.toObjects(Request.class);
+                if(userRequests.size() > 0) {
+                    Log.d(TAG + "-getDriv", userRequests.toString());
+                } else {
+                    Log.d(TAG + "-getDriv", "No Requests matched the username provided. ");
+                }
             }
         });
     }
