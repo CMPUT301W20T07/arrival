@@ -1,5 +1,7 @@
 package com.example.android.arrival.Model;
 
+import java.util.UUID;
+
 public class Request {
 
     public static final String STATUS_OPEN = "OPEN";
@@ -19,12 +21,25 @@ public class Request {
     }
 
     public Request(Rider rider, GeoLocation start, GeoLocation end, float fare) {
+        this.id = generateID();
         this.status = this.STATUS_OPEN;
         this.rider = rider;
         this.driver = null;
         this.startLocation = start;
         this.endLocation = end;
         this.fare = fare;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    /**
+     * Return a random, unique id.
+     * @return
+     */
+    public String generateID() {
+        return "" + System.nanoTime();
     }
 
     public String getStatus() {

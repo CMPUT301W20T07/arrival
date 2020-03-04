@@ -2,6 +2,9 @@ package com.example.android.arrival.Model;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -50,7 +53,7 @@ public class RequestManager {
     public void openNewRequest(Request req) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("requests").document().set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection("requests").document(req.getID()).set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG, "Successfully opened new request in FireStore.");
@@ -59,12 +62,28 @@ public class RequestManager {
         });
     }
 
-    public void updateRequest() {
-        getOpenRequests(); // Update current list of open requests
+    public void updateRequest(Request req) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference requestRef = db.collection(REQUESTS).document(req.getID());
+
+        db.collection(REQUESTS).document(req.getID())
+                .set(req)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Successfully updated");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "Failed");
+                    }
+                });
     }
 
-    public void cancelRequest() {
-        getOpenRequests(); // Update current list of open requests
+    public void cancelRequest(String id) {
+
     }
 
     /**
@@ -84,4 +103,5 @@ public class RequestManager {
             }
         });
     }
+
 }

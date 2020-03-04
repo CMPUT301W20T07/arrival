@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         // Create new request and open it using the RequestManager
         Request req = new Request(new Rider("user", "pass"), new GeoLocation(), new GeoLocation(), 6.9f);
         rm.openNewRequest(req);
+        req.setFare(4.20f);
+        rm.updateRequest(req);
     }
 
     public void openMaps(){
