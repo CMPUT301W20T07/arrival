@@ -83,7 +83,3 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
-
-#API key
-code/app/src/main/res/values/secretKey.xml
-
