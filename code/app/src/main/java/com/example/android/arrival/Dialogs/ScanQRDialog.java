@@ -45,6 +45,7 @@ public class ScanQRDialog extends DialogFragment {
     private String result;
 
 
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -103,18 +104,6 @@ public class ScanQRDialog extends DialogFragment {
                 if (barcodes.size() > 0) {
                     result = barcodes.valueAt(0).displayValue;
                     showQRTV.setText(result);
-                    showQRTV.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                            if (Build.VERSION.SDK_INT >= 26) {
-                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                            } else {
-                                vibrator.vibrate(200);
-                            }
-                        }
-                    });
-
                 }
             }
         });
