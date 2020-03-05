@@ -5,10 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import com.example.android.arrival.R;
 
 public class LoginActivity extends AppCompatActivity {
+
+    Button signIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
