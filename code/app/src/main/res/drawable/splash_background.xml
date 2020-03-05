@@ -3,7 +3,7 @@
     android:opacity="opaque">
 
     <item
-        android:drawable="@color/lightColor"/>
+        android:drawable="@color/white"/>
     <item
         android:width="300dp"
         android:height="300dp"
