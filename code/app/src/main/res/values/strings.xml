@@ -11,4 +11,5 @@
     <string name="login_failed">"Login failed"</string>
     <string name="title_activity_maps">Map</string>
     <string name="map_button">Map</string>
+    <string name="sign_up_button"><u>Sign Up.</u></string>
 </resources>
