@@ -2,7 +2,16 @@
 <project version="4">
   <component name="AndroidLayouts">
     <shared>
-      <config />
+      <config>
+        <device id="pixel_3" />
+        <device id="Nexus 6P" />
+        <device id="Nexus 9" />
+        <device id="pixel_3_xl" />
+        <device id="automotive_1024p_landscape" />
+        <device id="tv_1080p" />
+        <device id="Nexus 10" />
+        <device id="Nexus 7" />
+      </config>
     </shared>
   </component>
   <component name="ChangeListManager">
@@ -82,6 +91,7 @@
       <list>
         <option value="Class" />
         <option value="layoutResourceFile" />
+        <option value="resourceFile" />
       </list>
     </option>
   </component>
@@ -91,6 +101,8 @@
   <component name="ProjectId" id="1YgWREtpFY6kkTruTwwOvbOI1zS" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
+    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="89GX09R9S" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-03-05T08:16:46.453Z" />
     <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
@@ -99,12 +111,13 @@
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
       <recent name="$PROJECT_DIR$/app/src/main/res/drawable" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\nanae\OneDrive\School work\Year 2\CMPUT 301\Project\arrival\code\app\src\main\res\drawable-xxhdpi" />
+      <recent name="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
     </key>
   </component>
   <component name="RunDashboard">
