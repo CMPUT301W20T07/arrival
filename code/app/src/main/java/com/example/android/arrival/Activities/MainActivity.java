@@ -16,21 +16,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button map_Button;
+        Button riderMapButton;
+        riderMapButton = findViewById(R.id.riderMapButton);
 
-        map_Button = findViewById(R.id.map_button);
-
-        map_Button.setOnClickListener(new View.OnClickListener() {
+        riderMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openMaps();
+                openRiderMaps();
+            }
+        });
 
+        Button driverMapButton;
+        driverMapButton = findViewById(R.id.driverMapButton);
+
+        driverMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDriverMaps();
             }
         });
     }
 
-    public void openMaps(){
-        Intent intent = new Intent(this, MapsActivity.class);
+    public void openRiderMaps(){
+        Intent intent = new Intent(this, RiderMapActivity.class);
+        startActivity(intent);
+    }
+
+    public void openDriverMaps(){
+        Intent intent = new Intent(this, DriverMapActivity.class);
         startActivity(intent);
     }
 }
