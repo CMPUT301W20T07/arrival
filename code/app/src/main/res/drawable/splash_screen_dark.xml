@@ -10,7 +10,7 @@
         android:gravity="center"
         >
         <bitmap
-            android:src="@mipmap/ic_launcher_foreground"
+            android:src="@drawable/arrival2_01"
             android:gravity="fill"
             />
     </item>
