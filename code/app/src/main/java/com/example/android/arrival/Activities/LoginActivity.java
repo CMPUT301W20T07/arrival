@@ -10,11 +10,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.arrival.R;
+import com.example.android.arrival.RegistrationActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
     Button signIn;
     TextView signUp;
+    TextView email;
+    TextView password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,8 @@ public class LoginActivity extends AppCompatActivity {
 
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
+
+
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -36,7 +41,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Intent intent = getIntent();
+        signUp.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+            startActivity(intent);
+        });
     }
 
 

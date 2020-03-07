@@ -4,15 +4,21 @@
     <shared>
       <config>
         <device id="pixel_3" />
+        <device id="Nexus 10" />
+        <device id="wear_square" />
+        <device id="Nexus 7" />
+        <device id="Nexus 6" />
+        <device id="pixel" />
+        <device id="pixel_xl" />
         <device id="Nexus 6P" />
         <device id="Nexus 9" />
         <device id="pixel_3_xl" />
-        <device id="automotive_1024p_landscape" />
-        <device id="tv_1080p" />
-        <device id="Nexus 10" />
-        <device id="Nexus 7" />
       </config>
     </shared>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="debug" />
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a3f6a78a-98b7-49a7-8a73-324bd924ede5" name="Default Changelist" comment="">
@@ -73,7 +79,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="Nexus_5_API_29" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="89GX09R9S" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -94,10 +100,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
-        <option value="layoutResourceFile" />
         <option value="valueResourceFile" />
         <option value="resourceFile" />
+        <option value="layoutResourceFile" />
+        <option value="Class" />
       </list>
     </option>
   </component>
