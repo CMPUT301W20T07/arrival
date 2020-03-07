@@ -82,7 +82,12 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
-        <projects_view />
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
       </state>
     </system>
   </component>
@@ -102,8 +107,8 @@
   <component name="ProjectId" id="1YgWREtpFY6kkTruTwwOvbOI1zS" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
-    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="89GX09R9S" />
-    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-03-05T08:16:46.453Z" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="Nexus_5_API_29" />
+    <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-03-06T20:29:56.914Z" />
     <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
@@ -115,6 +120,9 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi" />
       <recent name="$PROJECT_DIR$/app/src/main/res/drawable" />
+    </key>
+    <key name="android.template.packageName">
+      <recent name="com.example.android.arrival" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\nanae\OneDrive\School work\Year 2\CMPUT 301\Project\arrival\code\app\src\main\res\drawable-xxhdpi" />

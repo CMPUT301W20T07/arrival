@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.android.arrival.R;
 
 public class LoginActivity extends AppCompatActivity {
 
     Button signIn;
+    TextView signUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
+        signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override

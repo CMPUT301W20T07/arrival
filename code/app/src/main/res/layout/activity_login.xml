@@ -43,15 +43,15 @@
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:autofillHints=""
-        android:inputType=""
-        android:textColorHint="@color/white"
-        android:hint="Username"
         android:backgroundTint="@color/colorPrimary"
+        android:hint="@string/prompt_email"
+        android:inputType=""
         android:textColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textColorHint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/sign_in_button"
