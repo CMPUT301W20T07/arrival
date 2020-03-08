@@ -3,12 +3,16 @@ package com.example.android.arrival.Model;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
@@ -20,7 +24,9 @@ public class RequestManager {
     public static final String REQUESTS = "requests";
     public static final String TAG = "RequestManager";
 
-    public static RequestManager instance;
+    private static RequestManager instance;
+    private FirebaseFirestore db;
+    private CollectionReference requestRef;
 
     /**
      * Returns the RequestManager object associated with the current Android application.
@@ -36,7 +42,19 @@ public class RequestManager {
     }
 
     private RequestManager() {
+        db = FirebaseFirestore.getInstance();
+        requestRef = db.collection(REQUESTS);
+        requestRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                // If error
+                if(e != null) {
+                    return;
+                }
 
+                // Notify all
+            }
+        });
     }
 
     /**
@@ -44,13 +62,11 @@ public class RequestManager {
      * @param req a Request object to be opened in FireStore.
      */
     public void openRequest(Request req) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("requests").document(req.getID()).set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
+        requestRef.document(req.getID()).set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + " in FireStore.");
-                getOpenRequests(); // Update current list of open requests
+//                getOpenRequests(); // Update current list of open requests
             }
         });
     }
@@ -60,8 +76,7 @@ public class RequestManager {
      * @param id
      */
     public void deleteRequest(String id) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("requests").document(id).delete()
+        requestRef.document(id).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -82,10 +97,7 @@ public class RequestManager {
      * @param req
      */
     public void updateRequest(Request req) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference requestRef = db.collection(REQUESTS).document(req.getID());
-
-        db.collection(REQUESTS).document(req.getID())
+        requestRef.document(req.getID())
                 .set(req)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -104,32 +116,31 @@ public class RequestManager {
     /**
      * Retrieves all currently open requests from the FireStore Cloud Database.
      */
-    public void getOpenRequests() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference requestsRef = db.collection(REQUESTS);
-        requestsRef.whereEqualTo("status", Request.STATUS_OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    public void getOpenRequests(final RequestCallbackListener listener) {
+        requestRef.whereEqualTo("status", Request.STATUS_OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");
-                List<Request> openRequests = queryDocumentSnapshots.toObjects(Request.class);
-                Log.d(TAG + "-getOpen", openRequests.toString());
+
+
+                listener.onGetOpenSuccess(queryDocumentSnapshots);
             }
         });
     }
 
     /**
-     * Retrieves all the requests made by the rider from the FireStore Cloud Database.
+     * Retrieves all the requests made by the given rider from the FireStore Cloud Database.
      */
-    public void getRiderRequests(String rider) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference requestsRef = db.collection(REQUESTS);
-        requestsRef.whereEqualTo("rider", rider).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    public void getRiderRequests(String rider, final RequestCallbackListener listener) {
+        requestRef.whereEqualTo("rider", rider).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getRider", "Successfully retrieved rider " + rider + "+'s requests from DB. ");
                 List<Request> userRequests = queryDocumentSnapshots.toObjects(Request.class);
                 if(userRequests.size() > 0) {
                     Log.d(TAG + "-getRider", userRequests.toString());
+
+                    listener.onGetRiderRequestsSuccess(queryDocumentSnapshots);
                 } else {
                     Log.d(TAG + "-getRider", "No Requests matched the username provided. ");
                 }
@@ -138,18 +149,18 @@ public class RequestManager {
     }
 
     /**
-     * Retrieves all the requests accepted by the driver from the FireStore Cloud Database.
+     * Retrieves all the requests accepted by the given driver from the FireStore Cloud Database.
      */
-    public void getDriverRequests(String driver) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference requestsRef = db.collection(REQUESTS);
-        requestsRef.whereEqualTo("driver", driver).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    public void getDriverRequests(String driver, final RequestCallbackListener listener) {
+        requestRef.whereEqualTo("driver", driver).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getDriv", "Successfully retrieved driver " + driver + "'s requests from DB. ");
                 List<Request> userRequests = queryDocumentSnapshots.toObjects(Request.class);
                 if(userRequests.size() > 0) {
                     Log.d(TAG + "-getDriv", userRequests.toString());
+
+                    listener.onGetDriverRequestsSuccess(queryDocumentSnapshots);
                 } else {
                     Log.d(TAG + "-getDriv", "No Requests matched the username provided. ");
                 }
