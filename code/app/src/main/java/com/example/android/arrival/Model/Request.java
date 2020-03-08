@@ -22,18 +22,19 @@ public class Request {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-//    public Request(Rider rider, GeoLocation start, GeoLocation end, float fare) {
-//        this.id = generateID();
-//        this.status = this.STATUS_OPEN;
-//        this.rider = rider;
-//        this.driver = null;
-//        this.startLocation = start;
-//        this.endLocation = end;
-//        this.fare = fare;
-//    }
-
     public Request(String rider, GeoLocation start, GeoLocation end, float fare) {
         this.id = generateID();
+        this.status = this.STATUS_OPEN;
+        this.rider = rider;
+        this.driver = null;
+        this.startLocation = start;
+        this.endLocation = end;
+        this.fare = fare;
+    }
+
+    // For testing
+    public Request(String id, String rider, GeoLocation start, GeoLocation end, float fare) {
+        this.id = id;
         this.status = this.STATUS_OPEN;
         this.rider = rider;
         this.driver = null;
