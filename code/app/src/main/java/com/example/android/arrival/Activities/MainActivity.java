@@ -37,25 +37,31 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
                 openMaps();
             }
         });
+    }
 
-        // FireStore test. This should be moved to the unit testing later.
+    /**
+     * Temporary method that allows the testing of the RequestManager class.
+     * Will be moved to the unit tests later.
+     */
+    public void testRequestManager() {
+        // Get RequestManager singleton instance.
         RequestManager rm = RequestManager.getInstance();
 
-        // Create new request and open it using the RequestManager
-        // Request req = new Request(new Rider("user", "pass"), new GeoLocation(), new GeoLocation(), 6.9f);
+        // Create new request and open it using the RequestManager.
         Request req = new Request(new Rider("user", "pass").getUsername(), new GeoLocation(), new GeoLocation(), 6.9f);
-        Request req1 = new Request(new Rider("user2", "pass").getUsername(), new GeoLocation(), new GeoLocation(), 6.9f);
-        Request req2 = new Request(new Rider("user3", "pass").getUsername(), new GeoLocation(), new GeoLocation(), 6.9f);
         rm.openRequest(req);
-        rm.openRequest(req1);
-        rm.openRequest(req2);
+
+        // Update request.
         req.setFare(4.20f);
         rm.updateRequest(req);
-        rm.getRiderRequests("user", this);
-        rm.deleteRequest(req.getID());
-        rm.deleteRequest(req1.getID());
-        rm.deleteRequest(req2.getID());
 
+        // Retrieve request history of User "user".
+        rm.getRiderRequests("user", this);
+
+        // Delete request, only used for testing.
+        rm.deleteRequest(req.getID());
+
+        // Retrieve a list of all requests currently open.
         rm.getOpenRequests(this);
     }
 
