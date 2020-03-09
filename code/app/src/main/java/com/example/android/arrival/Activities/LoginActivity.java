@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.arrival.R;
-import com.example.android.arrival.RegistrationActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
