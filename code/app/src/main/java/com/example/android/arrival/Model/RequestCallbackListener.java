@@ -17,6 +17,11 @@ public interface RequestCallbackListener {
     void onCallbackStart();
 
     /**
+     * Defines that the view should update.
+     */
+    void update();
+
+    /**
      * Define what should happen when data is successfully retrieved
      * using the RequestManger.getOpenRequests() methods from the
      * database and how it should update.
