@@ -27,7 +27,7 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
     private RequestManager rm;
 
     private Button btnOpenReq;
-    private Button btnClear;
+    private Button btnRefresh;
     private Button btnConfirm;
     private ListView reqList;
 
@@ -45,7 +45,7 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
         rm = RequestManager.getInstance();
 
         btnOpenReq = findViewById(R.id.btn_open);
-        btnClear = findViewById(R.id.button_clear);
+        btnRefresh = findViewById(R.id.button_refresh);
         btnConfirm = findViewById(R.id.button_confirm);
         reqList = findViewById(R.id.req_list);
 
@@ -67,53 +67,31 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
             @Override
             public void onClick(View v) {
                 // Open req
-                Log.d("RequestTest", "clicked!");
                 Request req = new Request(newName.getText().toString(), new GeoLocation(), new GeoLocation(), 13.37f );
-                openReq(req);
+                rm.openRequest(req, (RequestCallbackListener) v.getContext());
+
                 newName.getText().clear();
                 nameField.setVisibility(View.INVISIBLE);
             }
         });
 
-        btnClear.setOnClickListener(new View.OnClickListener() {
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestAdapter.clear();
+                rm.getOpenRequests((RequestCallbackListener) v.getContext());
             }
         });
-
     }
 
-    /**
-     * Temporary method that allows the testing of the RequestManager class.
-     * Will be moved to the unit tests later.
-     */
-    public void testRequestManager() {
-        // Create new request and open it using the RequestManager.
-        Request req = new Request(new Rider("user", "pass").getUsername(), new GeoLocation(), new GeoLocation(), 6.9f);
-        rm.openRequest(req, this);
-
-        // Update request.
-        req.setFare(4.20f);
-        rm.updateRequest(req, this);
-
-        // Retrieve request history of User "user".
-        rm.getRiderRequests("user", this);
-
-        // Delete request, only used for testing.
-        rm.deleteRequest(req.getID(), this);
-
-        // Retrieve a list of all requests currently open.
+    @Override
+    public void onResume() {
+        super.onResume();
         rm.getOpenRequests(this);
-    }
-
-    public void openReq(Request req) {
-        rm.openRequest(req, this);
     }
 
     @Override
     public void onCallbackStart() {
-
+        // Display loading...
     }
 
     @Override
