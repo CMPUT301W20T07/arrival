@@ -22,6 +22,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Temporary class for testing the functionality of the RequestManager.
+ *
+ * Activity layout code based on the Lab 7 starter code: https://github.com/Jakaria08/ListCity
+ */
 public class RequestTestActivity extends AppCompatActivity implements RequestCallbackListener {
 
     private RequestManager rm;

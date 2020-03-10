@@ -17,7 +17,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 /**
- * Pushes, pulls, and updates Requests to a FireBase FireStore Cloud Database.
+ * Singleton object used to push, pull, update, and delete
+ * Requests in the Arrival Firebase FireStore Cloud Database.
  */
 public class RequestManager {
 

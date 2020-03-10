@@ -20,6 +20,11 @@ import org.junit.runner.RunWith;
 
 import static junit.framework.TestCase.assertTrue;
 
+/**
+ * Provides testing of the RequestManager to verify correct
+ * additions, deletions, updates and callbacks from the
+ * Firebase FireStore Cloud Database.
+ */
 public class RequestManagerTest {
 
     private Solo solo;
@@ -43,6 +48,10 @@ public class RequestManagerTest {
         Activity activity = rule.getActivity();
     }
 
+    /**
+     * Test opening a Request, updating a list of current requests,
+     * deleting a request.
+     */
     @Test
     public void testOpenRequest() {
         solo.assertCurrentActivity("Wrong Activity", RequestTestActivity.class);

@@ -3,7 +3,7 @@ package com.example.android.arrival.Model;
 import com.google.firebase.firestore.QuerySnapshot;
 
 /**
- * Interface to be implemented by Activities that want to pull
+ * Interface to be implemented by Activities that want to access
  * information from Firebase through the RequestManager. Methods
  * determine how to receive the data pulled from the database.
  */
