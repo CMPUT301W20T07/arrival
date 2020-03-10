@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.RiderMapActivity">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="397dp"
+        android:layout_height="502dp"
+        app:layout_constraintBottom_toTopOf="@+id/startTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".Activities.MapsActivity" />
+
+    <TextView
+        android:id="@+id/startTextView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Start"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/map" />
+
+    <TextView
+        android:id="@+id/endTextView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="End"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/startTextView" />
+
+    <TextView
+        android:id="@+id/distanceTextView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Distance"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/endTextView" />
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Estimated time"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/distanceTextView" />
+
+    <SearchView
+        android:id="@+id/searchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:commitIcon="@android:drawable/ic_menu_search"
+        android:iconifiedByDefault="true"
+        android:queryHint="@string/search_hint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </SearchView>
+
+    <ListView
+        android:id="@+id/suggestionsListView"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        android:background="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchButton"
+        tools:visibility="gone">
+
+    </ListView>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#03A9F4"
+        android:text="Request Ride"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeTextView"
+        app:layout_constraintVertical_bias="0.172" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
