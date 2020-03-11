@@ -33,12 +33,16 @@ import java.util.List;
 
 public class SearchFragment extends DialogFragment {
     private ListView list;
-    private ArrayAdapter<Place> adapter;
-    private SearchView searchBar;
     private ArrayList<Place> arrayList = new ArrayList<>();
     private Place selected;
     private View oldView;
 
+    /**
+     * For each newInstance of the SearchFragment we bundle arguments so we can call them later
+     * @param activityType : 1 if this is a pickup search or 2 if this is a destination seach
+     * @param marks : ArrayList containing old markers that we need to reload to the map
+     * @return : returns a SearchFragment
+     */
     static SearchFragment newInstance(int activityType, ArrayList<Place> marks){
         //Bundles the parameters to be passed along later
         Bundle args = new Bundle();
@@ -49,6 +53,7 @@ public class SearchFragment extends DialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @NonNull
     @Override
@@ -85,7 +90,7 @@ public class SearchFragment extends DialogFragment {
             }
         });
 
-
+        //On click of something in the list we need to highlight it
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -120,7 +125,6 @@ public class SearchFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO pass back start action, and place
                         Bundle args = new Bundle();
                         args.putInt("type", finalActivityType);
                         args.putSerializable("place", selected);
@@ -143,9 +147,9 @@ public class SearchFragment extends DialogFragment {
     public void getSearch(String newText, View view) {
         //Update suggestions when query text changes
         Geocoder geocoder = new Geocoder(getContext());
-        searchBar = view.findViewById(R.id.searchButton);
+        SearchView searchBar = view.findViewById(R.id.searchButton);
 
-        adapter = new CustomSuggestionList(getContext(), arrayList);
+        ArrayAdapter<Place> adapter = new CustomSuggestionList(getContext(), arrayList);
         list.setAdapter(adapter);
         list.setVisibility(View.VISIBLE);
 
