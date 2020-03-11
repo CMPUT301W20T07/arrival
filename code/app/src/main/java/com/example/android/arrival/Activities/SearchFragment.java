@@ -39,10 +39,11 @@ public class SearchFragment extends DialogFragment {
     private Place selected;
     private View oldView;
 
-    static SearchFragment newInstance(int activityType){
+    static SearchFragment newInstance(int activityType, ArrayList<Place> marks){
         //Bundles the parameters to be passed along later
         Bundle args = new Bundle();
         args.putInt("type", activityType);
+        args.putSerializable("marks", marks);
 
         SearchFragment fragment = new SearchFragment();
         fragment.setArguments(args);
@@ -53,6 +54,7 @@ public class SearchFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         int activityType = 0;
+        ArrayList<Place> marks = new ArrayList<>();
 
         super.onCreate(savedInstanceState);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.search_fragment, null);
@@ -104,10 +106,13 @@ public class SearchFragment extends DialogFragment {
         //If the arguments were not null then set the fields of the fragment to the values in args
         if (args != null) {
             activityType = (int) args.getSerializable("type");
+            marks= (ArrayList<Place>) args.getSerializable("marks");
+
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         int finalActivityType = activityType;
+        ArrayList<Place> finalMarks = marks;
         return builder
                 .setView(view)
                 .setTitle("Search")
@@ -119,6 +124,7 @@ public class SearchFragment extends DialogFragment {
                         Bundle args = new Bundle();
                         args.putInt("type", finalActivityType);
                         args.putSerializable("place", selected);
+                        args.putSerializable("marks", finalMarks);
 
                         //TODO ensure that a place is being passed back if not throw an error
 

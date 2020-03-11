@@ -2,7 +2,7 @@ package com.example.android.arrival.Model;
 
 import java.io.Serializable;
 
-public class Place implements Comparable<Place>, Serializable {
+public class Place extends Throwable implements Comparable<Place>, Serializable {
     private String name;
     private String address;
     private Double lat;
