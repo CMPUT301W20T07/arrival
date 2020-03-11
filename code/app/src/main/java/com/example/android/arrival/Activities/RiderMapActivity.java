@@ -28,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -64,11 +65,16 @@ import java.lang.annotation.Documented;
 import java.util.ArrayList;
 import java.util.List;
 
+
+//TODO Create a new pin when we click on item in search list view
+//TODO Create search views for start and default
+//TODO Set default start location to be current location
+
+
 public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback {
     //Declaring variables for use later
     private GoogleMap mMap;
     private LocationRequest locationRequest;
-    private Location lastLocation;
     private Marker currentUserLocationMarker;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -77,13 +83,14 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     ListView list;
     ArrayAdapter<Place> adapter;
     SearchView searchBar;
-    ArrayList<Place> arrayList = new ArrayList<Place>();
+    ArrayList<Place> arrayList = new ArrayList<>();
+    private int codeCall = 0;
 
 
     /**
      * When activity is initially called we set up some basic location items needed later
      *
-     * @param savedInstanceState
+     * @param savedInstanceState : saved state of the application
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,14 +113,13 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     /**
      * When the map is ready to use we set it up for our specifications
      *
-     * @param googleMap
+     * @param googleMap : google maps object
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         locationRequest = new LocationRequest();
-        //TODO stop map from snapping back to current location
         locationRequest.setInterval(60 * 1000); //Get updates every 60 seconds
         locationRequest.setFastestInterval(10 * 1000); //Get updates at fastest every 10 secs
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
@@ -131,12 +137,13 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
         list.setVisibility(View.GONE);
 
+
         SearchView search = findViewById(R.id.searchButton);
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             /**
              * When a user submits the text from the searchView this function is called
-             * @param query
-             * @return
+             * @param query : final text in the searchBar
+             * @return : returns false when finished executing
              */
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -147,8 +154,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
             /**
              * When a user updates the text in the searchView this function is called
-             * @param newText
-             * @return
+             * @param newText : updated text in the searchBar
+             * @return : returns false when finished executing
              */
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -166,13 +173,28 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             }
         });
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Place selected = (Place) parent.getItemAtPosition(position);
 
+                LatLng latLng = new LatLng(selected.getLat(), selected.getLon());
+                MarkerOptions markerOptions= new MarkerOptions();
+                markerOptions.position(latLng);
+                markerOptions.draggable(true);
+                markerOptions.title("Destination");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                Marker destinationMarker = mMap.addMarker(markerOptions);
+
+
+            }
+        });
     }
 
 
     /**
      * Gets a list of possible addresses based on the users updated search
-     * @param newText
+     * @param newText : new string in the searchBar
      */
     public void getSearch(String newText) {
         //Update suggestions when query text changes
@@ -205,7 +227,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     /**
      * For each address that the geocoder found we check create a new place object and check
      * if it can be added to the arrayList
-     * @param addresses
+     * @param addresses : list of potential addresses determined by the geocoder
      */
     public void updateArraylist(List<Address> addresses){
         for (int i = 0; i < addresses.size(); i++) {
@@ -234,7 +256,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     /**
      * For each Place we want to ensure that we aren't having duplicates in our arrayList so we
      * check that with this function
-     * @param place
+     * @param place : Place object
      */
     public void checkArrayList(Place place) {
         int a = arrayList.size() - 1;
@@ -255,15 +277,17 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
+            double diffX = 0;
+            double diffY = 0;
             for (Location location : locationResult.getLocations()) {
-                lastLocation = location;
+                //lastLocation = location;
                 assert mMap != null;
                 mMap.setMyLocationEnabled(true);
 
-                //Removes the old marker so we can update it
-                if (currentUserLocationMarker != null) {
-                    currentUserLocationMarker.remove();
-                }
+//                //Removes the old marker so we can update it
+//                if (currentUserLocationMarker != null) {
+//                    currentUserLocationMarker.remove();
+//                }
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -274,24 +298,72 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                     markerOptions.draggable(true);
                     markerOptions.title("Current Location");
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                    currentUserLocationMarker = mMap.addMarker(markerOptions);
 
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    //Checking if the users location has changed drastically
+                    if (currentUserLocationMarker != null) {
+                        diffX = Math.abs(currentUserLocationMarker.getPosition().latitude -
+                                location.getLatitude());
+                        diffY = Math.abs(currentUserLocationMarker.getPosition().longitude -
+                                location.getLongitude());
+                    }
+
+                    //Allows for slight variances in the location of the user
+                    if (currentUserLocationMarker != null && diffX < 1 && diffY < 1) {
+                        return;
+                    }
+                    //If the users location has changed we put a new marker and move the camera
+                    else {
+                        if (currentUserLocationMarker != null) {
+                            currentUserLocationMarker.remove();
+                        }
+                        currentUserLocationMarker = mMap.addMarker(markerOptions);
+                        Log.i("add", "current user location has been set");
+                        Address currentLocation = getCurrentLocationAddress();
+                        if (codeCall == 0){
+                            EditText startLocationText = findViewById(R.id.startLocation);
+                            startLocationText.setText(currentLocation.getAddressLine(0));
+                            codeCall = 1;
+                        }
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    }
                 }
             }
         }
     };
 
 
+    public Address getCurrentLocationAddress(){
+        Geocoder geocoder = new Geocoder(getApplicationContext());
+        List<Address> addresses = null;
+        try {
+            if (currentUserLocationMarker != null) {
+                Log.i("add", "Checking address with geocoder");
+                addresses = geocoder.getFromLocation(currentUserLocationMarker.getPosition().latitude,
+                        currentUserLocationMarker.getPosition().longitude, 1);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(addresses != null) {
+            Log.i("add", addresses.get(0).getAddressLine(0));
+            Address currentLocation = addresses.get(0);
+            return currentLocation;
+        }
+        Log.i("add", "no location from geocoder");
+        return null;
+    }
+
+
     /**
+     * NOT SURE IF THIS IS NEEDED CAN POSSIBLY DELETE IT LATER (MAYBE ONLY FOR DRIVER?)
      * Gets the current position of the user
      *
-     * @return
+     * @return : the location of the users current position
      */
-    public LatLng getMarkerLocation() {
-        return currentUserLocationMarker.getPosition();
-    }
+//    public LatLng getMarkerLocation() {
+//        return currentUserLocationMarker.getPosition();
+//    }
 
 
     /**

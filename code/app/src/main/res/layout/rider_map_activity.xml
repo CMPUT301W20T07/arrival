@@ -15,23 +15,38 @@
         android:layout_height="502dp"
         app:layout_constraintBottom_toTopOf="@+id/startTextView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".Activities.MapsActivity" />
 
     <TextView
         android:id="@+id/startTextView"
-        android:layout_width="match_parent"
+        android:layout_width="56dp"
         android:layout_height="40dp"
+        android:gravity="center_vertical"
         android:text="Start"
         android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map" />
+
+    <EditText
+        android:id="@+id/startLocation"
+        android:layout_width="364dp"
+        android:layout_height="40dp"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:inputType="none"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/endTextView"
+        app:layout_constraintStart_toEndOf="@+id/startTextView" />
 
     <TextView
         android:id="@+id/endTextView"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="End"
+        android:gravity="center_vertical"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/startTextView" />
 
@@ -40,6 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="Distance"
+        android:gravity="center_vertical"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/endTextView" />
 
@@ -48,6 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="Estimated time"
+        android:gravity="center_vertical"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/distanceTextView" />
 
