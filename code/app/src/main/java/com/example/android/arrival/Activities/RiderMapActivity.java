@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -66,9 +69,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//TODO Create a new pin when we click on item in search list view
 //TODO Create search views for start and default
-//TODO Set default start location to be current location
+
 
 
 public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -79,11 +81,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    //Variables for search suggestions
-    ListView list;
-    ArrayAdapter<Place> adapter;
-    SearchView searchBar;
-    ArrayList<Place> arrayList = new ArrayList<>();
     private int codeCall = 0;
 
 
@@ -96,8 +93,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rider_map_activity);
-        list = (ListView) findViewById(R.id.suggestionsListView);
-        list.setVisibility(View.GONE);
 
         //Location service that can get a users location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -135,140 +130,26 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                 checkUserLocationPermission();
             }
         }
-        list.setVisibility(View.GONE);
 
 
-        SearchView search = findViewById(R.id.searchButton);
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            /**
-             * When a user submits the text from the searchView this function is called
-             * @param query : final text in the searchBar
-             * @return : returns false when finished executing
-             */
+        EditText startLocation = findViewById(R.id.startLocation);
+        startLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                //Place marker when user selects a query suggestion
-                list.setVisibility(View.GONE);
-                return false;
-            }
+            public void onClick(View v) {
+                //TODO need to pass to fragment that this is a start action
+                //Creates new instance of the fragment that we passed variables to
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            /**
-             * When a user updates the text in the searchView this function is called
-             * @param newText : updated text in the searchBar
-             * @return : returns false when finished executing
-             */
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //list.setVisibility(View.VISIBLE);
-                getSearch(newText);
-                return false;
-            }
-        });
-
-        //If the user clicks the x in the searchView it will hide the textView again
-        search.setOnCloseListener(new SearchView.OnCloseListener(){
-            public boolean onClose() {
-                list.setVisibility(View.GONE);
-                return false;
-            }
-        });
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Place selected = (Place) parent.getItemAtPosition(position);
-
-                LatLng latLng = new LatLng(selected.getLat(), selected.getLon());
-                MarkerOptions markerOptions= new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.draggable(true);
-                markerOptions.title("Destination");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                Marker destinationMarker = mMap.addMarker(markerOptions);
-
+                DialogFragment fragment = SearchFragment.newInstance();
+                fragmentTransaction.add(0, fragment);
+                fragmentTransaction.commit();
 
             }
         });
     }
 
 
-    /**
-     * Gets a list of possible addresses based on the users updated search
-     * @param newText : new string in the searchBar
-     */
-    public void getSearch(String newText) {
-        //Update suggestions when query text changes
-        Geocoder geocoder = new Geocoder(getApplicationContext());
-        searchBar = findViewById(R.id.searchButton);
-
-        adapter = new CustomSuggestionList(getApplicationContext(), arrayList);
-        list.setAdapter(adapter);
-        list.setVisibility(View.VISIBLE);
-
-        List<Address> addresses;
-        try {
-            //Gets addresses from within Edmonton
-            addresses = geocoder.getFromLocationName(newText, 5,
-                    53.431898,  -113.662692,
-                    53.646464,  -113.343030);
-
-            //If the geocoder found possible addresses we should add them to the
-            //arrayList if they aren't already there
-            if (addresses.size() > 0) {
-                updateArraylist(addresses);
-                adapter.notifyDataSetChanged();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * For each address that the geocoder found we check create a new place object and check
-     * if it can be added to the arrayList
-     * @param addresses : list of potential addresses determined by the geocoder
-     */
-    public void updateArraylist(List<Address> addresses){
-        for (int i = 0; i < addresses.size(); i++) {
-            String name = addresses.get(i).getFeatureName();
-            String address = addresses.get(i).getAddressLine(0);
-            Double lat = addresses.get(i).getLatitude();
-            Double lon = addresses.get(i).getLongitude();
-            Place place = new Place(name, address, lat, lon);
-
-            //By default we add the first address that the geocoder found
-            if (arrayList.size() == 0) {
-                arrayList.add(0, place);
-            }
-            else {
-                checkArrayList(place);
-            }
-        }
-
-        //Keeps the suggestions to a max of 6 and filters out the older suggestions
-        while(arrayList.size() > 6) {
-            arrayList.remove(6);
-        }
-    }
-
-
-    /**
-     * For each Place we want to ensure that we aren't having duplicates in our arrayList so we
-     * check that with this function
-     * @param place : Place object
-     */
-    public void checkArrayList(Place place) {
-        int a = arrayList.size() - 1;
-        int count = 0;
-        while(a >= 0) {
-            count = count + place.compareTo(arrayList.get(a));
-            a--;
-        }
-        if (count == arrayList.size()) {
-            arrayList.add(0, place);
-        }
-    }
 
 
     /**

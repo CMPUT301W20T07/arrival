@@ -68,30 +68,30 @@
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/distanceTextView" />
 
-    <SearchView
-        android:id="@+id/searchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:commitIcon="@android:drawable/ic_menu_search"
-        android:iconifiedByDefault="true"
-        android:queryHint="@string/search_hint"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+<!--    <SearchView-->
+<!--        android:id="@+id/searchButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="#FFFFFF"-->
+<!--        android:commitIcon="@android:drawable/ic_menu_search"-->
+<!--        android:iconifiedByDefault="true"-->
+<!--        android:queryHint="@string/search_hint"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent">-->
 
-    </SearchView>
+<!--    </SearchView>-->
 
-    <ListView
-        android:id="@+id/suggestionsListView"
-        android:layout_width="match_parent"
-        android:layout_height="270dp"
-        android:background="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchButton"
-        tools:visibility="gone">
+<!--    <ListView-->
+<!--        android:id="@+id/suggestionsListView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="270dp"-->
+<!--        android:background="#FFFFFF"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/searchButton"-->
+<!--        tools:visibility="gone">-->
 
-    </ListView>
+<!--    </ListView>-->
 
     <Button
         android:id="@+id/button"
