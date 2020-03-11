@@ -5,14 +5,18 @@ public class User {
     private String username;
     private String password;
     private String name;
+    private String phoneNumber;
+
 
     public User() {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-    public User(String username, String password) {
+    public User(String username, String password, String name, String phoneNumber) {
         this.username = username;
         this.password = password;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getUsername() {

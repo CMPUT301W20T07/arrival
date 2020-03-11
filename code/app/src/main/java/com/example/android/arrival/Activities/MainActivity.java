@@ -30,7 +30,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RequestCallbackListener {
+public class MainActivity extends AppCompatActivity implements RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener {
 
     private static final String TAG = "main-activity";
     private Button openScannerBTN;

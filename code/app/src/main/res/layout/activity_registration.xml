@@ -51,7 +51,7 @@
 
 
     <EditText
-        android:id="@+id/user_email_editText"
+        android:id="@+id/register_email_editText"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:autofillHints=""
@@ -67,7 +67,7 @@
 
 
     <EditText
-        android:id="@+id/password_editText"
+        android:id="@+id/register_password_editText"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:autofillHints=""
@@ -108,7 +108,7 @@
             android:id="@+id/sign_up_driver"
             android:layout_width="140dp"
             android:layout_height="36dp"
-            android:background="@drawable/sign_in_button"
+            android:background="@drawable/sign_in_button_background"
             android:text="Driver"
             android:textAllCaps="false"
             android:textColor="@color/white"
@@ -119,7 +119,7 @@
             android:layout_width="140dp"
             android:layout_height="36dp"
             android:id="@+id/sign_up_rider"
-            android:background="@drawable/sign_in_button"
+            android:background="@drawable/sign_in_button_background"
             android:text="Rider"
             android:textAllCaps="false"
             android:textColor="@color/white"

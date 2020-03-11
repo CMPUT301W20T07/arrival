@@ -56,7 +56,7 @@
         android:id="@+id/sign_in_button"
         android:layout_width="280dp"
         android:layout_height="35dp"
-        android:background="@drawable/sign_in_button"
+        android:background="@drawable/sign_in_button_background"
         android:text="Sign In"
         android:textAllCaps="false"
         android:textColor="@color/white"
