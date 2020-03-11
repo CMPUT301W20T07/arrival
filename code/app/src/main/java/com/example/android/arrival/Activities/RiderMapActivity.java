@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
@@ -67,21 +68,30 @@ import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
-//TODO Create search views for start and default
-
-
+//TODO get shared preferences working or some other method to save marker locations
+//TODO get location selection when clicking on the map working
+//TODO get a rideRequest confirmation fragment where user can edit the offer amount
+//TODO get distance between 2 markers to calculate the estimated cost and time
 
 public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback {
     //Declaring variables for use later
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private Marker currentUserLocationMarker;
+    private Marker pickupMarker;
+    private Marker destMarker;
+    private Place pickup = new Place();
+    private Place destination = new Place();
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private int codeCall = 0;
+    private SharedPreferences storage;
+    private SharedPreferences.Editor editor;
+    private Map<String, ?> markers;
 
 
     /**
@@ -93,6 +103,11 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rider_map_activity);
+
+        storage = getPreferences(MODE_PRIVATE);
+        markers = storage.getAll();
+        editor = storage.edit();
+
 
         //Location service that can get a users location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -113,6 +128,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        EditText startLocationText = findViewById(R.id.startLocation);
+        EditText endLocationText = findViewById(R.id.endLocation);
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(60 * 1000); //Get updates every 60 seconds
@@ -131,25 +148,145 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             }
         }
 
+        getMarkers();
 
-        EditText startLocation = findViewById(R.id.startLocation);
-        startLocation.setOnClickListener(new View.OnClickListener() {
+        //Adding pickup location if map is reloaded
+        if (pickup.getLat() != null){
+            Log.d("type", "Pickup location is available");
+            LatLng latLng = new LatLng(pickup.getLat(), pickup.getLon());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.draggable(false);
+            markerOptions.title("Pickup Location");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            startLocationText.setText(pickup.getAddress());
+            pickupMarker = mMap.addMarker(markerOptions);
+        }
+
+        if(destination.getLat() != null) {
+            Log.d("type", "Destination is available");
+            LatLng latLng = new LatLng(destination.getLat(), destination.getLon());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.draggable(false);
+            markerOptions.title("Destination");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            endLocationText.setText(destination.getAddress());
+            destMarker = mMap.addMarker(markerOptions);
+        }
+
+        //Note start location activity is 1 and endlocation activity is 2
+        startLocationText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO need to pass to fragment that this is a start action
                 //Creates new instance of the fragment that we passed variables to
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                DialogFragment fragment = SearchFragment.newInstance();
+                DialogFragment fragment = SearchFragment.newInstance(1);
                 fragmentTransaction.add(0, fragment);
                 fragmentTransaction.commit();
-
             }
         });
+
+
+        //Note start location activity is 1 and endlocation activity is 2
+        endLocationText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Creates new instance of the fragment that we passed variables to
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                DialogFragment fragment = SearchFragment.newInstance(2);
+                fragmentTransaction.add(0, fragment);
+                fragmentTransaction.commit();
+            }
+        });
+
+        //This section of code will run when searchFragment sends over a place
+        Intent intent = getIntent();
+        Bundle args = intent.getBundleExtra("selected");
+        if (args != null) {
+            addMarker(args);
+        }
     }
 
 
+    public void getMarkers() {
+        for (Map.Entry<String, ?> entry : markers.entrySet()) {
+            String pickupStr = storage.getString(entry.getKey(), "");
+            String[] split = pickupStr.split("\\*");
+            if (split[0].equals("")){
+                break;
+            }
+            int type = Integer.parseInt(split[0]);
+            Log.d("type", "Type: " + type);
+
+            if (type == 1){
+                pickup.setAddress(split[1]);
+                pickup.setName(split[2]);
+                pickup.setLat(Double.valueOf(split[3]));
+                pickup.setLon(Double.valueOf(split[4]));
+            }
+            else{
+                destination.setAddress(split[1]);
+                destination.setName(split[2]);
+                destination.setLat(Double.valueOf(split[3]));
+                destination.setLon(Double.valueOf(split[4]));
+            }
+
+        }
+    }
+
+    public void addMarker(Bundle args) {
+        //Gets place and activity type from the bundle
+        Place selected = (Place) args.getSerializable("place");
+        int activityType = args.getInt("type");
+
+        LatLng latLng = new LatLng(selected.getLat(), selected.getLon());
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(false);
+
+        if (activityType == 2) {
+            if (destMarker != null){
+                destMarker.remove();
+                destination = selected;
+            }
+
+            String marker = activityType + "*" + selected.getAddress()  + "*" + selected.getName()
+                    + "*" + selected.getLon() + "*" + selected.getLat();
+            editor.remove("destination");
+            editor.putString("destination", marker);
+            editor.apply();
+
+            markerOptions.title("Destination");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            EditText endLocationText = findViewById(R.id.endLocation);
+            endLocationText.setText(selected.getAddress());
+            destMarker = mMap.addMarker(markerOptions);
+
+        }
+        else{
+            if (pickupMarker != null){
+                pickupMarker.remove();
+                pickup = selected;
+            }
+            String marker = activityType + "*" + selected.getAddress()  + "*" + selected.getName()
+                    + "*" + selected.getLat() + "*" + selected.getLon();
+            editor.remove("pickup");
+            editor.putString("pickup", marker);
+            editor.apply();
+
+            markerOptions.title("Pickup Location");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            Log.d("marker", "Setting start location text");
+            EditText startLocationText = findViewById(R.id.startLocation);
+            startLocationText.setText(selected.getAddress());
+            pickupMarker = mMap.addMarker(markerOptions);
+        }
+    }
 
 
     /**
@@ -165,10 +302,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                 assert mMap != null;
                 mMap.setMyLocationEnabled(true);
 
-//                //Removes the old marker so we can update it
-//                if (currentUserLocationMarker != null) {
-//                    currentUserLocationMarker.remove();
-//                }
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -200,8 +333,9 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         currentUserLocationMarker = mMap.addMarker(markerOptions);
                         Log.i("add", "current user location has been set");
                         Address currentLocation = getCurrentLocationAddress();
-                        if (codeCall == 0){
+                        if (pickup == null && currentLocation != null){
                             EditText startLocationText = findViewById(R.id.startLocation);
+                            Log.d("marker", "changing start location text. Code call: " + codeCall);
                             startLocationText.setText(currentLocation.getAddressLine(0));
                             codeCall = 1;
                         }
@@ -219,7 +353,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         List<Address> addresses = null;
         try {
             if (currentUserLocationMarker != null) {
-                Log.i("add", "Checking address with geocoder");
                 addresses = geocoder.getFromLocation(currentUserLocationMarker.getPosition().latitude,
                         currentUserLocationMarker.getPosition().longitude, 1);
             }
@@ -231,20 +364,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             Address currentLocation = addresses.get(0);
             return currentLocation;
         }
-        Log.i("add", "no location from geocoder");
         return null;
     }
 
 
-    /**
-     * NOT SURE IF THIS IS NEEDED CAN POSSIBLY DELETE IT LATER (MAYBE ONLY FOR DRIVER?)
-     * Gets the current position of the user
-     *
-     * @return : the location of the users current position
-     */
-//    public LatLng getMarkerLocation() {
-//        return currentUserLocationMarker.getPosition();
-//    }
 
 
     /**

@@ -21,7 +21,8 @@
         android:id="@+id/suggestionsListView"
         android:layout_width="match_parent"
         android:layout_height="382dp"
-        android:background="#FFFFFF">
+        android:background="#FFFFFF"
+        android:choiceMode="singleChoice">
 
     </ListView>
 

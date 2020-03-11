@@ -1,6 +1,8 @@
 package com.example.android.arrival.Model;
 
-public class Place implements Comparable<Place>{
+import java.io.Serializable;
+
+public class Place implements Comparable<Place>, Serializable {
     private String name;
     private String address;
     private Double lat;
@@ -12,6 +14,10 @@ public class Place implements Comparable<Place>{
         this.address = address;
         this.lat = lat;
         this.lon = lon;
+    }
+
+    public Place() {
+
     }
 
     public String getName() {

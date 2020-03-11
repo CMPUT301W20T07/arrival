@@ -3,6 +3,8 @@ package com.example.android.arrival.Activities;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -34,15 +36,24 @@ public class SearchFragment extends DialogFragment {
     private ArrayAdapter<Place> adapter;
     private SearchView searchBar;
     private ArrayList<Place> arrayList = new ArrayList<>();
+    private Place selected;
+    private View oldView;
 
-    static SearchFragment newInstance(){
+    static SearchFragment newInstance(int activityType){
+        //Bundles the parameters to be passed along later
+        Bundle args = new Bundle();
+        args.putInt("type", activityType);
+
         SearchFragment fragment = new SearchFragment();
+        fragment.setArguments(args);
         return fragment;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        int activityType = 0;
+
         super.onCreate(savedInstanceState);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.search_fragment, null);
 
@@ -76,21 +87,27 @@ public class SearchFragment extends DialogFragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Place selected = (Place) parent.getItemAtPosition(position);
+                selected = (Place) parent.getItemAtPosition(position);
+                if(oldView != null) {
+                    oldView.setBackgroundColor(Color.WHITE);
+                }
+                view.setBackgroundColor(Color.LTGRAY);
 
-                //TODO have to send the place back to the rider activity
-                //TODO maybe highlight the selected and have place be a global
-//                LatLng latLng = new LatLng(selected.getLat(), selected.getLon());
-//                MarkerOptions markerOptions= new MarkerOptions();
-//                markerOptions.position(latLng);
-//                markerOptions.draggable(true);
-//                markerOptions.title("Destination");
-//                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//                Marker destinationMarker = mMap.addMarker(markerOptions);
+                oldView = view;
+
             }
         });
 
+        //Gets the arguments from the bundle
+        final Bundle args = getArguments();
+
+        //If the arguments were not null then set the fields of the fragment to the values in args
+        if (args != null) {
+            activityType = (int) args.getSerializable("type");
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        int finalActivityType = activityType;
         return builder
                 .setView(view)
                 .setTitle("Search")
@@ -99,6 +116,17 @@ public class SearchFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //TODO pass back start action, and place
+                        Bundle args = new Bundle();
+                        args.putInt("type", finalActivityType);
+                        args.putSerializable("place", selected);
+
+                        //TODO ensure that a place is being passed back if not throw an error
+
+                        //Sends this measurements details to the viewMeasurement activity
+                        Intent intent = new Intent(SearchFragment.this.getActivity(), RiderMapActivity.class);
+                        intent.putExtra("selected", args);
+                        startActivity(intent);
+
                     }}).create();
     }
 

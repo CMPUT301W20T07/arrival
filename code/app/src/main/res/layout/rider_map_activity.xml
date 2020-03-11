@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/startTextView"
-        android:layout_width="56dp"
+        android:layout_width="60dp"
         android:layout_height="40dp"
         android:gravity="center_vertical"
         android:text="Start"
@@ -32,7 +32,7 @@
 
     <EditText
         android:id="@+id/startLocation"
-        android:layout_width="364dp"
+        android:layout_width="362dp"
         android:layout_height="40dp"
         android:cursorVisible="false"
         android:focusable="false"
@@ -43,12 +43,25 @@
 
     <TextView
         android:id="@+id/endTextView"
-        android:layout_width="match_parent"
+        android:layout_width="60dp"
         android:layout_height="40dp"
-        android:text="End"
         android:gravity="center_vertical"
+        android:text="End"
         android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/startTextView" />
+
+    <EditText
+        android:id="@+id/endLocation"
+        android:layout_width="363dp"
+        android:layout_height="40dp"
+        android:ems="10"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:inputType="none"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/distanceTextView"
+        app:layout_constraintStart_toEndOf="@+id/endTextView" />
 
     <TextView
         android:id="@+id/distanceTextView"
@@ -68,30 +81,6 @@
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/distanceTextView" />
 
-<!--    <SearchView-->
-<!--        android:id="@+id/searchButton"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="#FFFFFF"-->
-<!--        android:commitIcon="@android:drawable/ic_menu_search"-->
-<!--        android:iconifiedByDefault="true"-->
-<!--        android:queryHint="@string/search_hint"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
-
-<!--    </SearchView>-->
-
-<!--    <ListView-->
-<!--        android:id="@+id/suggestionsListView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="270dp"-->
-<!--        android:background="#FFFFFF"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/searchButton"-->
-<!--        tools:visibility="gone">-->
-
-<!--    </ListView>-->
 
     <Button
         android:id="@+id/button"
