@@ -478,9 +478,9 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 //Creates the alert dialog box that asks a user for permission to access their location
                 new AlertDialog.Builder(this)
-                        .setTitle("give permission")
-                        .setMessage("give permission message")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setTitle("Current Location Permission Denied")
+                        .setMessage("Please give access to current location.")
+                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ActivityCompat.requestPermissions(RiderMapActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
@@ -499,13 +499,16 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_USER_LOCATION_CODE:
+                //If permission is accepted then create map with user location
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                     }
                     mMap.setMyLocationEnabled(true);
-                } else {
-                    Toast.makeText(this, "Permission Denied...", Toast.LENGTH_SHORT).show();
+                }
+                //else show permission denied message
+                else {
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
         }
     }
