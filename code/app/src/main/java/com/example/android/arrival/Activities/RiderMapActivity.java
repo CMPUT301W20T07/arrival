@@ -78,7 +78,7 @@ import java.util.Map;
 
 //TODO get a rideRequest confirmation fragment where user can edit the offer amount
 //TODO get distance between 2 markers to calculate the estimated cost and time
-//TODO send the riderequest to the firebase (Might need Reilly for this) get it all packaged though
+//TODO send the RideRequest to the firebase (Might need Reilly for this) get it all packaged though
 
 public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback {
     //Declaring variables for use later
@@ -113,10 +113,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         //Location service that can get a users location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        Log.d("marks", "Above loop" + marks.size());
-        for (int i = 0; i < marks.size(); i++) {
-            Log.d("marks", "Place: ", marks.get(i));
-        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -135,7 +131,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         mMap = googleMap;
         EditText startLocationText = findViewById(R.id.startLocation);
         EditText endLocationText = findViewById(R.id.endLocation);
-
+        Button rideRequest = findViewById(R.id.requestRide);
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(60 * 1000); //Get updates every 60 seconds
@@ -201,6 +197,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(latLng);
                         markerOptions.draggable(false);
+                        markerOptions.title("Pickup Location");
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         pickupMarker = mMap.addMarker(markerOptions);
                         popupWindow.dismiss();
@@ -225,6 +222,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(latLng);
                         markerOptions.draggable(false);
+                        markerOptions.title("Destination");
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
                         destMarker = mMap.addMarker(markerOptions);
                         popupWindow.dismiss();
@@ -277,6 +275,22 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                 DialogFragment fragment = SearchFragment.newInstance(2, marks);
                 fragmentTransaction.add(0, fragment);
                 fragmentTransaction.commit();
+            }
+        });
+
+        rideRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pickup != null && destination != null) {
+                    //TODO go to new intent to confirm RideRequest and get estimate cost and distance
+                    //Creates new instance of the RideRequest fragment that we pass variables to
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                    DialogFragment fragment = RideRequestConfFrag.newInstance(marks);
+                    fragmentTransaction.add(0, fragment);
+                    fragmentTransaction.commit();
+                }
             }
         });
 
