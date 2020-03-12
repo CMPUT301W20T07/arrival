@@ -70,6 +70,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -103,6 +104,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
     //ArrayList that holds the markers so we can add them again when the map reloads
     private ArrayList<Place> marks = new ArrayList<>();
+
+    private Request currentRequest;
 
 
 
@@ -572,12 +575,19 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onCallbackStart() {
-
+        // Load...
     }
 
     @Override
     public void update() {
         Log.d(TAG, "Opened new request. ");
+    }
+
+    @Override
+    public void onGetRequestSuccess(DocumentSnapshot snapshot) {
+        Request req = snapshot.toObject(Request.class);
+        currentRequest = req;
+        Log.d(TAG, "Retrieved request: " + req.toString());
     }
 
     @Override

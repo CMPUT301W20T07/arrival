@@ -117,6 +117,25 @@ public class RequestManager {
                 });
     }
 
+    public void getRequest(Request req, final RequestCallbackListener listener) {
+        getRequest(req.getID(), listener);
+    }
+
+    public void getRequest(String id, final RequestCallbackListener listener) {
+        requestRef.document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                listener.onGetRequestSuccess(documentSnapshot);
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Failed to get request with id" + id);
+            }
+        });
+    }
+
     /**
      * Retrieves all currently open requests from the FireStore Cloud Database.
      */
