@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,14 +20,17 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class RegistrationActivity extends AppCompatActivity {
 
-    EditText Name;
-    EditText phoneNumber;
-    EditText email;
-    EditText password;
-    EditText confirmPassword;
-    Button driverSignUp;
-    Button riderSignUp;
-    FirebaseAuth firebaseAuth;
+    private static final String TAG = "Registration";
+
+    private FirebaseAuth firebaseAuth;
+
+    private EditText txtName;
+    private EditText txtPhoneNumber;
+    private EditText txtEmail;
+    private EditText txtPassword;
+    private EditText txtConfirmPassword;
+    private Button btnDriverSignUp;
+    private Button btnRiderSignUp;
 
 
     @Override
@@ -35,55 +39,70 @@ public class RegistrationActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_registration);
 
-        email = findViewById(R.id.register_email_editText);
-        password = findViewById(R.id.register_password_editText);
-
-        driverSignUp = findViewById(R.id.sign_up_driver);
-        riderSignUp = findViewById(R.id.sign_up_rider);
+        // Initialize connection to Firebase Authentication
         firebaseAuth = FirebaseAuth.getInstance();
 
-        driverSignUp.setOnClickListener(new View.OnClickListener() {
+        // Initialize UI component references
+        txtName = findViewById(R.id.user_name_editText);
+        txtPhoneNumber = findViewById(R.id.user_phone_number_editText);
+        txtEmail = findViewById(R.id.register_email_editText);
+        txtPassword = findViewById(R.id.register_password_editText);
+        txtConfirmPassword = findViewById(R.id.confirm_password_editText);
+        btnDriverSignUp = findViewById(R.id.sign_up_driver);
+        btnRiderSignUp = findViewById(R.id.sign_up_rider);
+
+        // Set on click listeners
+        btnDriverSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                driverSignup();
             }
         });
 
-        riderSignUp.setOnClickListener(new View.OnClickListener() {
+        btnRiderSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String em = email.getText().toString();
-                String pwd = password.getText().toString();
-
-                // checking if something wasnt input
-                if (em.isEmpty()) {
-                    email.setError("Please enter an email address");
-                }
-                else if (pwd.isEmpty()) {
-                    password.setError("Please enter a password ");
-                }
-                else if (!(em.isEmpty() && pwd.isEmpty())) {
-                    firebaseAuth.createUserWithEmailAndPassword(em, pwd).addOnCompleteListener(RegistrationActivity.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(RegistrationActivity.this, "Sign up Unsuccessful", Toast.LENGTH_SHORT).show();
-                            }
-                            else {
-                                startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
-                            }
-                        }
-                    });
-                }
-                else {
-                    Toast.makeText(RegistrationActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
-                }
-
+                riderSignup();
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
 
 
-
+    private void driverSignup() {
 
     }
-}
+
+    private void riderSignup() {
+            String em = txtEmail.getText().toString();
+            String pwd = txtPassword.getText().toString();
+
+            // Check for empty input
+            if (em.isEmpty()) {
+                txtEmail.setError("Please enter an email address");
+            } else if (pwd.isEmpty()) {
+                txtPassword.setError("Please enter a password ");
+            } else if (!(em.isEmpty() && pwd.isEmpty())) {
+                firebaseAuth.createUserWithEmailAndPassword(em, pwd)
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+                        } else {
+                            Log.d(TAG, task.getException().toString());
+                            Toast.makeText(RegistrationActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            } else {
+                Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+

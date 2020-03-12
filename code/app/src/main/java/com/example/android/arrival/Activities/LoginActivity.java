@@ -29,12 +29,11 @@ public class LoginActivity extends AppCompatActivity {
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
 
-
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //TODO: Implement custom or Google authentication for sign-in
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-
                 startActivity(intent);
 
             }
