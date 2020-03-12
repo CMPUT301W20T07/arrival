@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
         RequestManager rm = RequestManager.getInstance();
 
         // Create new request and open it using the RequestManager.
-        Request req = new Request(new Rider("user", "pass").getUsername(), new GeoLocation(), new GeoLocation(), 6.9f);
+        Request req = new Request("hello", new GeoLocation(), new GeoLocation(), 6.9f);
         rm.openRequest(req);
 
         // Update request.

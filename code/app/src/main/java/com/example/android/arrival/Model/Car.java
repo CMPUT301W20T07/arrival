@@ -34,11 +34,11 @@ public class Car implements Serializable {
         this.model = model;
     }
 
-    public int getYear() {
+    public String getYear() {
         return Year;
     }
 
-    public void setYear(int year) {
+    public void setYear(String year) {
         Year = year;
     }
 
