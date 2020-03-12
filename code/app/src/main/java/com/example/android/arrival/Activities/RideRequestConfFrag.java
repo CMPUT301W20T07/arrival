@@ -3,14 +3,11 @@ package com.example.android.arrival.Activities;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,12 +15,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.android.arrival.Model.Place;
+import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.RequestCallbackListener;
+import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class RideRequestConfFrag extends DialogFragment {
+
+    private static final String TAG = "RideRequestFrag";
+
+    private RequestManager rm;
+
     private Place pickup = new Place();
     private Place destination = new Place();
 
@@ -47,6 +52,10 @@ public class RideRequestConfFrag extends DialogFragment {
         super.onCreate(savedInstanceState);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.ride_request_fragment, null);
 
+        // Get instance of Request Manager
+        rm = RequestManager.getInstance();
+
+        // Get component references
         TextView pickupLoc = view.findViewById(R.id.pickupLoc);
         TextView destLoc = view.findViewById(R.id.destLoc);
         TextView distanceValue = view.findViewById(R.id.distanceValue);
@@ -87,6 +96,12 @@ public class RideRequestConfFrag extends DialogFragment {
                         //TODO send the data to the request manager
                         //lat and lon stored in pick and destination
                         //get cost from the yourOfferValue textbox
+
+                        Log.d(TAG, "Pressed OK");
+
+                        float currFare = Float.parseFloat(yourOfferValue.getText().toString());
+                        Request req = new Request("usr-map-test", pickup, destination, currFare);
+                        rm.openRequest(req, (RequestCallbackListener) getContext());
 
                     }}).create();
     }

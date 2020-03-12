@@ -11,11 +11,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.example.android.arrival.Model.GeoLocation;
+import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
-import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -72,7 +71,7 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
             @Override
             public void onClick(View v) {
                 // Open req
-                Request req = new Request(newName.getText().toString(), new GeoLocation(), new GeoLocation(), 13.37f );
+                Request req = new Request(newName.getText().toString(), new Place(), new Place(), 13.37f );
                 rm.openRequest(req, (RequestCallbackListener) v.getContext());
 
                 newName.getText().clear();

@@ -10,25 +10,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.example.android.arrival.Dialogs.ScanQRDialog;
-import com.example.android.arrival.Model.GeoLocation;
-import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
-import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
