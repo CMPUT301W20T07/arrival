@@ -13,4 +13,5 @@
     <string name="map_button">Map</string>
     <string name="search_hint">Enter location</string>
     <string name="star">*</string>
+    <string name="sign_up_button"><u>Sign Up.</u></string>
 </resources>
