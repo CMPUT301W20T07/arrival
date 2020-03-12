@@ -28,7 +28,6 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText txtPhoneNumber;
     private EditText txtEmail;
     private EditText txtPassword;
-    private EditText txtConfirmPassword;
     private Button btnDriverSignUp;
     private Button btnRiderSignUp;
 
@@ -47,7 +46,6 @@ public class RegistrationActivity extends AppCompatActivity {
         txtPhoneNumber = findViewById(R.id.user_phone_number_editText);
         txtEmail = findViewById(R.id.register_email_editText);
         txtPassword = findViewById(R.id.register_password_editText);
-        txtConfirmPassword = findViewById(R.id.confirm_password_editText);
         btnDriverSignUp = findViewById(R.id.sign_up_driver);
         btnRiderSignUp = findViewById(R.id.sign_up_rider);
 
