@@ -26,8 +26,8 @@ import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener {
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
     private static final String TAG = "main-activity";
     private Button openScannerBTN;
     private Button genQRBTN;
+    private Button btnLogout;
     private EditText inputText;
     private static final int CAMERA_REQUEST = 100;
 
@@ -44,12 +45,13 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         checkPermissions(getApplicationContext());
+
         // bind views
         openScannerBTN = findViewById(R.id.scanner);
         genQRBTN = findViewById(R.id.genQR);
         inputText = findViewById(R.id.text_to_convert);
+        btnLogout = findViewById(R.id.btnSignOut);
 
 
         genQRBTN.setOnClickListener(view -> {
@@ -66,9 +68,17 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
 
         openScannerBTN.setOnClickListener(view -> openScanner());
 
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
 
+                Intent intent = new Intent(v.getContext(), LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
-
 
     public void openScanner() {
         ScanQRDialog scanQRDialog = new ScanQRDialog();
