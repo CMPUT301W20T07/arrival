@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.android.arrival.R;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
@@ -35,19 +37,26 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.util.List;
+import java.util.Map;
+
+public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private Location lastLocation;
-    private Marker currentUserLocationMarker;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private String riderID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +70,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+//        getCustomerInfo();
 
     }
 
@@ -76,7 +87,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             {
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
+                mMap.setMyLocationEnabled(true);
             }
             else {
                 checkUserLocationPermission();
@@ -89,35 +102,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onLocationResult(LocationResult locationResult) {
             for (Location location : locationResult.getLocations())
             {
+                // lastLocation might be useless
                 lastLocation = location;
                 mMap.setMyLocationEnabled(true);
 
-                if (currentUserLocationMarker != null) {
-                    currentUserLocationMarker.remove();
-                }
-
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                MarkerOptions markerOptions = new MarkerOptions();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
 
-                if (mMap != null) {
-                    markerOptions.position(latLng);
-                    markerOptions.draggable(true);
-                    markerOptions.title("Current Location");
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                    currentUserLocationMarker = mMap.addMarker(markerOptions);
-
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-                }
+//                //Get the ID of the customer
+//                String driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("driversAvailable");
+//
+//                //Share information with database creating an available driver
+//                GeoFire geoFire = new GeoFire(databaseReference);
+//                geoFire.setLocation(driverID, new GeoLocation(location.getLatitude(), location.getLongitude()));
 
             }
         }
     };
 
-    public LatLng getMarkerLocation() {
-        return currentUserLocationMarker.getPosition();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        //Get the ID of the customer
+//        String driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("driversAvailable");
+//
+//        GeoFire geoFire = new GeoFire(databaseReference);
+//        //When driver closes the app remove driver from the available drivers
+//        geoFire.removeLocation(driverID);
+//    }
 
     public void checkUserLocationPermission(){
         //If permission is not granted the app will ask for user permission
@@ -126,19 +143,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION))
             {
                 new AlertDialog.Builder(this)
-                        .setTitle("give permission")
-                        .setMessage("give permission message")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(MapsActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
-                    }
-                })
-                .create()
-                .show();
+                        .setTitle("Current Location Permission Denied")
+                        .setMessage("Please give access to current location.")
+                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(DriverMapActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
+                            }
+                        })
+                        .create()
+                        .show();
             }
             else
-                {
+            {
                 ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
             }
         }
@@ -162,10 +179,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 else
                 {
-                    Toast.makeText(this, "Permission Denied...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
-                return;
         }
     }
+
+//    public void getCustomerInfo() {
+//
+//        String driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        DatabaseReference assignedRiderRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers");
+//        assignedRiderRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()) {
+//                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
+//                    if(map.get("riderRideID") != null) {
+//                        riderID = map.get("riderRideID").toString();
+//                        getAssignedRiderPickupLocation();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//    }
+
+//    public void getAssignedRiderPickupLocation() {
+//
+//        DatabaseReference assignedRiderPickupLocationRef = FirebaseDatabase.getInstance().getReference().child("driversWorking").child(customerID).child("1");
+//        assignedRiderPickupLocationRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()) {
+//                    List<Object> map = (List<Object>) dataSnapshot.getValue();
+//                    }
+//                }
+//            });
+//
+//    }
 
 }

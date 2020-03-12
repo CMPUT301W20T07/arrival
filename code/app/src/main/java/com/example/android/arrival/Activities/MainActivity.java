@@ -45,6 +45,25 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button riderMapButton = (Button) findViewById(R.id.riderMapButton);
+
+        riderMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openRiderMaps();
+            }
+        });
+
+        Button driverMapButton;
+        driverMapButton = findViewById(R.id.driverMapButton);
+
+        driverMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDriverMaps();
+            }
+        });
+
         checkPermissions(getApplicationContext());
         // bind views
         openScannerBTN = findViewById(R.id.scanner);
@@ -114,8 +133,13 @@ public class MainActivity extends AppCompatActivity implements RequestCallbackLi
         rm.getOpenRequests(this);
     }
 
-    public void openMaps(){
-        Intent intent = new Intent(this, MapsActivity.class);
+    public void openRiderMaps(){
+        Intent intent = new Intent(this, RiderMapActivity.class);
+        startActivity(intent);
+    }
+
+    public void openDriverMaps(){
+        Intent intent = new Intent(this, DriverMapActivity.class);
         startActivity(intent);
     }
 

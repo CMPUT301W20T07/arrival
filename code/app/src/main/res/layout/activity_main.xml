@@ -30,6 +30,24 @@
 
 
     <Button
+        android:id="@+id/driverMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="180dp"
+        android:layout_marginTop="16dp"
+        android:text="Driver map"
+        app:layout_constraintStart_toEndOf="@+id/riderMapButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/riderMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RiderMap"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp"/>
+    <Button
         android:id="@+id/genQR"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,6 +55,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_to_convert" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
