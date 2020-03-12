@@ -12,8 +12,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/GitFiles-arrival-code-app.iml" filepath="$PROJECT_DIR$/app/GitFiles-arrival-code-app.iml" group="Arrival/app" />
       <module fileurl="file://$PROJECT_DIR$/app/GitFiles-arrival-code-app~1.iml" filepath="$PROJECT_DIR$/app/GitFiles-arrival-code-app~1.iml" group="Arrival/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Arrival/app" />
-      <module fileurl="file://$PROJECT_DIR$/code-Arrival.iml" filepath="$PROJECT_DIR$/code-Arrival.iml" group="Arrival" />
-      <module fileurl="file://$PROJECT_DIR$/app/code-app.iml" filepath="$PROJECT_DIR$/app/code-app.iml" group="Arrival/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/code.iml" filepath="$PROJECT_DIR$/.idea/code.iml" />
     </modules>
   </component>
 </project>

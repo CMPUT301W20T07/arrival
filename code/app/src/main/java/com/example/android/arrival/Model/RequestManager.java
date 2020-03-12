@@ -17,7 +17,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 /**
- * Pushes, pulls, and updates Requests to a FireBase FireStore Cloud Database.
+ * Singleton object used to push, pull, update, and delete
+ * Requests in the Arrival Firebase FireStore Cloud Database.
  */
 public class RequestManager {
 
@@ -61,12 +62,13 @@ public class RequestManager {
      * Opens a request in the FireStore Cloud Database.
      * @param req a Request object to be opened in FireStore.
      */
-    public void openRequest(Request req) {
+    public void openRequest(Request req, final RequestCallbackListener listener) {
         requestRef.document(req.getID()).set(req).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + " in FireStore.");
 //                getOpenRequests(); // Update current list of open requests
+                listener.update();
             }
         });
     }
@@ -75,12 +77,13 @@ public class RequestManager {
      * Deletes a request from the FireStore CLoud Database. Used for testing.
      * @param id
      */
-    public void deleteRequest(String id) {
+    public void deleteRequest(String id, final RequestCallbackListener listener) {
         requestRef.document(id).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG + "-delete", "Successfully deleted request " + id + " from FireStore.");
+                        listener.update();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -96,13 +99,14 @@ public class RequestManager {
      * to change the status of a request, or to assign a driver.
      * @param req
      */
-    public void updateRequest(Request req) {
+    public void updateRequest(Request req, final RequestCallbackListener listener) {
         requestRef.document(req.getID())
                 .set(req)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG + "-update", "Successfully updated request " + req.getID() + "in FireStore.");
+                        listener.update();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
