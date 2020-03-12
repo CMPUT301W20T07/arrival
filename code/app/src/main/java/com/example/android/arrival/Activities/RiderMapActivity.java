@@ -584,10 +584,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     public void onGetOpenSuccess(QuerySnapshot snapshot) {
         // Convert the snapshot to objects that can be used to display information
         List<Request> openRequests = snapshot.toObjects(Request.class);
-        requestAdapter.clear();
-        requestAdapter.addAll(openRequests);
-        requestAdapter.notifyDataSetChanged();
-        Log.d("MainActivity" + "-getOpen", openRequests.toString());
+//        requestAdapter.clear();
+//        requestAdapter.addAll(openRequests);
+//        requestAdapter.notifyDataSetChanged();
+        Log.d(TAG, "getOpen() : " + openRequests.toString());
     }
 
     @Override
