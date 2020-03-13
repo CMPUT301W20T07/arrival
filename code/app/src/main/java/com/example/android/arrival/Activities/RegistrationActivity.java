@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.android.arrival.Dialogs.CarDetailsDialog;
+import com.example.android.arrival.Model.Car;
+import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.Model.User;
 import com.example.android.arrival.R;
@@ -27,7 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegistrationActivity extends AppCompatActivity {
+public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener {
 
     private static final String TAG = "Registration";
 
@@ -39,10 +42,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText txtPassword;
     private Button btnDriverSignUp;
     private Button btnRiderSignUp;
+    private Car driverCar;
     private FirebaseFirestore db;
-    private CollectionReference riderRef;
-    private CollectionReference driverRef;
-    private CollectionReference userRef;
     private String userID;
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
@@ -88,12 +89,11 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
     private void driverSignup() {
-
-    }
-
-    private void riderSignup() {
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
+        String uName = txtName.getText().toString();
+        String uPhoneNumber = txtPhoneNumber.getText().toString();
+
         db = FirebaseFirestore.getInstance();
 
         // Check for empty input
@@ -101,15 +101,87 @@ public class RegistrationActivity extends AppCompatActivity {
             txtEmail.setError("Please enter an email address");
         } else if (pwd.isEmpty()) {
             txtPassword.setError("Please enter a password ");
-        } else if (!(em.isEmpty() && pwd.isEmpty())) {
+        }
+        else if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
             firebaseAuth.createUserWithEmailAndPassword(em, pwd)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                String uName = txtName.getText().toString();
-                                String uPhoneNumber = txtPhoneNumber.getText().toString();
+                                storeDriverInDatabase(uName, uPhoneNumber, em);
+                                startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+                            } else {
+                                Log.d(TAG, task.getException().toString());
+                                Toast.makeText(RegistrationActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void storeDriverInDatabase(String uName, String uPhoneNumber, String em) {
+
+        userID = firebaseAuth.getCurrentUser().getUid();
+
+        /*
+         * handles inputting userId in users table along with their type
+         */
+        DocumentReference usersDocReference = db.collection("users").document(userID);
+        Map<String, String> user = new HashMap<>();
+        user.put("type", DRIVER_TYPE_STRING);
+
+        usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(RegistrationActivity.this, uName + " added as driver", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        /*
+        handles inputting users into rider table with all relevant data
+         */
+        DocumentReference ridersDocReference = db.collection("drivers").document(userID);
+        //Map<String, Object> rider = new HashMap<>();
+        //rider.put("Name", uName);
+        //rider.put("PhoneNumber", uPhoneNumber);
+        //rider.put("Email", uEmail);
+
+        Driver driver = new Driver(uName, uPhoneNumber, em, driverCar);
+
+        ridersDocReference.set(driver).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(RegistrationActivity.this, uName + " data stored", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+    private void riderSignup() {
+        String em = txtEmail.getText().toString();
+        String pwd = txtPassword.getText().toString();
+        String uName = txtName.getText().toString();
+        String uPhoneNumber = txtPhoneNumber.getText().toString();
+
+        db = FirebaseFirestore.getInstance();
+
+        // Check for empty input
+        if (em.isEmpty()) {
+            txtEmail.setError("Please enter an email address");
+        } else if (pwd.isEmpty()) {
+            txtPassword.setError("Please enter a password ");
+        } else if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+            firebaseAuth.createUserWithEmailAndPassword(em, pwd)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+
                                 storeRiderInDatabase(uName, uPhoneNumber, em);
+
                                 startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
                             } else {
                                 Log.d(TAG, task.getException().toString());
@@ -143,7 +215,7 @@ public class RegistrationActivity extends AppCompatActivity {
         usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(RegistrationActivity.this, uName + "added as rider", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegistrationActivity.this, uName + " added as rider", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -161,10 +233,15 @@ public class RegistrationActivity extends AppCompatActivity {
         ridersDocReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(RegistrationActivity.this, uName + "data stored", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegistrationActivity.this, uName + " data stored", Toast.LENGTH_SHORT).show();
             }
         });
 
+    }
+
+    @Override
+    public void onDonePressed(Car s) {
+        driverCar = s;
     }
 }
 

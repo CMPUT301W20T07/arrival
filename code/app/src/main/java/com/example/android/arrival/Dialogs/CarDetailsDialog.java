@@ -24,7 +24,6 @@ public class CarDetailsDialog extends DialogFragment {
     private EditText year;
     private EditText color;
     private EditText plate;
-    FirebaseAuth firebaseAuth;
     private OnFragmentInteractionListener listener;
     Car result;
 
@@ -54,7 +53,20 @@ public class CarDetailsDialog extends DialogFragment {
                 .setPositiveButton("Done", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.onDonePressed(result);
+                        String makeStr = make.getText().toString();
+                        String modelStr = model.getText().toString();
+                        String yearStr = year.getText().toString();
+                        String plateStr = plate.getText().toString();
+                        String colorStr = color.getText().toString();
+
+                        if ((makeStr.isEmpty() || modelStr.isEmpty() || yearStr.isEmpty() || plateStr.isEmpty() || colorStr.isEmpty())) {
+                            make.setError("Input all relevant info");
+                        }
+                        else {
+
+                            result = new Car(makeStr, modelStr, yearStr, plateStr, colorStr);
+                            listener.onDonePressed(result);
+                        }
                     }
                 }).create();
 

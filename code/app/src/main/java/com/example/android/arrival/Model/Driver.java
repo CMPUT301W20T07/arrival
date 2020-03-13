@@ -12,4 +12,12 @@ public class Driver extends User {
         super(username, name, phoneNumber);
         this.car = car;
     }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
 }

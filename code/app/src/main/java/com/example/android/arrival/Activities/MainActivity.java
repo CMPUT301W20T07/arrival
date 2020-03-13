@@ -27,6 +27,7 @@ import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
