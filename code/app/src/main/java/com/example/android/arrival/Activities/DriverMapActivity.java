@@ -72,7 +72,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
-    //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&list=PLxabZQCAe5fgXx8cn2iKOtt0VFJrf5bOd&index=42
+    //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String riderID;
     public boolean zoom = true;

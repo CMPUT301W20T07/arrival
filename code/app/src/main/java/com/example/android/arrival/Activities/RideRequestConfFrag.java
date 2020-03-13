@@ -106,7 +106,8 @@ public class RideRequestConfFrag extends DialogFragment {
                     }}).create();
     }
 
-    //GeeksforGeeks, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    //TODO need to cite this
+    // https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
         // The math module contains a function
