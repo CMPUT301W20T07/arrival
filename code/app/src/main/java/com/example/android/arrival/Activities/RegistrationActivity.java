@@ -120,6 +120,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
                             if (task.isSuccessful()) {
                                 storeDriverInDatabase(uName, uPhoneNumber, em);
                                 startActivity(new Intent(RegistrationActivity.this, DriverMapActivity.class));
+                                finish();
                             } else {
                                 Log.d(TAG, task.getException().toString());
                                 Toast.makeText(RegistrationActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
@@ -203,6 +204,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
                                 storeRiderInDatabase(uName, uPhoneNumber, em);
 
                                 startActivity(new Intent(RegistrationActivity.this, RiderMapActivity.class));
+                                finish();
                             } else {
                                 Log.d(TAG, task.getException().toString());
                                 Toast.makeText(RegistrationActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();

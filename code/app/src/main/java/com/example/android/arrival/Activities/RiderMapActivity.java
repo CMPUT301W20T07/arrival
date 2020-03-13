@@ -48,6 +48,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -89,7 +90,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-
+    private Button btnSignOut;
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -116,6 +117,17 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         txtEndLocation = findViewById(R.id.txtRiderLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
+        btnSignOut = findViewById(R.id.btnRiderSignout);
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+
+            }
+        });
 
         if(currentRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);

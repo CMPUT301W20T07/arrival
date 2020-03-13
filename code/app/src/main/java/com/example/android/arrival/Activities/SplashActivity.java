@@ -11,8 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android.arrival.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -37,9 +39,24 @@ public class SplashActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
-        if (user != null) {
-            Log.d(TAG, "User = " + user.getEmail());
-            checkUserType(user.getUid());
+        // Makes sure the account is still valid
+        if(user != null) {
+            user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        // User still exits
+                        Log.d(TAG, "User = " + user.getEmail());
+                        checkUserType(user.getUid());
+                    } else {
+                        // User no longer exists, send to login screen
+                        Log.d(TAG, "User is null.");
+                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            });
         } else {
             Log.d(TAG, "User is null.");
             Intent intent = new Intent(SplashActivity.this, LoginActivity.class);

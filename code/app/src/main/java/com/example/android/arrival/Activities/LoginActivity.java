@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         signUp.setOnClickListener(view -> {
             Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
             startActivity(intent);
+            finish();
         });
     }
 
@@ -131,10 +132,12 @@ public class LoginActivity extends AppCompatActivity {
                 if (docData.equals(DRIVER_TYPE_STRING)) {
                     Intent intent = new Intent(LoginActivity.this, DriverMapActivity.class);
                     startActivity(intent);
+                    finish();
                 }
                 else if (docData.equals(RIDER_TYPE_STRING)){
                     Intent intent = new Intent(LoginActivity.this, RiderMapActivity.class);
                     startActivity(intent);
+                    finish();
                 }
                 else {
                     Log.d(TAG, "onComplete: " + uid + " " + docData);
