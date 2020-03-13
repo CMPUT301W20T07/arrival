@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/ride_request_fragment">
+
+
+    <TextView
+        android:id="@+id/recCostValue"
+        android:layout_width="221dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/recCost"
+        app:layout_constraintTop_toBottomOf="@+id/distanceValue" />
+
+    <TextView
+        android:id="@+id/pickupLocation"
+        android:layout_width="128dp"
+        android:layout_height="80dp"
+        android:gravity="center_vertical"
+        android:text="Pickup Location"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/destination"
+        android:layout_width="88dp"
+        android:layout_height="80dp"
+        android:gravity="center_vertical"
+        android:text="Destination"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pickupLocation" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:text="Distance (km)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/destination" />
+
+    <TextView
+        android:id="@+id/recCost"
+        android:layout_width="149dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:text="Recommended Cost"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/distance" />
+
+    <TextView
+        android:id="@+id/yourOffer"
+        android:layout_width="88dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:text="Your offer"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recCost" />
+
+    <TextView
+        android:id="@+id/pickupLoc"
+        android:layout_width="192dp"
+        android:layout_height="81dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/pickupLocation"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/destLoc"
+        android:layout_width="232dp"
+        android:layout_height="80dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/destination"
+        app:layout_constraintTop_toBottomOf="@+id/pickupLoc" />
+
+    <TextView
+        android:id="@+id/distanceValue"
+        android:layout_width="288dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/distance"
+        app:layout_constraintTop_toBottomOf="@+id/destLoc" />
+
+    <EditText
+        android:id="@+id/yourOfferValue"
+        android:layout_width="285dp"
+        android:layout_height="60dp"
+        android:ems="10"
+        android:gravity="center_vertical"
+        android:inputType="numberDecimal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/yourOffer"
+        app:layout_constraintTop_toBottomOf="@+id/recCostValue" />
+</androidx.constraintlayout.widget.ConstraintLayout>
