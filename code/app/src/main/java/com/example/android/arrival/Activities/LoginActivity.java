@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.example.android.arrival.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -102,18 +104,6 @@ public class LoginActivity extends AppCompatActivity {
                             else {
                                String uid = firebaseAuth.getCurrentUser().getUid();
                                checkUserType(uid);
-                               if (userType != null && userType.equals(DRIVER_TYPE_STRING)) {
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                               }
-                               else if (userType != null && userType.equals(RIDER_TYPE_STRING)){
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
-                               }
-                               else {
-                                   Log.d(TAG, "onComplete: " + uid + userType);
-                                   Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
-                               }
                             }
                         }
                     });
@@ -132,24 +122,30 @@ public class LoginActivity extends AppCompatActivity {
 
 
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection("users")
-                .whereEqualTo(uid, true)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        DocumentReference documentReference = firestore.collection("users").document(uid);
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String docData = documentSnapshot.get("type").toString();
+                Log.d(TAG, "onSuccess: " + docData);
+                if (docData.equals(DRIVER_TYPE_STRING)) {
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+                else if (docData.equals(RIDER_TYPE_STRING)){
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    Log.d(TAG, "onComplete: " + uid + " " + docData);
+                    Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
+                }
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                Map<String, Object> documentSnapshotData = documentSnapshot.getData();
-                                userType = (String) documentSnapshotData.get("type");
-                                Log.d(TAG, "Check user type: " + userType);
-                            }
-
-                        }
-                        else {
-                            Log.d(TAG, "onComplete: there was an error getting " + uid + " user type");
-                            Toast.makeText(LoginActivity.this, "There was an error getting user data", Toast.LENGTH_SHORT).show();
-                        }
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure: could not get document: " + uid);
                     }
                 });
 
