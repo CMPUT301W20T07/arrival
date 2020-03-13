@@ -24,7 +24,6 @@ public class CarDetailsDialog extends DialogFragment {
     private EditText year;
     private EditText color;
     private EditText plate;
-    FirebaseAuth firebaseAuth;
     private OnFragmentInteractionListener listener;
     Car result;
 

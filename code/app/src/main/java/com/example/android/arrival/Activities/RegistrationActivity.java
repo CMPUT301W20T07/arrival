@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.android.arrival.Dialogs.CarDetailsDialog;
+import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.Model.User;
 import com.example.android.arrival.R;
@@ -27,7 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegistrationActivity extends AppCompatActivity {
+public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener {
 
     private static final String TAG = "Registration";
 
@@ -88,12 +90,47 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
     private void driverSignup() {
+        String em = txtEmail.getText().toString();
+        String pwd = txtPassword.getText().toString();
+        String uName = txtName.getText().toString();
+        String uPhoneNumber = txtPhoneNumber.getText().toString();
 
+        db = FirebaseFirestore.getInstance();
+
+        // Check for empty input
+        if (em.isEmpty()) {
+            txtEmail.setError("Please enter an email address");
+        } else if (pwd.isEmpty()) {
+            txtPassword.setError("Please enter a password ");
+        }
+        else if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+            firebaseAuth.createUserWithEmailAndPassword(em, pwd)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                storeDriverInDatabase(uName, uPhoneNumber, em);
+                                startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+                            } else {
+                                Log.d(TAG, task.getException().toString());
+                                Toast.makeText(RegistrationActivity.this, task.getException().toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void storeDriverInDatabase(String uName, String uPhoneNumber, String em) {
     }
 
     private void riderSignup() {
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
+        String uName = txtName.getText().toString();
+        String uPhoneNumber = txtPhoneNumber.getText().toString();
+
         db = FirebaseFirestore.getInstance();
 
         // Check for empty input
@@ -107,9 +144,9 @@ public class RegistrationActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                String uName = txtName.getText().toString();
-                                String uPhoneNumber = txtPhoneNumber.getText().toString();
+
                                 storeRiderInDatabase(uName, uPhoneNumber, em);
+
                                 startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
                             } else {
                                 Log.d(TAG, task.getException().toString());
@@ -143,7 +180,7 @@ public class RegistrationActivity extends AppCompatActivity {
         usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(RegistrationActivity.this, uName + "added as rider", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegistrationActivity.this, uName + " added as rider", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -161,9 +198,14 @@ public class RegistrationActivity extends AppCompatActivity {
         ridersDocReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(RegistrationActivity.this, uName + "data stored", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegistrationActivity.this, uName + " data stored", Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+    @Override
+    public void onDonePressed(Car s) {
 
     }
 }
