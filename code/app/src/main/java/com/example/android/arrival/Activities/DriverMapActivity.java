@@ -78,9 +78,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String riderID;
     public boolean zoom = true;
     static boolean active = false;
+    private int index;
 
     ArrayList<Request> requestsList = new ArrayList<>();
-    ArrayList<Marker> markers = new ArrayList<>();
 
     private FirebaseFirestore fb;
     private RequestManager rm;
@@ -90,7 +90,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private EditText txtDriverLocation;
     private EditText txtRiderLocation;
     private Button btnCancelRide;
-    private Button btnSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +105,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         txtDriverLocation = findViewById(R.id.txtDriverLocation);
         txtRiderLocation = findViewById(R.id.txtRiderLocation);
         btnCancelRide = findViewById(R.id.driverCancelRide);
-        btnSignOut = findViewById(R.id.btnDriverSignout);
 
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,16 +112,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.STATUS_OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
-            }
-        });
-
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
             }
         });
 
@@ -171,12 +159,20 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //Share marker and requests with the fragment
+                for (int i = 0; i < requestsList.size(); i++) {
+                    if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude && requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude){
+                        index = i;
+                        currRequest = requestsList.get(i);
+                    }
+                }
+
+                ArrayList<Marker> markers = new ArrayList<>();
                 markers.add(marker);
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 Bundle args = new Bundle();
-                args.putSerializable("requestsList", requestsList);
+                args.putSerializable("currentRequest", currRequest);
                 args.putSerializable("markerLocation", markers);
 
                 AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
@@ -413,3 +409,10 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 }
+
+
+
+
+
+
+

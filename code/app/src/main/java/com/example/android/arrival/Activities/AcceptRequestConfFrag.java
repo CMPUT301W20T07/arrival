@@ -43,6 +43,8 @@ public class AcceptRequestConfFrag extends DialogFragment {
     private Place pickup = new Place();
     private Place destination = new Place();
     private Request requestInfo = new Request();
+    private Request currRequest = new Request();
+    private Marker marker;
 
     private int index;
 
@@ -67,26 +69,17 @@ public class AcceptRequestConfFrag extends DialogFragment {
         TextView custPaymentOffer = view.findViewById(R.id.custPaymentOfferValue);
 
         //Info passed from DriverMapActivity
-        ArrayList<Request> requestArrayList = (ArrayList<Request>)getArguments().getSerializable("requestsList");
         ArrayList<Marker> markers = (ArrayList<Marker>)getArguments().getSerializable("markerLocation");
-        Marker marker = markers.get(0);
+        currRequest = (Request) getArguments().getSerializable("currentRequest");
 
-        LatLng latlng = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
 
-        //if the location is equivalent to the marker passed then hold the index of that marker
-        //in the arraylist
-        for (int i = 0; i < requestArrayList.size(); i++) {
-            if ((requestArrayList.get(i).getStartLocation().getLatLng()) == latlng){
-                index = i;
-            }
-        }
+        marker = markers.get(0);
+        if (currRequest.getStartLocation().getLat() == marker.getPosition().latitude && currRequest.getStartLocation().getLon() == marker.getPosition().longitude) {
 
-        if (!requestArrayList.isEmpty()) {
-
-            String riderName = requestArrayList.get(index).getRider();
-            Place startLocation = requestArrayList.get(index).getStartLocation();
-            Place endLocation = requestArrayList.get(index).getEndLocation();
-            Float fare = requestArrayList.get(index).getFare();
+            String riderName = currRequest.getRider();
+            Place startLocation = currRequest.getStartLocation();
+            Place endLocation = currRequest.getEndLocation();
+            Float fare = currRequest.getFare();
 
 
             custName.setText(riderName);
@@ -98,8 +91,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     double driverLat = (double) documentSnapshot.get("lat");
-                    double driverLon = (double) documentSnapshot.get("lat");
-                    LatLng driverLatLng = new LatLng(driverLat, driverLon);
+                    double driverLon = (double) documentSnapshot.get("lon");
                     double distance1 = distance(startLocation.getLat(), driverLat, startLocation.getLon(), driverLon);
                     distanceToCust.setText(format.format((int) distance1));
                 }
@@ -109,7 +101,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
             custDistanceToDestination.setText(format.format((int) distance2));
 
             double recTime = distance2;
-            estTime.setText(format.format((int) (recTime / 180)));
+            estTime.setText(format.format((int) (distance2 / 180)));
 
             custPaymentOffer.setText(format.format(fare));
         }
@@ -122,11 +114,9 @@ public class AcceptRequestConfFrag extends DialogFragment {
                 .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO send the data to the request manager
-                        Request req = requestArrayList.get(index);
-                        req.setStatus(Request.STATUS_ACCEPTED);
-                        req.setDriver("curr-driver");
-                        rm.updateRequest(req, (RequestCallbackListener) getContext());
+                        currRequest.setStatus(Request.STATUS_ACCEPTED);
+                        currRequest.setDriver("curr-driver");
+                        rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
                     }}).create();
     }
 
