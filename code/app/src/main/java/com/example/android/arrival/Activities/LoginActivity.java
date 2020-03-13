@@ -129,11 +129,11 @@ public class LoginActivity extends AppCompatActivity {
                 String docData = documentSnapshot.get("type").toString();
                 Log.d(TAG, "onSuccess: " + docData);
                 if (docData.equals(DRIVER_TYPE_STRING)) {
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, DriverMapActivity.class);
                     startActivity(intent);
                 }
                 else if (docData.equals(RIDER_TYPE_STRING)){
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, RiderMapActivity.class);
                     startActivity(intent);
                 }
                 else {
@@ -146,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "onFailure: could not get document: " + uid);
+                        Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
                     }
                 });
 
