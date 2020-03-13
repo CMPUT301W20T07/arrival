@@ -90,6 +90,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private EditText txtDriverLocation;
     private EditText txtRiderLocation;
     private Button btnCancelRide;
+    private Button btnSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         txtDriverLocation = findViewById(R.id.txtDriverLocation);
         txtRiderLocation = findViewById(R.id.txtRiderLocation);
         btnCancelRide = findViewById(R.id.driverCancelRide);
+        btnSignOut = findViewById(R.id.btnDriverSignout);
 
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +114,16 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.STATUS_OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
