@@ -1,61 +1,40 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.OnLifecycleEvent;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.LauncherActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.SearchView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.example.android.arrival.Model.CustomSuggestionList;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.R;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 //import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -65,21 +44,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
-import java.lang.annotation.Documented;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 //TODO get a rideRequest confirmation fragment where user can edit the offer amount
@@ -115,7 +90,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-
+    private Button btnSignOut;
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -138,10 +113,21 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
         rm = RequestManager.getInstance();
 
-        txtStartLocation = findViewById(R.id.startLocation);
-        txtEndLocation = findViewById(R.id.endLocation);
+        txtStartLocation = findViewById(R.id.txtDriverLocation);
+        txtEndLocation = findViewById(R.id.txtRiderLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
+        btnSignOut = findViewById(R.id.btnRiderSignout);
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+
+            }
+        });
 
         if(currentRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);

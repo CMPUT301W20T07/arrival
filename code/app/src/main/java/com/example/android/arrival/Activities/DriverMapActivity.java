@@ -20,6 +20,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.android.arrival.Model.Request;
@@ -77,25 +78,68 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String riderID;
     public boolean zoom = true;
     static boolean active = false;
+
     ArrayList<Request> requestsList = new ArrayList<>();
     ArrayList<Marker> markers = new ArrayList<>();
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    private FirebaseFirestore fb;
+    private RequestManager rm;
+
+    private Request currRequest;
+
+    private EditText txtDriverLocation;
+    private EditText txtRiderLocation;
+    private Button btnCancelRide;
+    private Button btnSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.driver_map_activity);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        fb = FirebaseFirestore.getInstance();
+        rm = RequestManager.getInstance();
+
+        // Bind components
+        txtDriverLocation = findViewById(R.id.txtDriverLocation);
+        txtRiderLocation = findViewById(R.id.txtRiderLocation);
+        btnCancelRide = findViewById(R.id.driverCancelRide);
+        btnSignOut = findViewById(R.id.btnDriverSignout);
+
+        btnCancelRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currRequest.setDriver(null);
+                currRequest.setStatus(Request.STATUS_OPEN);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        loadOpenRequests();
-
+        if(currRequest == null) {
+            loadOpenRequests();
+            btnCancelRide.setVisibility(View.INVISIBLE);
+        } else {
+            requestsList.clear();
+            txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
+            btnCancelRide.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -171,7 +215,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                     map.put("lat", location.getLatitude());
                     map.put("lon", location.getLongitude());
 
-                    firebaseFirestore.collection("availableDrivers").document("driver1")
+                    fb.collection("availableDrivers").document("driver1")
                             .set(map)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -202,7 +246,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         map.put("lat", null);
         map.put("lon", null);
 
-        firebaseFirestore.collection("availableDrivers").document("driver1")
+        fb.collection("availableDrivers").document("driver1")
                 .set(map)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -227,6 +271,16 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     public void onResume() {
         super.onResume();
         active = true;
+
+        if(currRequest == null) {
+            loadOpenRequests();
+            btnCancelRide.setVisibility(View.INVISIBLE);
+            txtRiderLocation.setText("");
+        } else {
+            requestsList.clear();
+            txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
+            btnCancelRide.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -300,8 +354,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
      * Get open requests
      */
     public void loadOpenRequests() {
-        RequestManager.getInstance().getOpenRequests(this);
-
+        rm.getOpenRequests(this);
     }
 
     @Override
@@ -316,8 +369,19 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
+        Request req = snapshot.toObject(Request.class);
 
+        if(req != null && currRequest == null) {
+            currRequest = req;
+            mMap.clear();
+            MarkerOptions mop = new MarkerOptions();
+            mop.position(currRequest.getStartLocation().getLatLng());
+            mMap.addMarker(mop);
+        } else {
+            currRequest = null;
+        }
 
+        onResume();
     }
 
     /**
@@ -326,11 +390,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
      */
     @Override
     public void onGetOpenSuccess(QuerySnapshot snapshot) {
-
-        for (DocumentSnapshot snapshot2 : snapshot) {
-            requestsList.add(snapshot2.toObject(Request.class));
-        }
-
+        requestsList.clear();
+        requestsList.addAll(snapshot.toObjects(Request.class));
 
         for (int i = 0; i < requestsList.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
