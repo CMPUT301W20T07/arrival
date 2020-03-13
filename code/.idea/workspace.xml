@@ -39,9 +39,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="layoutResourceFile" />
         <option value="valueResourceFile" />
         <option value="Class" />
+        <option value="layoutResourceFile" />
       </list>
     </option>
   </component>
@@ -49,9 +49,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="ProjectId" id="1Yx0ffVriTABWY8qtSouHbu1niD" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="DeviceAndSnapshotComboBoxAction.selectedDevice" value="D8TNU19523105248" />
     <property name="DeviceAndSnapshotComboBoxAction.selectionTime" value="2020-03-10T22:59:46.594Z" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../Labs/ListyCity - Fragment" />
   </component>
   <component name="RecentsManager">
     <key name="android.template.packageName">
@@ -321,6 +323,13 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Android App.app" />
+      <item itemvalue="Android Instrumented Tests.RequestManagerTest" />
+      <item itemvalue="Android Instrumented Tests.openReq()" />
+      <item itemvalue="Android Instrumented Tests.testOpenRequest()" />
+      <item itemvalue="Android Instrumented Tests.testUpdateRequest()" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Android Instrumented Tests.RequestManagerTest" />
