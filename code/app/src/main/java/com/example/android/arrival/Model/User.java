@@ -2,7 +2,7 @@ package com.example.android.arrival.Model;
 
 public class User {
 
-    private String username;
+    private String email;
     private String name;
     private String phoneNumber;
 
@@ -11,18 +11,18 @@ public class User {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-    public User(String username, String name, String phoneNumber) {
-        this.username = username;
+    public User(String email, String name, String phoneNumber) {
+        this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {

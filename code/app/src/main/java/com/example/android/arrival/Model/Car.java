@@ -51,4 +51,12 @@ public class Car implements Serializable {
     public void setPlate(String plate) {
         Plate = plate;
     }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getColor() {
+        return color;
+    }
 }

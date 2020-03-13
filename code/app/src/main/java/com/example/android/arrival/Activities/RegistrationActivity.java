@@ -158,7 +158,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         handles inputting users into driver table with all relevant data
          */
         DocumentReference ridersDocReference = db.collection("drivers").document(userID);
-        Driver driver = new Driver(uName, uPhoneNumber, em, driverCar);
+        Driver driver = new Driver(em, uName, uPhoneNumber, driverCar);
         ridersDocReference.set(driver).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -241,6 +241,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         handles inputting users into rider table with all relevant data
          */
         DocumentReference ridersDocReference = db.collection("riders").document(userID);
+        Log.d(TAG, "storeRiderInDatabase: " + uEmail);
         Rider rider = new Rider(uEmail, uName, uPhoneNumber);
         ridersDocReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
