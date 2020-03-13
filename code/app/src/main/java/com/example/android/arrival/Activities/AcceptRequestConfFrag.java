@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+//Add open request information to fragment
 
 public class AcceptRequestConfFrag extends DialogFragment {
     private Place pickup = new Place();
@@ -58,12 +59,15 @@ public class AcceptRequestConfFrag extends DialogFragment {
         TextView estTime = view.findViewById(R.id.estTimeValue);
         TextView custPaymentOffer = view.findViewById(R.id.custPaymentOfferValue);
 
+        //Info passed from DriverMapActivity
         ArrayList<Request> requestArrayList = (ArrayList<Request>)getArguments().getSerializable("requestsList");
         ArrayList<Marker> markers = (ArrayList<Marker>)getArguments().getSerializable("markerLocation");
         Marker marker = markers.get(0);
 
         LatLng latlng = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
 
+        //if the location is equivalent to the marker passed then hold the index of that marker
+        //in the arraylist
         for (int i = 0; i < requestArrayList.size(); i++) {
             if ((requestArrayList.get(i).getStartLocation().getLatLng()) == latlng){
 
@@ -83,6 +87,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
             custName.setText(riderName);
             custDestination.setText(endLocation.getAddress());
 
+            //Get the drivers location to calculate the distance from the marker selected
             firebaseFirestore.collection("availableDrivers").document("driver1")
                     .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
@@ -113,9 +118,6 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //TODO send the data to the request manager
-                        //lat and lon stored in pick and destination
-                        //get cost from the yourOfferValue textbox
-//                        requestsList.indexOf();
 
                     }}).create();
     }
