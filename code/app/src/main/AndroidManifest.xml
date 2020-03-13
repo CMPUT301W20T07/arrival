@@ -21,6 +21,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Activities.RequestTestActivity"></activity>
         <activity android:name=".Activities.RegistrationActivity"></activity>
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -34,7 +35,10 @@
             android:value="@string/google_maps_api_key"
         />
 
-            android:value="@string/google_maps_key" />
+<!--        <meta-data-->
+<!--            android:name="com.google.android.geo.API_KEY"-->
+<!--            android:value="@string/google_maps_key" />-->
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
