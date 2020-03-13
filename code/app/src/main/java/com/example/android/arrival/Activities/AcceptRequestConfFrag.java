@@ -39,11 +39,15 @@ import java.util.Map;
 //Add open request information to fragment
 
 public class AcceptRequestConfFrag extends DialogFragment {
+
     private Place pickup = new Place();
     private Place destination = new Place();
     private Request requestInfo = new Request();
-    int index;
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    private int index;
+
+    private FirebaseFirestore fb;
+    private RequestManager rm;
 
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -51,6 +55,9 @@ public class AcceptRequestConfFrag extends DialogFragment {
         DecimalFormat format = new DecimalFormat("0.00");
 
         super.onCreate(savedInstanceState);
+
+        fb = FirebaseFirestore.getInstance();
+        rm = RequestManager.getInstance();
 
         TextView custName = view.findViewById(R.id.custNameValue);
         TextView custDestination = view.findViewById(R.id.custDestinationValue);
@@ -70,9 +77,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
         //in the arraylist
         for (int i = 0; i < requestArrayList.size(); i++) {
             if ((requestArrayList.get(i).getStartLocation().getLatLng()) == latlng){
-
                 index = i;
-
             }
         }
 
@@ -88,7 +93,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
             custDestination.setText(endLocation.getAddress());
 
             //Get the drivers location to calculate the distance from the marker selected
-            firebaseFirestore.collection("availableDrivers").document("driver1")
+            fb.collection("availableDrivers").document("driver1")
                     .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -118,7 +123,10 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //TODO send the data to the request manager
-
+                        Request req = requestArrayList.get(index);
+                        req.setStatus(Request.STATUS_ACCEPTED);
+                        req.setDriver("curr-driver");
+                        rm.updateRequest(req, (RequestCallbackListener) getContext());
                     }}).create();
     }
 
