@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -15,10 +17,14 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.RequestCallbackListener;
+import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.R;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -37,6 +43,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,18 +54,32 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback {
+//Drivers map, contains the driver's locations, markers of open requests
+//when marker is pressed info pops up about marker
+
+public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
-    private Location lastLocation;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
+    //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&list=PLxabZQCAe5fgXx8cn2iKOtt0VFJrf5bOd&index=42
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String riderID;
+    public boolean zoom = true;
+    static boolean active = false;
+    ArrayList<Request> requestsList = new ArrayList<>();
+    ArrayList<Marker> markers = new ArrayList<>();
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +94,14 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-//        getCustomerInfo();
+        loadOpenRequests();
 
     }
 
+    /**
+     * Create map with current location and switch to fragment on marker press
+     * @param googleMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -95,47 +122,127 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 checkUserLocationPermission();
             }
         }
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                //Share marker and requests with the fragment
+                markers.add(marker);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                Bundle args = new Bundle();
+                args.putSerializable("requestsList", requestsList);
+                args.putSerializable("markerLocation", markers);
+
+                AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
+                acceptRequestConfFrag.setArguments(args);
+                fragmentTransaction.add(0, acceptRequestConfFrag);
+                fragmentTransaction.commit();
+                return false;
+            }
+        });
+
     }
 
+    /**
+     * Place current location and move camera towards it
+     * also shares driver's location with firestore to create an available driver
+     */
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             for (Location location : locationResult.getLocations())
             {
-                // lastLocation might be useless
-                lastLocation = location;
                 mMap.setMyLocationEnabled(true);
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                if (zoom) {
+                    zoom = false;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                }
 
-//                //Get the ID of the customer
-//                String driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("driversAvailable");
-//
-//                //Share information with database creating an available driver
-//                GeoFire geoFire = new GeoFire(databaseReference);
-//                geoFire.setLocation(driverID, new GeoLocation(location.getLatitude(), location.getLongitude()));
+                if(active) {
 
+//                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("lat", location.getLatitude());
+                    map.put("lon", location.getLongitude());
+
+                    firebaseFirestore.collection("availableDrivers").document("driver1")
+                            .set(map)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("driverLocation", "updated");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("driverLocation", "not updated", e);
+                                }
+                            });
+                }
             }
         }
     };
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//
-//        //Get the ID of the customer
-//        String driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("driversAvailable");
-//
-//        GeoFire geoFire = new GeoFire(databaseReference);
-//        //When driver closes the app remove driver from the available drivers
-//        geoFire.removeLocation(driverID);
-//    }
 
+    /**
+     * When map is closed stop showing the driver's location making the driver unavailable
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("lat", null);
+        map.put("lon", null);
+
+        firebaseFirestore.collection("availableDrivers").document("driver1")
+                .set(map)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("driverLocation", "null");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("driverLocation", "not null", e);
+                    }
+                });
+    }
+
+    /**
+     * Check if the map activity is open
+     */
+//    Stackoverflow post by virsir https://stackoverflow.com/users/238061/virsir
+//    Answer https://stackoverflow.com/questions/3262157/how-to-check-if-my-activity-is-the-current-activity-running-in-the-screen
+    @Override
+    public void onResume() {
+        super.onResume();
+        active = true;
+    }
+
+    /**
+     * Check if the map activity is closed
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        active = false;
+    }
+
+
+    /**
+     * Ask the user for location permission
+     * if they do not accept then ask again when the activity is opened
+     */
     public void checkUserLocationPermission(){
         //If permission is not granted the app will ask for user permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -162,7 +269,12 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     }
 
 
-
+    /**
+     * If the user accepts locations then show the current location
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
@@ -184,42 +296,59 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         }
     }
 
-//    public void getCustomerInfo() {
-//
-//        String driverID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//        DatabaseReference assignedRiderRef = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers");
-//        assignedRiderRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(dataSnapshot.exists()) {
-//                    Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-//                    if(map.get("riderRideID") != null) {
-//                        riderID = map.get("riderRideID").toString();
-//                        getAssignedRiderPickupLocation();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//    }
+    /**
+     * Get open requests
+     */
+    public void loadOpenRequests() {
+        RequestManager.getInstance().getOpenRequests(this);
 
-//    public void getAssignedRiderPickupLocation() {
-//
-//        DatabaseReference assignedRiderPickupLocationRef = FirebaseDatabase.getInstance().getReference().child("driversWorking").child(customerID).child("1");
-//        assignedRiderPickupLocationRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(dataSnapshot.exists()) {
-//                    List<Object> map = (List<Object>) dataSnapshot.getValue();
-//                    }
-//                }
-//            });
-//
-//    }
+    }
 
+    @Override
+    public void onCallbackStart() {
+
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    public void onGetRequestSuccess(DocumentSnapshot snapshot) {
+
+
+    }
+
+    /**
+     * Add all requests to an ArrayList
+     * @param snapshot
+     */
+    @Override
+    public void onGetOpenSuccess(QuerySnapshot snapshot) {
+
+        for (DocumentSnapshot snapshot2 : snapshot) {
+            requestsList.add(snapshot2.toObject(Request.class));
+        }
+
+
+        for (int i = 0; i < requestsList.size(); i++) {
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            Request request = requestsList.get(i);
+
+            markerOptions.position(request.getStartLocation().getLatLng());
+            mMap.addMarker(markerOptions);
+        }
+    }
+
+    @Override
+    public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
+
+    }
+
+    @Override
+    public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
+
+    }
 }
