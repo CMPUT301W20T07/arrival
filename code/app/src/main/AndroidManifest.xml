@@ -19,7 +19,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+<<<<<<< HEAD
         <activity android:name=".Activities.RequestTestActivity"></activity>
+=======
+        <activity android:name=".Activities.RegistrationActivity"></activity>
+>>>>>>> b433dba5651c2656ca2e2618a4c7c11f03713ea9
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -30,9 +34,13 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
+<<<<<<< HEAD
             android:value="@string/google_maps_api_key"
         />
 
+=======
+            android:value="@string/google_maps_key" />
+>>>>>>> b433dba5651c2656ca2e2618a4c7c11f03713ea9
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -42,6 +50,7 @@
 
         <activity
             android:name=".Activities.MapsActivity"
+<<<<<<< HEAD
             android:label="@string/title_activity_maps">
         </activity>
 
@@ -62,6 +71,11 @@
         <activity android:name=".Activities.MainActivity">
         </activity>
         <activity android:name=".Activities.SplashActivity"
+=======
+            android:label="@string/title_activity_maps"></activity>
+        <activity
+            android:name=".Activities.SplashActivity"
+>>>>>>> b433dba5651c2656ca2e2618a4c7c11f03713ea9
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
