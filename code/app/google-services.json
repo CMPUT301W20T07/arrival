@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "116132464972",
+    "firebase_url": "https://cmput301w20t07-arrival.firebaseio.com",
+    "project_id": "cmput301w20t07-arrival",
+    "storage_bucket": "cmput301w20t07-arrival.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116132464972:android:fbdb837aa695d8d03127e9",
+        "android_client_info": {
+          "package_name": "com.example.android.arrival"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "116132464972-0vqe5v4cjkg72nuarse8ik92nbvmiqn7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkLA1Vb9rv6e5Qaw2pZKcdrTWby9Vtc5s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "116132464972-0vqe5v4cjkg72nuarse8ik92nbvmiqn7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
