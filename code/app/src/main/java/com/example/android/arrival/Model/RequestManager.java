@@ -68,7 +68,12 @@ public class RequestManager {
             public void onSuccess(Void aVoid) {
                 Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + " in FireStore.");
 //                getOpenRequests(); // Update current list of open requests
-                listener.update();
+                getRequest(req.getID(), listener);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Failed to create new request for " + req.getID());
             }
         });
     }
@@ -106,7 +111,7 @@ public class RequestManager {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG + "-update", "Successfully updated request " + req.getID() + "in FireStore.");
-                        listener.update();
+                        getRequest(req.getID(), listener);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -115,10 +120,6 @@ public class RequestManager {
                         Log.d(TAG, "Failed");
                     }
                 });
-    }
-
-    public void getRequest(Request req, final RequestCallbackListener listener) {
-        getRequest(req.getID(), listener);
     }
 
     public void getRequest(String id, final RequestCallbackListener listener) {
