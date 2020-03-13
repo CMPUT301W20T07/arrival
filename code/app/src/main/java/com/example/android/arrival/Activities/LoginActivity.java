@@ -21,8 +21,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -31,12 +35,14 @@ public class LoginActivity extends AppCompatActivity {
     EditText email;
     EditText password;
     EditText edit_name;
-    private int USER_TYPE_RIDER = 1;
-    private int USER_TYPE_DRIVER = 0;
+    String userType;
     FirebaseAuth firebaseAuth;
-    FirebaseFirestore db;
-    DocumentReference docRef;
-    String name;
+    FirebaseFirestore firestore;
+    String TAG = "LoginActivity: ";
+    private static final String RIDER_TYPE_STRING = "rider";
+    private static final String DRIVER_TYPE_STRING = "driver";
+
+
 
 
     @Override
@@ -56,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
         edit_name = findViewById(R.id.user_name_editText);
-        name = edit_name.getText().toString();
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,43 +82,76 @@ public class LoginActivity extends AppCompatActivity {
      */
     public void signUserIn() {
 
+        String emailStr = email.getText().toString();
+        String passwordStr = password.getText().toString();
 
-        firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()){
-                            Toast.makeText(LoginActivity.this, "Sign in error occurred", Toast.LENGTH_LONG).show();
-                        }
-                        else {
-//                            docRef = db.collection("users").document(name);
-////                            String filePassword = docRef.get(password);
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            if (user != null) {
-                                String name = user.getDisplayName();
-                                String email = user.getEmail();
-                                //Uri photoUrl = user.getPhotoUrl();
-
-                                // Check if user's email is verified
-                                boolean emailVerified = user.isEmailVerified();
-
-                                // The user's ID, unique to the Firebase project. Do NOT use this value to
-                                // authenticate with your backend server, if you have one. Use
-                                // FirebaseUser.getIdToken() instead.
-                                String uid = user.getUid();
+        if (emailStr.isEmpty()) {
+            email.setError("Input your email address");
+        }
+        if (passwordStr.isEmpty()) {
+            password.setError("Input your password");
+        }
+        if (!(emailStr.isEmpty() && passwordStr.isEmpty())) {
+            firebaseAuth.signInWithEmailAndPassword(emailStr, passwordStr)
+                    .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(LoginActivity.this, "Sign in error occurred", Toast.LENGTH_LONG).show();
+                            }
+                            else {
+                               String uid = firebaseAuth.getCurrentUser().getUid();
+                               checkUserType(uid);
+                               if (userType != null && userType.equals(DRIVER_TYPE_STRING)) {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                               }
+                               else if (userType != null && userType.equals(RIDER_TYPE_STRING)){
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                               }
+                               else {
+                                   Log.d(TAG, "onComplete: " + uid + userType);
+                                   Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
+                               }
                             }
                         }
-                    }
-                });
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-
+                    });
+        }
+        else {
+                Toast.makeText(LoginActivity.this, "Input relevant data", Toast.LENGTH_SHORT).show();
+            }
     }
 
     /**
-     * check user type
+     * checks user type
+     * @param uid takes in userID to search the users document on firestore
+     * @return userType
      */
-    public void checkUserType(){
+    public void checkUserType(String uid){
+
+
+        firestore = FirebaseFirestore.getInstance();
+        firestore.collection("users")
+                .whereEqualTo(uid, true)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                Map<String, Object> documentSnapshotData = documentSnapshot.getData();
+                                userType = (String) documentSnapshotData.get("type");
+                                Log.d(TAG, "Check user type: " + userType);
+                            }
+
+                        }
+                        else {
+                            Log.d(TAG, "onComplete: there was an error getting " + uid + " user type");
+                            Toast.makeText(LoginActivity.this, "There was an error getting user data", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 
     }
 

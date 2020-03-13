@@ -39,48 +39,8 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
-
-        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                Log.d(TAG, "Authentication State Changed!");
-
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-                if (user != null) {
-                    Log.d(TAG, "User: " + user.getEmail());
-                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Log.d(TAG, "User is null.");
-                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        };
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-
-        if (user != null) {
-            Log.d(TAG, "User = " + user.getEmail());
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        } else {
-            Log.d(TAG, "User is null.");
-            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }
-    }
 
 
 }

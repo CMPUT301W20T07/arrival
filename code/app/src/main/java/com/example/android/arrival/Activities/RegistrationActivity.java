@@ -35,7 +35,6 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     private static final String TAG = "Registration";
 
     private FirebaseAuth firebaseAuth;
-
     private EditText txtName;
     private EditText txtPhoneNumber;
     private EditText txtEmail;
@@ -70,7 +69,8 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         btnDriverSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                driverSignup();
+                CarDetailsDialog carDetailsDialog = new CarDetailsDialog();
+                carDetailsDialog.show(getSupportFragmentManager(), "car");
             }
         });
 
@@ -87,7 +87,9 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         super.onStart();
     }
 
-
+    /**
+     * this handles authenticating driver for app
+     */
     private void driverSignup() {
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
@@ -96,13 +98,21 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
         db = FirebaseFirestore.getInstance();
 
+
         // Check for empty input
         if (em.isEmpty()) {
             txtEmail.setError("Please enter an email address");
-        } else if (pwd.isEmpty()) {
+        }
+        if (pwd.isEmpty()) {
             txtPassword.setError("Please enter a password ");
         }
-        else if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+        if (uName.isEmpty()) {
+            txtName.setError("Please enter your name");
+        }
+        if (uPhoneNumber.isEmpty()) {
+            txtPhoneNumber.setError("Please input your phoneNumber");
+        }
+        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
             firebaseAuth.createUserWithEmailAndPassword(em, pwd)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -121,13 +131,18 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         }
     }
 
+    /**
+     * this function stores all relevant driver data in correct collection in firebase
+     * @param uName
+     * @param uPhoneNumber
+     * @param em
+     */
     private void storeDriverInDatabase(String uName, String uPhoneNumber, String em) {
 
         userID = firebaseAuth.getCurrentUser().getUid();
 
-        /*
-         * handles inputting userId in users table along with their type
-         */
+        // handles inputting userId in users table along with their type
+
         DocumentReference usersDocReference = db.collection("users").document(userID);
         Map<String, String> user = new HashMap<>();
         user.put("type", DRIVER_TYPE_STRING);
@@ -140,16 +155,10 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         });
 
         /*
-        handles inputting users into rider table with all relevant data
+        handles inputting users into driver table with all relevant data
          */
         DocumentReference ridersDocReference = db.collection("drivers").document(userID);
-        //Map<String, Object> rider = new HashMap<>();
-        //rider.put("Name", uName);
-        //rider.put("PhoneNumber", uPhoneNumber);
-        //rider.put("Email", uEmail);
-
         Driver driver = new Driver(uName, uPhoneNumber, em, driverCar);
-
         ridersDocReference.set(driver).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -160,6 +169,9 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     }
 
+    /**
+     * handles authenticating rider for app
+     */
     private void riderSignup() {
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
@@ -171,9 +183,17 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         // Check for empty input
         if (em.isEmpty()) {
             txtEmail.setError("Please enter an email address");
-        } else if (pwd.isEmpty()) {
+        }
+        if (pwd.isEmpty()) {
             txtPassword.setError("Please enter a password ");
-        } else if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+        }
+        if (uName.isEmpty()) {
+            txtName.setError("Please enter your name");
+        }
+        if (uPhoneNumber.isEmpty()) {
+            txtPhoneNumber.setError("Please input your phoneNumber");
+        }
+        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
             firebaseAuth.createUserWithEmailAndPassword(em, pwd)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -211,25 +231,17 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         DocumentReference usersDocReference = db.collection("users").document(userID);
         Map<String, String> user = new HashMap<>();
         user.put("type", RIDER_TYPE_STRING);
-
         usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(RegistrationActivity.this, uName + " added as rider", Toast.LENGTH_SHORT).show();
             }
         });
-
         /*
         handles inputting users into rider table with all relevant data
          */
         DocumentReference ridersDocReference = db.collection("riders").document(userID);
-        //Map<String, Object> rider = new HashMap<>();
-        //rider.put("Name", uName);
-        //rider.put("PhoneNumber", uPhoneNumber);
-        //rider.put("Email", uEmail);
-
         Rider rider = new Rider(uEmail, uName, uPhoneNumber);
-
         ridersDocReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -242,6 +254,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     @Override
     public void onDonePressed(Car s) {
         driverCar = s;
+        driverSignup();
     }
 }
 

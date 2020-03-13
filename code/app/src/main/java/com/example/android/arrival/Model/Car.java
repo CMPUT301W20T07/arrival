@@ -10,6 +10,8 @@ public class Car implements Serializable {
     private String Plate;
     private String color;
 
+    public Car(){};
+
     public Car(String make, String model, String year, String plate, String color) {
         this.make = make;
         this.model = model;

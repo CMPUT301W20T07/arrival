@@ -2,8 +2,12 @@ package com.example.android.arrival.Model;
 
 public class Driver extends User {
 
-
     private Car car;
+    private String make;
+    private String model;
+    private String year;
+    private String plate;
+
     public Driver() {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
