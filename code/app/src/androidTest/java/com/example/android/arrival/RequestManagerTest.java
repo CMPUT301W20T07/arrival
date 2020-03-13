@@ -1,13 +1,12 @@
 package com.example.android.arrival;
 
 import android.app.Activity;
-import android.widget.EditText;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.android.arrival.Activities.RequestTestActivity;
-import com.example.android.arrival.Model.GeoLocation;
+import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
@@ -29,7 +28,9 @@ public class RequestManagerTest {
     private Solo solo;
 
     private Request mockRequest() {
-        return new Request("rm-test-user", new GeoLocation(), new GeoLocation(), 1.0f);
+        Place pickup = new Place("Henday Hall", "6969 Big Hammer Ln.", 69.69, 420.1337);
+        Place destination = new Place("Panda Express", "1985 Loser Dr.", 17.38, 419.999);
+        return new Request("rm-test-user", pickup, destination, 1.0f);
     }
 
     @Rule

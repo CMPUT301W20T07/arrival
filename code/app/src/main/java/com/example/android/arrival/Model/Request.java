@@ -1,8 +1,9 @@
 package com.example.android.arrival.Model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Request {
+public class Request implements Serializable {
 
     public static final String STATUS_OPEN = "OPEN";
     public static final String STATUS_CANCELLED = "CANCELLED";
@@ -13,10 +14,8 @@ public class Request {
     private String id;
     private String status;
     private float fare;
-    private GeoLocation startLocation;
-    private GeoLocation endLocation;
-//    private Rider rider;
-//    private Driver driver;
+    private Place startLocation;
+    private Place endLocation;
     private String rider;
     private String driver;
 
@@ -24,7 +23,7 @@ public class Request {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-    public Request(String rider, GeoLocation start, GeoLocation end, float fare) {
+    public Request(String rider, Place start, Place end, float fare) {
         this.id = generateID();
         this.status = this.STATUS_OPEN;
         this.rider = rider;
@@ -35,7 +34,7 @@ public class Request {
     }
 
     // For testing
-    public Request(String id, String rider, GeoLocation start, GeoLocation end, float fare) {
+    public Request(String id, String rider, Place start, Place end, float fare) {
         this.id = id;
         this.status = this.STATUS_OPEN;
         this.rider = rider;
@@ -74,33 +73,21 @@ public class Request {
         this.fare = fare;
     }
 
-    public GeoLocation getStartLocation() {
+    public Place getStartLocation() {
         return startLocation;
     }
 
-    public void setStartLocation(GeoLocation startLocation) {
+    public void setStartLocation(Place startLocation) {
         this.startLocation = startLocation;
     }
 
-    public GeoLocation getEndLocation() {
+    public Place getEndLocation() {
         return endLocation;
     }
 
-    public void setEndLocation(GeoLocation endLocation) {
+    public void setEndLocation(Place endLocation) {
         this.endLocation = endLocation;
     }
-
-//    public Rider getRider() {
-//        return rider;
-//    }
-//
-//    public Driver getDriver() {
-//        return driver;
-//    }
-//
-//    public void setDriver(Driver driver) {
-//        this.driver = driver;
-//    }
 
     public String getRider() {
         return rider;

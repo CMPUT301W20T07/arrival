@@ -1,5 +1,6 @@
 package com.example.android.arrival.Model;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 /**
@@ -20,6 +21,13 @@ public interface RequestCallbackListener {
      * Defines that the view should update.
      */
     void update();
+
+    /**
+     * Define what should happen when a Request is successfully retrieved
+     * using the RequestManager.getOpenRequests() method from the db.
+     * @param snapshot
+     */
+    void onGetRequestSuccess(DocumentSnapshot snapshot);
 
     /**
      * Define what should happen when data is successfully retrieved

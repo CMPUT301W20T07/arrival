@@ -11,12 +11,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.example.android.arrival.Model.GeoLocation;
+import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
-import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -28,6 +28,8 @@ import java.util.List;
  * Activity layout code based on the Lab 7 starter code: https://github.com/Jakaria08/ListCity
  */
 public class RequestTestActivity extends AppCompatActivity implements RequestCallbackListener {
+
+    private static final String TAG = "ReqTest";
 
     private RequestManager rm;
 
@@ -72,7 +74,7 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
             @Override
             public void onClick(View v) {
                 // Open req
-                Request req = new Request(newName.getText().toString(), new GeoLocation(), new GeoLocation(), 13.37f );
+                Request req = new Request(newName.getText().toString(), new Place(), new Place(), 13.37f );
                 rm.openRequest(req, (RequestCallbackListener) v.getContext());
 
                 newName.getText().clear();
@@ -105,26 +107,32 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
     }
 
     @Override
+    public void onGetRequestSuccess(DocumentSnapshot snapshot) {
+        Request req = snapshot.toObject(Request.class);
+        Log.d(TAG + "-getReq", req.toString());
+    }
+
+    @Override
     public void onGetOpenSuccess(QuerySnapshot snapshot){
         // Convert the snapshot to objects that can be used to display information
         List<Request> openRequests = snapshot.toObjects(Request.class);
         requestAdapter.clear();
         requestAdapter.addAll(openRequests);
         requestAdapter.notifyDataSetChanged();
-        Log.d("MainActivity" + "-getOpen", openRequests.toString());
+        Log.d(TAG + "-getOpen", openRequests.toString());
     }
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
         // Convert the snapshot to objects that can be used to display information
         List<Request> userRequests = snapshot.toObjects(Request.class);
-        Log.d("MainActivity" + "-getReq", userRequests.toString());
+        Log.d(TAG + "-getReqs", userRequests.toString());
     }
 
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
         // Convert the snapshot to objects that can be used to display information
         List<Request> userRequests = snapshot.toObjects(Request.class);
-        Log.d("MainActivity" + "-getReq", userRequests.toString());
+        Log.d(TAG + "-getReqs", userRequests.toString());
     }
 }
