@@ -6,16 +6,16 @@ import java.util.UUID;
 public class Request implements Serializable {
 
 //    public static final String STATUS_OPEN = "OPEN";
+    //    public static final String STATUS_ACCEPTED = "ACCEPTED";
 //    public static final String STATUS_CANCELLED = "CANCELLED";
 //    public static final String STATUS_COMPLETED = "COMPLETED";
-//    public static final String STATUS_ACCEPTED = "ACCEPTED";
 //    public static final String STATUS_DENIED = "DENIED";
 
     public static final int STATUS_OPEN = 0;
-    public static final int STATUS_CANCELLED = 1;
-    public static final int STATUS_COMPLETED = 2;
-    public static final int STATUS_ACCEPTED = 3;
-    public static final int STATUS_DENIED = 4;
+    public static final int STATUS_ACCEPTED = 1;
+    public static final int STATUS_PICKED_UP = 2;
+    public static final int STATUS_COMPLETED = 3;
+    public static final int STATUS_CANCELLED = 4;
 
     private String id;
     private int status;
