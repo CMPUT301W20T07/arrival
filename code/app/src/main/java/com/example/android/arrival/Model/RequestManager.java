@@ -68,7 +68,6 @@ public class RequestManager {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG + "-open", "Successfully opened new request " + req.getID() + " in FireStore.");
-//                getOpenRequests(); // Update current list of open requests
                 getRequest(req.getID(), listener);
             }
         }).addOnFailureListener(new OnFailureListener() {

@@ -43,7 +43,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
     private Place pickup = new Place();
     private Place destination = new Place();
     private Request requestInfo = new Request();
-    private Request currRequest = new Request();
+    private Request currRequest;
     private Marker marker;
 
     private int index;
@@ -72,6 +72,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
         ArrayList<Marker> markers = (ArrayList<Marker>)getArguments().getSerializable("markerLocation");
         currRequest = (Request) getArguments().getSerializable("currentRequest");
 
+        assert currRequest != null;
 
         marker = markers.get(0);
         if (currRequest.getStartLocation().getLat() == marker.getPosition().latitude && currRequest.getStartLocation().getLon() == marker.getPosition().longitude) {
@@ -114,6 +115,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                 .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("AcceptRequestFrag", "OK clicked");
                         currRequest.setStatus(Request.STATUS_ACCEPTED);
                         currRequest.setDriver("curr-driver");
                         rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
