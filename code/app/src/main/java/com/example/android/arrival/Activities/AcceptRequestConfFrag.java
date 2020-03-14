@@ -7,10 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
@@ -19,23 +17,13 @@ import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.R;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 //Add open request information to fragment
 
 public class AcceptRequestConfFrag extends DialogFragment {
@@ -116,7 +104,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Log.d("AcceptRequestFrag", "OK clicked");
-                        currRequest.setStatus(Request.STATUS_ACCEPTED);
+                        currRequest.setStatus(Request.ACCEPTED);
                         currRequest.setDriver("curr-driver");
                         rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
                     }}).create();

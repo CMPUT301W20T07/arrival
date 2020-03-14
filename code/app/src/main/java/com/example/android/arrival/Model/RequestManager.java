@@ -9,7 +9,6 @@ import com.example.android.arrival.Activities.AcceptRequestConfFrag;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -141,7 +140,7 @@ public class RequestManager {
      * Retrieves all currently open requests from the FireStore Cloud Database.
      */
     public void getOpenRequests(final RequestCallbackListener listener) {
-        requestRef.whereEqualTo("status", Request.STATUS_OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        requestRef.whereEqualTo("status", Request.OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");

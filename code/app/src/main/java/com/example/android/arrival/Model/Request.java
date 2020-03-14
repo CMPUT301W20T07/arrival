@@ -1,7 +1,9 @@
 package com.example.android.arrival.Model;
 
 import java.io.Serializable;
-import java.util.UUID;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Request implements Serializable {
 
@@ -11,11 +13,24 @@ public class Request implements Serializable {
 //    public static final String STATUS_COMPLETED = "COMPLETED";
 //    public static final String STATUS_DENIED = "DENIED";
 
-    public static final int STATUS_OPEN = 0;
-    public static final int STATUS_ACCEPTED = 1;
-    public static final int STATUS_PICKED_UP = 2;
-    public static final int STATUS_COMPLETED = 3;
-    public static final int STATUS_CANCELLED = 4;
+    public static final int OPEN = 0;
+    public static final int ACCEPTED = 1;
+    public static final int PICKED_UP = 2;
+    public static final int COMPLETED = 3;
+    public static final int CANCELLED = 4;
+
+    public static final Map<Integer, String> STATUS;
+
+    static {
+        Map<Integer, String> tmap = new HashMap<>();
+        tmap.put(OPEN, "OPEN");
+        tmap.put(ACCEPTED, "ACCEPTED");
+        tmap.put(PICKED_UP, "PICKED UP");
+        tmap.put(COMPLETED, "COMPLETED");
+        tmap.put(CANCELLED, "CANCELLED");
+        STATUS = Collections.unmodifiableMap(tmap);
+    }
+
 
     private String id;
     private int status;
@@ -25,13 +40,13 @@ public class Request implements Serializable {
     private String rider;
     private String driver;
 
-    public Request(){
+    public Request() {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
     public Request(String rider, Place start, Place end, float fare) {
         this.id = generateID();
-        this.status = this.STATUS_OPEN;
+        this.status = this.OPEN;
         this.rider = rider;
         this.driver = null;
         this.startLocation = start;
@@ -42,7 +57,7 @@ public class Request implements Serializable {
     // For testing
     public Request(String id, String rider, Place start, Place end, float fare) {
         this.id = id;
-        this.status = this.STATUS_OPEN;
+        this.status = this.OPEN;
         this.rider = rider;
         this.driver = null;
         this.startLocation = start;
@@ -57,6 +72,7 @@ public class Request implements Serializable {
 
     /**
      * Return a random, unique id.
+     *
      * @return
      */
     public String generateID() {
@@ -109,11 +125,25 @@ public class Request implements Serializable {
 
     public String toString() {
         return "{STATUS: " + getStatus() +
-                ", RIDER: " +  getRider() +
+                ", RIDER: " + getRider() +
                 ", DRIVER: " + getDriver() +
                 ", START: " + getStartLocation().toString() +
-                ", END: "  + getEndLocation().toString() +
+                ", END: " + getEndLocation().toString() +
                 ", FARE: " + getFare() + "}";
+    }
+
+    public Boolean equals(Request r) {
+        if (id.equals(r.getID()) &&
+                status == r.getStatus() &&
+                fare == r.getFare() &&
+                rider.equals(r.getRider()) &&
+                (driver == null || driver.equals(r.getDriver())) &&
+                startLocation.equals(r.getStartLocation()) &&
+                endLocation.equals(r.getEndLocation())) {
+            return true;
+        }
+
+        return false;
     }
 
 }
