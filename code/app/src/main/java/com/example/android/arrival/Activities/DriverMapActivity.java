@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -70,6 +71,8 @@ import java.util.Map;
 
 public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
 
+    private static final String TAG = "DriverMapActivity";
+
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
@@ -90,6 +93,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private EditText txtDriverLocation;
     private EditText txtRiderLocation;
     private Button btnCancelRide;
+    private Button btnSignOut;
+    private FloatingActionButton btnRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,13 +110,36 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         txtDriverLocation = findViewById(R.id.txtDriverLocation);
         txtRiderLocation = findViewById(R.id.txtRiderLocation);
         btnCancelRide = findViewById(R.id.driverCancelRide);
+        btnSignOut = findViewById(R.id.btnDriverSignout);
+        btnRefresh = findViewById(R.id.btnRefresh);
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "btnSignOut Clicked");
+                Log.d(TAG, "Attempting to sign out user... ");
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                assert(currRequest != null);
+
+                Log.d(TAG, "btnCancelRide clicked");
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.STATUS_OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onResume();
             }
         });
 
@@ -182,7 +210,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 return false;
             }
         });
-
     }
 
     /**
@@ -268,11 +295,15 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         super.onResume();
         active = true;
 
+        Log.d(TAG, "onResume()");
+
         if(currRequest == null) {
+            Log.d(TAG, "currRequest is null");
             loadOpenRequests();
             btnCancelRide.setVisibility(View.INVISIBLE);
             txtRiderLocation.setText("");
         } else {
+            Log.d(TAG, "currRequest is " + currRequest.toString());
             requestsList.clear();
             txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
             btnCancelRide.setVisibility(View.VISIBLE);
@@ -287,7 +318,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         super.onPause();
         active = false;
     }
-
 
     /**
      * Ask the user for location permission
@@ -367,13 +397,24 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
 
-        if(req != null && currRequest == null) {
-            currRequest = req;
-            mMap.clear();
-            MarkerOptions mop = new MarkerOptions();
-            mop.position(currRequest.getStartLocation().getLatLng());
-            mMap.addMarker(mop);
+        Log.d(TAG, "Retrieved req: " + req.toString());
+        if(req != null) {
+            Log.d(TAG, "Request does not equal null");
+            if(currRequest == null) {
+                Log.d(TAG, "currRequest is null, req is not null");
+                currRequest = req;
+                mMap.clear();
+                MarkerOptions mop = new MarkerOptions();
+                mop.position(currRequest.getStartLocation().getLatLng());
+                mMap.addMarker(mop);
+            } else if(req.getStatus() == Request.STATUS_OPEN){
+                Log.d(TAG, "Request was cancelled, setting currRequest to null");
+                currRequest = null;
+            } else {
+                Log.d(TAG, "Other random bullshitasfdjalksdf j;alksfklajsdf;lkasjf;adslf");
+            }
         } else {
+            Log.d(TAG, "Setting currRequest = null...");
             currRequest = null;
         }
 
@@ -388,6 +429,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     public void onGetOpenSuccess(QuerySnapshot snapshot) {
         requestsList.clear();
         requestsList.addAll(snapshot.toObjects(Request.class));
+
+        mMap.clear();
 
         for (int i = 0; i < requestsList.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
