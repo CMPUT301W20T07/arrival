@@ -31,8 +31,8 @@ import android.widget.Toast;
 
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
+import com.example.android.arrival.Util.RequestCallbackListener;
+import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
 import com.google.android.gms.location.LocationCallback;
 //import com.google.android.gms.common.api.GoogleApiClient;
