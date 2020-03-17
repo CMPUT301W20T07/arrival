@@ -57,9 +57,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//TODO get a rideRequest confirmation fragment where user can edit the offer amount
-//TODO get distance between 2 markers to calculate the estimated cost and time
-//TODO send the RideRequest to the firebase (Might need Reilly for this) get it all packaged though
 
 public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
 
@@ -179,30 +176,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
 
 
-//        //Adding pickup location if map is reloaded
-//        if (pickup.getLat() != null){
-//            LatLng latLng = new LatLng(pickup.getLat(), pickup.getLon());
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.draggable(false);
-//            markerOptions.title("Pickup Location");
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//            startLocationText.setText(pickup.getAddress());
-//            pickupMarker = mMap.addMarker(markerOptions);
-//        }
-//
-//        //Adding destination location if the map is reloaded
-//        if(destination.getLat() != null) {
-//            LatLng latLng = new LatLng(destination.getLat(), destination.getLon());
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.draggable(false);
-//            markerOptions.title("Destination");
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//            endLocationText.setText(destination.getAddress());
-//            destMarker = mMap.addMarker(markerOptions);
-//        }
-
         //Adding pickup location if map is reloaded
         if (pickup.getLatLng() != null){
             LatLng latLng = pickup.getLatLng();
@@ -215,17 +188,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             pickupMarker = mMap.addMarker(markerOptions);
         }
 
-        //Adding destination location if the map is reloaded
-//        if(destination.getLat() != null) {
-//            LatLng latLng = new LatLng(destination.getLat(), destination.getLon());
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.draggable(false);
-//            markerOptions.title("Destination");
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//            endLocationText.setText(destination.getAddress());
-//            destMarker = mMap.addMarker(markerOptions);
-//        }
 
         //Adding destination location if the map is reloaded
         if(destination.getLatLng() != null) {
