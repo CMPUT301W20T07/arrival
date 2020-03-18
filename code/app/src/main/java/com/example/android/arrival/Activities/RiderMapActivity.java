@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -110,8 +111,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
         rm = RequestManager.getInstance();
 
-        txtStartLocation = findViewById(R.id.txtDriverLocation);
-        txtEndLocation = findViewById(R.id.txtRiderLocation);
+        txtStartLocation = findViewById(R.id.pickupLocation);
+        txtEndLocation = findViewById(R.id.destLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
         btnSignOut = findViewById(R.id.btnRiderSignout);
@@ -150,6 +151,16 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    /**
+     * Check if the map activity is closed
+     */
+    @Override
+    public void onPause() {
+        Log.d(TAG, "map on pause");
+        super.onPause();
+        //active = false;
+    }
+
 
     /**
      * When the map is ready to use we set it up for our specifications
@@ -176,35 +187,11 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
 
 
-        //Adding pickup location if map is reloaded
-        if (pickup.getLatLng() != null){
-            LatLng latLng = pickup.getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            txtStartLocation.setText(pickup.getAddress());
-            pickupMarker = mMap.addMarker(markerOptions);
-        }
-
-
-        //Adding destination location if the map is reloaded
-        if(destination.getLatLng() != null) {
-            LatLng latLng = destination.getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Destination");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            txtEndLocation.setText(destination.getAddress());
-            destMarker = mMap.addMarker(markerOptions);
-        }
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Log.d("map", "map was clicked");
+                Log.d(TAG, "map was clicked");
                 View customView = getLayoutInflater().inflate(R.layout.pickup_dest_popup, null);
 
                 PopupWindow popupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -222,23 +209,9 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         if (pickupMarker != null){
                             pickupMarker.remove();
                         }
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.draggable(false);
-                        markerOptions.title("Pickup Location");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                        pickupMarker = mMap.addMarker(markerOptions);
+                        addPickupMarker(latLng);
                         popupWindow.dismiss();
-                        Address pickupAddress = getCurrentLocationAddress(pickupMarker);
 
-                        pickup.setName(pickupAddress.getFeatureName());
-                        pickup.setAddress(pickupAddress.getAddressLine(0));
-//                        pickup.setLat(pickupAddress.getLatitude());
-//                        pickup.setLon(pickupAddress.getLongitude());
-                        pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-                        txtStartLocation.setText(pickup.getAddress());
-
-                        marks.set(0, pickup);
                     }
                 });
 
@@ -248,21 +221,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         if (destMarker != null) {
                             destMarker.remove();
                         }
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.draggable(false);
-                        markerOptions.title("Destination");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                        destMarker = mMap.addMarker(markerOptions);
+                        addDestMarker(latLng);
                         popupWindow.dismiss();
-                        Address pickupAddress = getCurrentLocationAddress(destMarker);
-
-                        destination.setName(pickupAddress.getFeatureName());
-                        destination.setAddress(pickupAddress.getAddressLine(0));
-                        destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-                        txtEndLocation.setText(destination.getAddress());
-
-                        marks.add(1, destination);
                     }
                 });
 
@@ -309,8 +269,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnRequestRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pickup != null && destination != null) {
-                    //TODO go to new intent to confirm RideRequest and get estimate cost and distance
+                if (pickupMarker != null && destMarker!= null) {
                     //Creates new instance of the RideRequest fragment that we pass variables to
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -318,6 +277,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                     DialogFragment fragment = RideRequestConfFrag.newInstance(marks);
                     fragmentTransaction.add(0, fragment);
                     fragmentTransaction.commit();
+                }
+                else{
+                    Toast.makeText(RiderMapActivity.this,
+                            "Please select pickup and destination locations", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -352,9 +315,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         assert(selected != null);
 
         LatLng latLng = selected.getLatLng();
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.draggable(false);
 
         //If the search was for a destination
         if (activityType == 2) {
@@ -362,69 +322,65 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             if (destMarker != null){
                 destMarker.remove();
             }
-            destination = selected;
-            marks.add(1, destination);
-
-            markerOptions.title("Destination");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            txtEndLocation.setText(selected.getAddress());
-            destMarker = mMap.addMarker(markerOptions);
+            addDestMarker(latLng);
 
             //Checks if we need to add a pickup marker that may have been erased when the map reloaded
-            addPickupMarker();
+            if(marks.get(0)!= null) {
+                addPickupMarker(marks.get(0).getLatLng());
+            }
 
         }
         //If the search was for a pickup
         else{
-            //Deletes the old pickup marker if necessary
             if (pickupMarker != null){
                 pickupMarker.remove();
             }
-            pickup = selected;
-            marks.set(0, pickup);
-
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            txtStartLocation.setText(selected.getAddress());
-            pickupMarker = mMap.addMarker(markerOptions);
-
-            //Checks if we need to add a destination marker that may have been erased when the map relaoded
-            addDestMarker();
-        }
-    }
-
-    /**
-     * Adds a pickup marker to the screen
-     */
-    public void addPickupMarker() {
-        if (marks.get(0) != null){
-            LatLng latLng = marks.get(0).getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            txtStartLocation.setText(marks.get(0).getAddress());
-            pickupMarker = mMap.addMarker(markerOptions);
+            addPickupMarker(latLng);
+            if(marks.get(1) != null) {
+                addDestMarker(marks.get(1).getLatLng());
+            }
         }
     }
 
 
-    /**
-     * Adds a destination marker to the screen
-     */
-    public void addDestMarker(){
-        if (marks.size() > 1) {
-            LatLng latLng = marks.get(1).getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Destination");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            txtEndLocation.setText(marks.get(1).getAddress());
-            destMarker = mMap.addMarker(markerOptions);
-        }
+
+    public void addPickupMarker(LatLng latLng){
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(false);
+        markerOptions.title("Pickup Location");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        pickupMarker = mMap.addMarker(markerOptions);
+
+        Address pickupAddress = getCurrentLocationAddress(pickupMarker);
+        pickup.setName(pickupAddress.getFeatureName());
+        pickup.setAddress(pickupAddress.getAddressLine(0));
+        pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+        txtStartLocation.setText(pickup.getAddress());
+
+        marks.set(0, pickup);
+
     }
+
+
+
+    public void addDestMarker(LatLng latLng){
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(false);
+        markerOptions.title("Destination");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        destMarker = mMap.addMarker(markerOptions);
+
+        Address pickupAddress = getCurrentLocationAddress(destMarker);
+        destination.setName(pickupAddress.getFeatureName());
+        destination.setAddress(pickupAddress.getAddressLine(0));
+        destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+        txtEndLocation.setText(destination.getAddress());
+
+        marks.add(1, destination);
+    }
+
 
 
     /**
@@ -448,7 +404,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                     markerOptions.position(latLng);
                     markerOptions.draggable(true);
                     markerOptions.title("Current Location");
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
                     //Checking if the users location has changed drastically
                     if (currentUserLocationMarker != null) {
@@ -471,15 +427,17 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         Address currentLocation = getCurrentLocationAddress(currentUserLocationMarker);
                         //If this is the first time the map is loaded set the default pickup
                         //location to be the current location
-                        if (marks.size() == 0){
+                        if (pickupMarker == null){
                             txtStartLocation.setText(currentLocation.getAddressLine(0));
 
                             current.setLatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                             current.setAddress(currentLocation.getAddressLine(0));
                             current.setName(currentLocation.getFeatureName());
 
+                            //pickupMarker = currentUserLocationMarker;
+
                             marks.add(0, current);
-                            addPickupMarker();
+                            addPickupMarker(latLng);
                         }
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
@@ -587,9 +545,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     public void onGetOpenSuccess(QuerySnapshot snapshot) {
         // Convert the snapshot to objects that can be used to display information
         List<Request> openRequests = snapshot.toObjects(Request.class);
-//        requestAdapter.clear();
-//        requestAdapter.addAll(openRequests);
-//        requestAdapter.notifyDataSetChanged();
         Log.d(TAG, "getOpen() : " + openRequests.toString());
     }
 
