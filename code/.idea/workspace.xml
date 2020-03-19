@@ -11,26 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d627a9fa-bcd4-43d3-abee-fb2d97694991" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/assetWizardSettings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/MainActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Model/GeoLocation.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/arrival2_01.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/arrival_logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/sign_in_button.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/splash_screen_photo.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/example/android/arrival/PlaceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../doc/UML.dia.autosave" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../doc/part3UMLDiagram.dia" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../doc/part3UMLDiagram.dia.autosave" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../doc/part3UMLDiagram.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RideRequestConfFrag.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RideRequestConfFrag.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RiderMapActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RiderMapActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/driver_map_activity.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/driver_map_activity.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/rider_map_activity.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/rider_map_activity.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -38,7 +20,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="BPN0218709002842" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="Pixel_3_API_29" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />

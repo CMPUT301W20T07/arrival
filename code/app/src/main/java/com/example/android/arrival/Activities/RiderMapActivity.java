@@ -136,6 +136,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+
+    /**
+     * Called when the map resumes from its previous state
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -343,7 +347,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
-
+    /**
+     * Adds a pickup marker to the map
+     * @param latLng : set of lat/lon coordinates
+     */
     public void addPickupMarker(LatLng latLng){
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
@@ -363,7 +370,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
-
+    /**
+     * adds a destination marker to the map
+     * @param latLng : set of lat/lon coordinates
+     */
     public void addDestMarker(LatLng latLng){
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
@@ -499,6 +509,12 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
+    /**
+     * Gets the results of the location permissions and acts accordingly
+     * @param requestCode : int of what request we are calling
+     * @param permissions : string of permissions granted
+     * @param grantResults : integer array of results
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
