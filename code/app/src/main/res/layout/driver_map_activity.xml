@@ -58,7 +58,7 @@
         android:gravity="center_vertical"
         android:text="Rider Location"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/requestRide"
+        app:layout_constraintBottom_toTopOf="@+id/driverCancelRide"
         app:layout_constraintEnd_toStartOf="@+id/txtRiderLocation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
@@ -73,36 +73,80 @@
         android:focusable="false"
         android:inputType="none"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/requestRide"
+        app:layout_constraintBottom_toTopOf="@+id/driverCancelRide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/endTextView" />
 
     <Button
-        android:id="@+id/requestRide"
-        android:layout_width="wrap_content"
+        android:id="@+id/driverConfirmPickup"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
-        android:visibility="invisible"
-        android:text="BRUH"
+        android:text="CONFIRM PICKUP"
         android:textColor="@android:color/background_light"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/driverCancelRide"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnDriverSignout"
+        app:layout_constraintStart_toStartOf="@+id/driverCompleteRide" />
 
     <Button
         android:id="@+id/driverCancelRide"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
-        android:visibility="invisible"
         android:text="CANCEL RIDE"
         android:textColor="@android:color/background_light"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/driverConfirmPickup" />
+
+    <Button
+        android:id="@+id/driverCompleteRide"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#03A9F4"
+        android:text="COMPLETE RIDE"
+        android:textColor="@android:color/background_light"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnDriverSignout" />
+
+    <Button
+        android:id="@+id/btnDriverSignout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#03A9F4"
+        android:text="SIGN OUT"
+        android:textColor="@android:color/background_light"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:src="@android:drawable/ic_popup_sync"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

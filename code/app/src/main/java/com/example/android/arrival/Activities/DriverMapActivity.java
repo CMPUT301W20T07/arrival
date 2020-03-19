@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -70,6 +71,8 @@ import java.util.Map;
 
 public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
 
+    private static final String TAG = "DriverMapActivity";
+
     private GoogleMap mMap;
     private LocationRequest locationRequest;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
@@ -78,9 +81,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private String riderID;
     public boolean zoom = true;
     static boolean active = false;
+    private int index;
 
     ArrayList<Request> requestsList = new ArrayList<>();
-    ArrayList<Marker> markers = new ArrayList<>();
 
     private FirebaseFirestore fb;
     private RequestManager rm;
@@ -90,6 +93,10 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private EditText txtDriverLocation;
     private EditText txtRiderLocation;
     private Button btnCancelRide;
+    private Button btnConfirmPickup;
+    private Button btnCompleteRide;
+    private Button btnSignOut;
+    private FloatingActionButton btnRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,13 +112,59 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         txtDriverLocation = findViewById(R.id.txtDriverLocation);
         txtRiderLocation = findViewById(R.id.txtRiderLocation);
         btnCancelRide = findViewById(R.id.driverCancelRide);
+        btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
+        btnCompleteRide = findViewById(R.id.driverCompleteRide);
+        btnSignOut = findViewById(R.id.btnDriverSignout);
+        btnRefresh = findViewById(R.id.btnRefresh);
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "btnSignOut Clicked");
+                Log.d(TAG, "Attempting to sign out user... ");
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                assert (currRequest != null);
+
+                Log.d(TAG, "btnCancelRide clicked");
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.STATUS_OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnConfirmPickup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                assert currRequest != null;
+
+                Log.d(TAG, "btnConfirmPickup clicked");
+                currRequest.setStatus(Request.STATUS_PICKED_UP);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnCompleteRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currRequest.setStatus(Request.STATUS_COMPLETED);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+                // TODO: Bring up QR scanner
+                refresh();
+            }
+        });
+
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh();
             }
         });
 
@@ -120,18 +173,59 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        if(currRequest == null) {
-            loadOpenRequests();
+        refresh();
+    }
+
+    public void refresh() {
+        Log.d(TAG, "refreshing...");
+
+        if (currRequest == null) {
+            rm.getOpenRequests(this);
+
             btnCancelRide.setVisibility(View.INVISIBLE);
+            btnConfirmPickup.setVisibility(View.INVISIBLE);
+            btnCompleteRide.setVisibility(View.INVISIBLE);
+            txtRiderLocation.setText("");
         } else {
+            Log.d(TAG, "currRequest is " + currRequest.toString());
+
             requestsList.clear();
             txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
-            btnCancelRide.setVisibility(View.VISIBLE);
+
+            if (currRequest.getStatus() == Request.STATUS_ACCEPTED) {
+                // Clear open requests from map, except currRequest
+                mMap.clear();
+                MarkerOptions mop = new MarkerOptions();
+                mop.position(currRequest.getStartLocation().getLatLng());
+                mMap.addMarker(mop);
+
+                btnCancelRide.setVisibility(View.VISIBLE);
+                btnConfirmPickup.setVisibility(View.VISIBLE);
+                btnCompleteRide.setVisibility(View.INVISIBLE);
+            } else if (currRequest.getStatus() == Request.STATUS_PICKED_UP) {
+                // Clear open requests from map, except currRequest destination
+                mMap.clear();
+                MarkerOptions mop = new MarkerOptions();
+                mop.position(currRequest.getEndLocation().getLatLng());
+                mMap.addMarker(mop);
+
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                btnCompleteRide.setVisibility(View.VISIBLE);
+            } else if(currRequest.getStatus() == Request.STATUS_COMPLETED) {
+                rm.getOpenRequests(this);
+
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                btnCompleteRide.setVisibility(View.INVISIBLE);
+                txtRiderLocation.setText("");
+            }
         }
     }
 
     /**
      * Create map with current location and switch to fragment on marker press
+     *
      * @param googleMap
      */
     @Override
@@ -143,14 +237,12 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         locationRequest.setFastestInterval(1100);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
 
                 mMap.setMyLocationEnabled(true);
-            }
-            else {
+            } else {
                 checkUserLocationPermission();
             }
         }
@@ -159,12 +251,20 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //Share marker and requests with the fragment
+                for (int i = 0; i < requestsList.size(); i++) {
+                    if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude && requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude) {
+                        index = i;
+                        currRequest = requestsList.get(i);
+                    }
+                }
+
+                ArrayList<Marker> markers = new ArrayList<>();
                 markers.add(marker);
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 Bundle args = new Bundle();
-                args.putSerializable("requestsList", requestsList);
+                args.putSerializable("currentRequest", currRequest);
                 args.putSerializable("markerLocation", markers);
 
                 AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
@@ -174,7 +274,6 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 return false;
             }
         });
-
     }
 
     /**
@@ -184,8 +283,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            for (Location location : locationResult.getLocations())
-            {
+            for (Location location : locationResult.getLocations()) {
                 mMap.setMyLocationEnabled(true);
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -196,7 +294,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
                 }
 
-                if(active) {
+                if (active) {
 
 //                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
                     Map<String, Object> map = new HashMap<>();
@@ -260,15 +358,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         super.onResume();
         active = true;
 
-        if(currRequest == null) {
-            loadOpenRequests();
-            btnCancelRide.setVisibility(View.INVISIBLE);
-            txtRiderLocation.setText("");
-        } else {
-            requestsList.clear();
-            txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
-            btnCancelRide.setVisibility(View.VISIBLE);
-        }
+        refresh();
     }
 
     /**
@@ -280,32 +370,27 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         active = false;
     }
 
-
     /**
      * Ask the user for location permission
      * if they do not accept then ask again when the activity is opened
      */
-    public void checkUserLocationPermission(){
+    public void checkUserLocationPermission() {
         //If permission is not granted the app will ask for user permission
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION))
-            {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 new AlertDialog.Builder(this)
                         .setTitle("Current Location Permission Denied")
                         .setMessage("Please give access to current location.")
                         .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(DriverMapActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
+                                ActivityCompat.requestPermissions(DriverMapActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
                             }
                         })
                         .create()
                         .show();
-            }
-            else
-            {
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_USER_LOCATION_CODE);
             }
         }
     }
@@ -313,36 +398,24 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     /**
      * If the user accepts locations then show the current location
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        switch(requestCode)
-        {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
             case REQUEST_USER_LOCATION_CODE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                    {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                     }
                     mMap.setMyLocationEnabled(true);
-                }
-                else
-                {
+                } else {
                     Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
         }
-    }
-
-    /**
-     * Get open requests
-     */
-    public void loadOpenRequests() {
-        rm.getOpenRequests(this);
     }
 
     @Override
@@ -358,28 +431,31 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
-
-        if(req != null && currRequest == null) {
-            currRequest = req;
-            mMap.clear();
-            MarkerOptions mop = new MarkerOptions();
-            mop.position(currRequest.getStartLocation().getLatLng());
-            mMap.addMarker(mop);
+        Log.d(TAG, "Retrieved req: " + req.toString());
+        if (req != null) {
+            if (currRequest == null) {
+                currRequest = req;
+            } else if (req.getStatus() == Request.STATUS_OPEN) {
+                currRequest = null;
+            }
         } else {
             currRequest = null;
         }
 
-        onResume();
+        refresh();
     }
 
     /**
      * Add all requests to an ArrayList
+     *
      * @param snapshot
      */
     @Override
     public void onGetOpenSuccess(QuerySnapshot snapshot) {
         requestsList.clear();
         requestsList.addAll(snapshot.toObjects(Request.class));
+
+        mMap.clear();
 
         for (int i = 0; i < requestsList.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
@@ -401,3 +477,10 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 }
+
+
+
+
+
+
+
