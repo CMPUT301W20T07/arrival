@@ -86,7 +86,6 @@ public class RideRequestConfFrag extends DialogFragment {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        ArrayList<Place> finalMarks = marks;
         return builder
                 .setView(view)
                 .setTitle("Confirm Ride Request")
@@ -94,21 +93,21 @@ public class RideRequestConfFrag extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO send the data to the request manager
-                        //lat and lon stored in pick and destination
-                        //get cost from the yourOfferValue textbox
-
                         Log.d(TAG, "Pressed OK");
                         float currFare = 0;
                         if(yourOfferValue.getText().length() == 0){
                             Toast.makeText(getContext(), "Fare offer cannot be empty", Toast.LENGTH_SHORT).show();
-                            return;
+                        }
+                        else if(Float.parseFloat(yourOfferValue.getText().toString()) <
+                                Float.parseFloat(recCostValue.getText().toString())){
+                            Toast.makeText(getContext(), "Offer must be at least the recommended",
+                                    Toast.LENGTH_SHORT).show();
                         }
                         else {
                             currFare = Float.parseFloat(yourOfferValue.getText().toString());
+                            Request req = new Request("usr-map-test", pickup, destination, currFare);
+                            rm.openRequest(req, (RequestCallbackListener) getContext());
                         }
-                        Request req = new Request("usr-map-test", pickup, destination, currFare);
-                        rm.openRequest(req, (RequestCallbackListener) getContext());
 
                     }}).create();
     }

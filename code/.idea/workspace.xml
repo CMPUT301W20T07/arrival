@@ -11,9 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d627a9fa-bcd4-43d3-abee-fb2d97694991" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/example/android/arrival/RiderMapActivityTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/example/android/arrival/RiderMapActivityTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RiderMapActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RiderMapActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RideRequestConfFrag.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RideRequestConfFrag.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -283,10 +282,10 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testBlankRideRequest()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="testBlankCostOffer()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="code-app" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="testBlankRideRequest" />
+      <option name="METHOD_NAME" value="testBlankCostOffer" />
       <option name="CLASS_NAME" value="com.example.android.arrival.RiderMapActivityTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -331,10 +330,10 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testClickingOnMap()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
-      <module name="CMPUT301-Arrival-code-app" />
+    <configuration name="testBlankRideRequest()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="code-app" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="testClickingOnMap" />
+      <option name="METHOD_NAME" value="testBlankRideRequest" />
       <option name="CLASS_NAME" value="com.example.android.arrival.RiderMapActivityTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -477,11 +476,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Android Instrumented Tests.testOpenSearchFrag...()" />
+        <item itemvalue="Android Instrumented Tests.testBlankCostOffer()" />
         <item itemvalue="Android Instrumented Tests.RiderMapActivityTest" />
+        <item itemvalue="Android Instrumented Tests.testOpenSearchFrag...()" />
         <item itemvalue="Android Instrumented Tests.testBlankRideRequest()" />
         <item itemvalue="Android Instrumented Tests.testCostOffer()" />
-        <item itemvalue="Android Instrumented Tests.testClickingOnMap()" />
       </list>
     </recent_temporary>
   </component>

@@ -19,6 +19,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotSame;
 import static junit.framework.TestCase.assertTrue;
 
+
 /**
  * Testing the buttons and views in the RiderMapActivtity and associate Fragments and Popups
  */
@@ -204,6 +205,32 @@ public class RiderMapActivityTest {
         String yourOfferValue = yourOffer.getText().toString();
 
         assertEquals(offerValue, yourOfferValue);
+    }
+
+    /**
+     * Testing the offer needs to have some value in it
+     */
+    @Test
+    public void testBlankCostOffer() {
+        solo.assertCurrentActivity("wrong activity", RiderMapActivity.class);
+
+        solo.sleep(10000);
+
+        //Adding a random destination to the screen so we can get to the confirmation fragment
+        solo.clickOnScreen(200, 400);
+        solo.waitForView(R.id.pickDestPopUp);
+        solo.clickOnButton("Destination");
+        solo.sleep(2000);
+
+        solo.clickOnButton("Request Ride");
+        solo.sleep(2000);
+
+        assertTrue(solo.searchText("Recommended Cost"));
+        EditText yourOffer = (EditText) solo.getView(R.id.yourOfferValue);
+        yourOffer.setText("");
+
+        solo.clickOnButton("OK");
+        assertTrue(solo.searchText("Fare offer cannot be empty"));
     }
 
 
