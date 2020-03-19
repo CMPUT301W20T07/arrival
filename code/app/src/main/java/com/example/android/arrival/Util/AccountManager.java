@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.android.arrival.Activities.LoginActivity;
 import com.example.android.arrival.Activities.RegistrationActivity;
@@ -20,12 +21,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class AccountManager {
+
+/**
+ * Singleton object used to manage all actions pertaining to an account
+ */
+public class AccountManager implements FirebaseAuth.AuthStateListener {
 
     public static final String TAG = "AccountManager: ";
     private static AccountManager instance;
@@ -37,12 +46,6 @@ public class AccountManager {
     private CollectionReference riderRef;
     private CollectionReference driverRef;
 
-    public static AccountManager getInstance() {
-        if(instance == null) {
-            instance = new AccountManager();
-        }
-        return instance;
-    }
 
     private AccountManager() {
         db = FirebaseFirestore.getInstance();
@@ -50,7 +53,23 @@ public class AccountManager {
         userRef = db.collection("users");
         riderRef = db.collection("riders");
         driverRef = db.collection("drivers");
+        firebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null) {
+                    return;
+                }
+            }
+        });
 
+
+    }
+
+    public static AccountManager getInstance() {
+        if(instance == null) {
+            instance = new AccountManager();
+        }
+        return instance;
     }
 
     /**
@@ -106,16 +125,65 @@ public class AccountManager {
                 }
                 else {
                     Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onComplete: create driver:" + task.getException().toString());
                 }
             }
         });
     }
 
     public void createRiderAccount(Rider rider, String password, Context context) {
+        firebaseAuth.createUserWithEmailAndPassword(rider.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    String userId = firebaseAuth.getCurrentUser().getUid();
+                    DocumentReference usersDocReference = userRef.document(userId);
 
+                    // add user type to look up table "users"
+                    Map<String, String> user = new HashMap<>();
+                    user.put("type", RIDER_TYPE_STRING);
+                    usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(context, "You have been added as rider", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "User onFailure: " + e);
+
+                        }
+                    });
+
+                    // add user data to driver table
+                    DocumentReference riderDocumentReference = riderRef.document(userId);
+                    riderDocumentReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(context, "Your data has been stored", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG, "Rider onFailure: " + e);
+
+                                }
+                            });
+                }
+                else {
+                    Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onComplete: create rider:" + task.getException().toString());
+                }
+            }
+        });
     }
 
-    public String getAccountType(Context context) {
+    public String getAccountType() {
+
+
         final String[] accountType = new String[1];
         String uid = firebaseAuth.getCurrentUser().getUid();
         DocumentReference documentReference = userRef.document(uid);
@@ -130,7 +198,6 @@ public class AccountManager {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "onFailure: getAccountType: " + e.toString());
-                Toast.makeText(context, "There was an error", Toast.LENGTH_SHORT).show();
                 accountType[0] = null;
             }
         });
@@ -141,6 +208,7 @@ public class AccountManager {
     public void updateDriverInfo() {
 
     }
+
 
     public void updateRiderInfo() {
 
@@ -190,7 +258,7 @@ public class AccountManager {
                     Log.d(TAG, "onComplete: user account deleted from firebaseFireAuth");
                 }
                 else {
-                    Log.d(TAG, "onComplete: Failed to delete from firebaseFireAuth with error: " + task.getException());
+                    Log.d(TAG, "onComplete: Failed to delete from firebaseFireAuth with error: " + task.getException().toString());
                 }
             }
         });
@@ -200,7 +268,7 @@ public class AccountManager {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         String uid = firebaseUser.getUid();
 
-        String accType = getAccountType(context);
+        String accType = getAccountType();
 
         if (accType.equals(DRIVER_TYPE_STRING)) {
             deleteDriverData(context, uid);
@@ -213,7 +281,39 @@ public class AccountManager {
 
     }
 
+    public void signInWithGoogle() {
+
+    }
+
+    public String signInUser(String email, String password, Context context) {
 
 
+        final String[] result = new String[1];
 
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(context, email + " signed in successfully", Toast.LENGTH_SHORT).show();
+                    String uid = firebaseAuth.getCurrentUser().getUid();
+                    Log.d(TAG, "signInUser: " + uid);
+                    result[0] = "success";
+                }
+                else {
+                    Log.d(TAG, "onComplete: signInUser error: " + task.getException().toString());
+                    Toast.makeText(context, "There was a problem signing you in...", Toast.LENGTH_SHORT).show();
+                    result[0] = "fail";
+                }
+            }
+        });
+
+        Log.d(TAG, "signInUser: " + result[0]);
+        return result[0];
+    }
+
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        getAccountType();
+    }
 }

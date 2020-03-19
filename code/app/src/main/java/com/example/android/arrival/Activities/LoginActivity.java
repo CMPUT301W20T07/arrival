@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.AccountManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,8 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     String TAG = "LoginActivity: ";
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
-
-
+    AccountManager accountManager;
 
 
     @Override
@@ -52,18 +52,15 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_login);
 
-        // Initalize firebase auth
-        firebaseAuth = FirebaseAuth.getInstance();
-
+        accountManager = AccountManager.getInstance();
         // View binding
         email = findViewById(R.id.login_email_editText);
         password = findViewById(R.id.login_passWord_editText);
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
-        edit_name = findViewById(R.id.user_name_editText);
+
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,9 +77,40 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * this function handles the backend of signing a user into their account
-     */
+
+    public void signUserIn () {
+        String emailStr = email.getText().toString();
+        String passwordStr = password.getText().toString();
+
+        if (emailStr.isEmpty()) {
+            email.setError("Input your email address");
+        }
+        if (passwordStr.isEmpty()) {
+            password.setError("Input your password");
+        }
+        if (!(emailStr.isEmpty() && passwordStr.isEmpty())) {
+            accountManager.signInUser(emailStr, passwordStr, LoginActivity.this);
+            String accountType = accountManager.getAccountType();
+            if (accountType.equals(DRIVER_TYPE_STRING)) {
+                Intent intent = new Intent(LoginActivity.this, DriverMapActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else if (accountType.equals(RIDER_TYPE_STRING)){
+                Intent intent = new Intent(LoginActivity.this, RiderMapActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else {
+                Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            Log.d(TAG, "signUserIn: fail");
+        }
+    }
+/*
+
     public void signUserIn() {
 
         String emailStr = email.getText().toString();
@@ -95,30 +123,22 @@ public class LoginActivity extends AppCompatActivity {
             password.setError("Input your password");
         }
         if (!(emailStr.isEmpty() && passwordStr.isEmpty())) {
-            firebaseAuth.signInWithEmailAndPassword(emailStr, passwordStr)
-                    .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(LoginActivity.this, "Sign in error occurred", Toast.LENGTH_LONG).show();
-                            }
-                            else {
-                               String uid = firebaseAuth.getCurrentUser().getUid();
-                               checkUserType(uid);
-                            }
-                        }
-                    });
+            firebaseAuth.signInWithEmailAndPassword(emailStr, passwordStr).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                @Override
+                public void onSuccess(AuthResult authResult) {
+                    String uid = firebaseAuth.getCurrentUser().getUid();
+                    checkUserType(uid);
+                }
+            });
+
         }
         else {
                 Toast.makeText(LoginActivity.this, "Input relevant data", Toast.LENGTH_SHORT).show();
             }
     }
 
-    /**
-     * checks user type
-     * @param uid takes in userID to search the users document on firestore
-     * @return userType
-     */
+
+
     public void checkUserType(String uid){
 
 
@@ -145,14 +165,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure: could not get document: " + uid);
-                        Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ;
 
     }
-
+*/
 }
