@@ -313,9 +313,15 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     @Override
     public void onAccountCreated(String accountType) {
-        startActivity(new Intent(RegistrationActivity.this, RiderMapActivity.class));
-        finish();
+        if (accountType.equals(RIDER_TYPE_STRING)) {
 
+            startActivity(new Intent(RegistrationActivity.this, RiderMapActivity.class));
+            finish();
+        }
+        else if (accountType.equals(DRIVER_TYPE_STRING)){
+            startActivity(new Intent(RegistrationActivity.this, DriverMapActivity.class));
+            finish();
+        }
     }
 }
 
