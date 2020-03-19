@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -31,7 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements AccountCallbackListener {
 
     Button signIn;
     TextView signUp;
@@ -89,24 +90,32 @@ public class LoginActivity extends AppCompatActivity {
             password.setError("Input your password");
         }
         if (!(emailStr.isEmpty() && passwordStr.isEmpty())) {
-            accountManager.signInUser(emailStr, passwordStr, LoginActivity.this);
-            String accountType = accountManager.getAccountType();
-            if (accountType.equals(DRIVER_TYPE_STRING)) {
-                Intent intent = new Intent(LoginActivity.this, DriverMapActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            else if (accountType.equals(RIDER_TYPE_STRING)){
-                Intent intent = new Intent(LoginActivity.this, RiderMapActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            else {
-                Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
-            }
+
+            accountManager.signInUser(emailStr, passwordStr, this);
+
         }
         else {
             Log.d(TAG, "signUserIn: fail");
+        }
+    }
+
+    @Override
+    public void onAccountSignIn(String accountType) {
+        Log.d(TAG, "onAccountSignIn: " + accountType);
+        if (accountType.equals(DRIVER_TYPE_STRING)) {
+            Toast.makeText(this, "Signing in as driver...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, DriverMapActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else if (accountType.equals(RIDER_TYPE_STRING)){
+            Toast.makeText(this, "Signing in as rider...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, RiderMapActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else {
+            Toast.makeText(LoginActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
         }
     }
 /*

@@ -34,13 +34,14 @@ import java.util.Objects;
 /**
  * Singleton object used to manage all actions pertaining to an account
  */
-public class AccountManager implements FirebaseAuth.AuthStateListener {
+public class AccountManager {
 
     public static final String TAG = "AccountManager: ";
     private static AccountManager instance;
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
     private FirebaseAuth firebaseAuth;
+
     private FirebaseFirestore db;
     private CollectionReference userRef;
     private CollectionReference riderRef;
@@ -53,14 +54,6 @@ public class AccountManager implements FirebaseAuth.AuthStateListener {
         userRef = db.collection("users");
         riderRef = db.collection("riders");
         driverRef = db.collection("drivers");
-        firebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-                    return;
-                }
-            }
-        });
 
 
     }
@@ -181,17 +174,17 @@ public class AccountManager implements FirebaseAuth.AuthStateListener {
         });
     }
 
-    public String getAccountType() {
+    public void getAccountType(String uid, final AccountCallbackListener listener) {
 
 
         final String[] accountType = new String[1];
-        String uid = firebaseAuth.getCurrentUser().getUid();
         DocumentReference documentReference = userRef.document(uid);
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 String docData = documentSnapshot.get("type").toString();
                 accountType[0] = docData;
+                listener.onAccountSignIn(accountType[0]);
                 Log.d(TAG, "onSuccess: " + docData);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -202,7 +195,7 @@ public class AccountManager implements FirebaseAuth.AuthStateListener {
             }
         });
 
-        return accountType[0];
+
     }
 
     public void updateDriverInfo() {
@@ -263,12 +256,12 @@ public class AccountManager implements FirebaseAuth.AuthStateListener {
             }
         });
     }
-
+/*
     public void deleteCurrentUser (Context context) {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         String uid = firebaseUser.getUid();
 
-        String accType = getAccountType();
+
 
         if (accType.equals(DRIVER_TYPE_STRING)) {
             deleteDriverData(context, uid);
@@ -280,40 +273,28 @@ public class AccountManager implements FirebaseAuth.AuthStateListener {
         }
 
     }
-
+*/
     public void signInWithGoogle() {
 
     }
 
-    public String signInUser(String email, String password, Context context) {
+    public void signInUser(String email, String password, final AccountCallbackListener listener) {
 
 
-        final String[] result = new String[1];
-
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()) {
-                    Toast.makeText(context, email + " signed in successfully", Toast.LENGTH_SHORT).show();
-                    String uid = firebaseAuth.getCurrentUser().getUid();
-                    Log.d(TAG, "signInUser: " + uid);
-                    result[0] = "success";
-                }
-                else {
-                    Log.d(TAG, "onComplete: signInUser error: " + task.getException().toString());
-                    Toast.makeText(context, "There was a problem signing you in...", Toast.LENGTH_SHORT).show();
-                    result[0] = "fail";
-                }
+            public void onSuccess(AuthResult authResult) {
+                Log.d(TAG, "onSuccess: " + authResult.getUser().getUid());
+                getAccountType(authResult.getUser().getUid(), listener);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: " + e.toString());
             }
         });
 
-        Log.d(TAG, "signInUser: " + result[0]);
-        return result[0];
     }
 
 
-    @Override
-    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        getAccountType();
-    }
 }
