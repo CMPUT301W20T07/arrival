@@ -6,4 +6,8 @@ public interface AccountCallbackListener {
 
     void onAccountSignIn(String userType);
 
+    void onSignInFailure(String e);
+
+    void onAccountCreated(String accountType);
+
 }

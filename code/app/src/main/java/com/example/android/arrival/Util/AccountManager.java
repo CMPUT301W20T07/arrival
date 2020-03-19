@@ -5,10 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.example.android.arrival.Activities.LoginActivity;
-import com.example.android.arrival.Activities.RegistrationActivity;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,14 +18,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 
 /**
@@ -67,7 +60,7 @@ public class AccountManager {
 
     /**
      * this method creates an account for a driver, registering all necessary data in firebase
-     * @param driver
+     * @param driver this is a driver object
      * @param password
      * @param context
      */
@@ -78,7 +71,7 @@ public class AccountManager {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    String userId = firebaseAuth.getCurrentUser().getUid();
+                    String userId = task.getResult().getUser().getUid();
                     DocumentReference usersDocReference = userRef.document(userId);
 
                     // add user type to look up table "users"
@@ -124,7 +117,7 @@ public class AccountManager {
         });
     }
 
-    public void createRiderAccount(Rider rider, String password, Context context) {
+    public void createRiderAccount(Rider rider, String password, Context context, final AccountCallbackListener listener) {
         firebaseAuth.createUserWithEmailAndPassword(rider.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -155,6 +148,7 @@ public class AccountManager {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(context, "Your data has been stored", Toast.LENGTH_SHORT).show();
+                            listener.onAccountCreated(RIDER_TYPE_STRING);
                         }
                     })
                             .addOnFailureListener(new OnFailureListener() {
@@ -291,6 +285,8 @@ public class AccountManager {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "onFailure: " + e.toString());
+                listener.onSignInFailure(e.toString());
+
             }
         });
 

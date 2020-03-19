@@ -127,6 +127,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 

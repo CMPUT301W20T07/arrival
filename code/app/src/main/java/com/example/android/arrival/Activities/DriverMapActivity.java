@@ -109,6 +109,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
