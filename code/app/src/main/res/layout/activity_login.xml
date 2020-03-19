@@ -70,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="42dp"
         android:padding="10dp"
-        android:text="Forgot your username or password?"
+        android:text="@string/forgot_password"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="normal"
