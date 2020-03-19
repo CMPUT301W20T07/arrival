@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -83,6 +84,9 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         String emailStr = email.getText().toString();
         String passwordStr = password.getText().toString();
 
+        if (!Patterns.EMAIL_ADDRESS.matcher(emailStr).matches()){
+            email.setError("Please enter a valid email address");
+        }
         if (emailStr.isEmpty()) {
             email.setError("Input your email address");
         }
@@ -122,6 +126,16 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     @Override
     public void onSignInFailure(String e) {
         Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
     }
 
 }

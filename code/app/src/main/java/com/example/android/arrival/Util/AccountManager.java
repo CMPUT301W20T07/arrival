@@ -59,12 +59,12 @@ public class AccountManager {
     }
 
     /**
-     * this method creates an account for a driver, registering all necessary data in firebase
-     * @param driver this is a driver object
-     * @param password
-     * @param context
+     * this function takes in a driver object and stores it in firebase
+     * @param driver driver object
+     * @param password password to create account with
+     * @param listener callback listener
      */
-    public void createDriverAccount(Driver driver, String password, Context context) {
+    public void createDriverAccount(Driver driver, String password, final AccountCallbackListener listener) {
 
 
         firebaseAuth.createUserWithEmailAndPassword(driver.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -80,13 +80,12 @@ public class AccountManager {
                     usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(context,"You have been added as driver", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onSuccess: " + DRIVER_TYPE_STRING);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "User onFailure: " + e);
 
                         }
@@ -97,27 +96,33 @@ public class AccountManager {
                     driverDocumentReference.set(driver).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(context, "Your data has been stored", Toast.LENGTH_SHORT).show();
+                            listener.onAccountCreated(DRIVER_TYPE_STRING);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
+
                             Log.d(TAG, "Driver onFailure: " + e);
 
                         }
                     });
                 }
                 else {
-                    Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onComplete: create driver:" + task.getException().toString());
                 }
             }
         });
     }
 
-    public void createRiderAccount(Rider rider, String password, Context context, final AccountCallbackListener listener) {
+    /**
+     * this function takes in a rider object and stores it in firebase
+     * @param rider rider object
+     * @param password password to create account with
+     * @param listener callback listener
+     */
+    public void createRiderAccount(Rider rider, String password, final AccountCallbackListener listener) {
+
         firebaseAuth.createUserWithEmailAndPassword(rider.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -131,14 +136,12 @@ public class AccountManager {
                     usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(context, "You have been added as rider", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onSuccess: " + RIDER_TYPE_STRING);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "User onFailure: " + e);
-
                         }
                     });
 
@@ -147,27 +150,29 @@ public class AccountManager {
                     riderDocumentReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            Toast.makeText(context, "Your data has been stored", Toast.LENGTH_SHORT).show();
                             listener.onAccountCreated(RIDER_TYPE_STRING);
                         }
                     })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
                                     Log.d(TAG, "Rider onFailure: " + e);
 
                                 }
                             });
                 }
                 else {
-                    Toast.makeText(context, "There was a problem creating your account", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onComplete: create rider:" + task.getException().toString());
                 }
             }
         });
     }
 
+    /**
+     * given a user id this function finds the user type related to that user and returns it to the callback listener
+     * @param uid user id
+     * @param listener callback listener that the function gives final output to
+     */
     public void getAccountType(String uid, final AccountCallbackListener listener) {
 
 
@@ -250,12 +255,11 @@ public class AccountManager {
             }
         });
     }
-/*
-    public void deleteCurrentUser (Context context) {
+
+    public void deleteCurrentUser (Context context, final AccountCallbackListener listener) {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         String uid = firebaseUser.getUid();
-
-
+        String accType = "hello";
 
         if (accType.equals(DRIVER_TYPE_STRING)) {
             deleteDriverData(context, uid);
@@ -267,11 +271,17 @@ public class AccountManager {
         }
 
     }
-*/
+
     public void signInWithGoogle() {
 
     }
 
+    /**
+     * This function signs the user in
+     * @param email user email
+     * @param password user password
+     * @param listener callback listener to be used by activity that calls it
+     */
     public void signInUser(String email, String password, final AccountCallbackListener listener) {
 
 

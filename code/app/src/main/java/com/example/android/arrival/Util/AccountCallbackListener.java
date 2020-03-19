@@ -10,4 +10,6 @@ public interface AccountCallbackListener {
 
     void onAccountCreated(String accountType);
 
+    void onAccountCreationFailure(String e);
+
 }
