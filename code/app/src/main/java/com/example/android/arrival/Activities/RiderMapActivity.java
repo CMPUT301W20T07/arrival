@@ -49,6 +49,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -75,6 +77,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private Place pickup = new Place();
     private Place destination = new Place();
     private Place current = new Place();
+
+    private Polyline line;
 
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -360,7 +364,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
      * Adds a pickup marker to the map
      * @param latLng : set of lat/lon coordinates
      */
-    public void addPickupMarker(LatLng latLng){
+    public void addPickupMarker(LatLng latLng) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.draggable(false);
@@ -376,6 +380,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
         marks.set(0, pickup);
 
+        addLine();
     }
 
 
@@ -398,8 +403,22 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         txtEndLocation.setText(destination.getAddress());
 
         marks.add(1, destination);
+
+        addLine();
     }
 
+
+    public void addLine() {
+        if (marks.size() >= 2){
+            if (line != null ){
+                line.remove();
+            }
+            line = mMap.addPolyline(new PolylineOptions()
+                    .add(marks.get(0).getLatLng(), marks.get(1).getLatLng())
+                    .width(10)
+                    .color(Color.RED));
+        }
+    }
 
 
     /**
