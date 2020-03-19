@@ -316,7 +316,16 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         int activityType = args.getInt("type");
         marks = (ArrayList<Place>) args.getSerializable("marks");
 
-        assert(selected != null);
+        if (selected == null){
+            if (marks.get(1) != null){
+                addDestMarker(marks.get(1).getLatLng());
+            }
+            if (marks.get(0) != null){
+                addPickupMarker(marks.get(0).getLatLng());
+            }
+
+            return;
+        }
 
         LatLng latLng = selected.getLatLng();
 
@@ -412,9 +421,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                 if (mMap != null) {
                     //Specifications for the current location marker
                     markerOptions.position(latLng);
-                    markerOptions.draggable(true);
                     markerOptions.title("Current Location");
-                    //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    markerOptions.visible(false);
 
                     //Checking if the users location has changed drastically
                     if (currentUserLocationMarker != null) {
@@ -516,18 +524,21 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
      * @param grantResults : integer array of results
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        switch(requestCode)
+        {
             case REQUEST_USER_LOCATION_CODE:
-                //If permission is accepted then create map with user location
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                    {
                         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                     }
                     mMap.setMyLocationEnabled(true);
                 }
-                //else show permission denied message
-                else {
+                else
+                {
                     Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
         }

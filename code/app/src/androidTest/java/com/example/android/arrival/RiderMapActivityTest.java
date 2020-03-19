@@ -61,7 +61,7 @@ public class RiderMapActivityTest {
 
         solo.sleep(10000);
 
-        TextView start = (TextView) solo.getView(R.id.txtDriverLocation);
+        TextView start = (TextView) solo.getView(R.id.pickupLocation);
         assertTrue(start.getText().length() > 0);
     }
 
@@ -73,8 +73,8 @@ public class RiderMapActivityTest {
     public void testClickingOnMap() {
         solo.assertCurrentActivity("Wrong activity", RiderMapActivity.class);
         RiderMapActivity activity = (RiderMapActivity) solo.getCurrentActivity();
-        TextView start = (TextView) solo.getView(R.id.txtDriverLocation);
-        TextView end = (TextView) solo.getView(R.id.txtRiderLocation);
+        TextView start = (TextView) solo.getView(R.id.pickupLocation);
+        TextView end = (TextView) solo.getView(R.id.destLocation);
 
         //Waits for the map to load
         solo.sleep(10000);
@@ -134,8 +134,8 @@ public class RiderMapActivityTest {
 
         solo.sleep(10000);
 
-        TextView start = (TextView) solo.getView(R.id.txtDriverLocation);
-        TextView end = (TextView) solo.getView(R.id.txtRiderLocation);
+        TextView start = (TextView) solo.getView(R.id.pickupLocation);
+        TextView end = (TextView) solo.getView(R.id.destLocation);
         String start1 = start.getText().toString();
 
         //Adding a random destination to the screen so we can test that its value doesn't change

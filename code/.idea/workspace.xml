@@ -12,6 +12,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d627a9fa-bcd4-43d3-abee-fb2d97694991" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/example/android/arrival/RiderMapActivityTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/example/android/arrival/RiderMapActivityTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RiderMapActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RiderMapActivity.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,7 +21,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="Pixel_3_API_29" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="BPN0218709002842" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -427,7 +428,7 @@
       </method>
     </configuration>
     <configuration name="testOpenSearchFrag...()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
-      <module name="CMPUT301-Arrival-code-app" />
+      <module name="code-app" />
       <option name="TESTING_TYPE" value="3" />
       <option name="METHOD_NAME" value="testOpenSearchFragments" />
       <option name="CLASS_NAME" value="com.example.android.arrival.RiderMapActivityTest" />
@@ -476,11 +477,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Android Instrumented Tests.testBlankRideRequest()" />
+        <item itemvalue="Android Instrumented Tests.testOpenSearchFrag...()" />
         <item itemvalue="Android Instrumented Tests.RiderMapActivityTest" />
+        <item itemvalue="Android Instrumented Tests.testBlankRideRequest()" />
         <item itemvalue="Android Instrumented Tests.testCostOffer()" />
         <item itemvalue="Android Instrumented Tests.testClickingOnMap()" />
-        <item itemvalue="Android Instrumented Tests.testOpenSearchFrag...()" />
       </list>
     </recent_temporary>
   </component>
