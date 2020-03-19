@@ -124,10 +124,11 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "btnSignOut Clicked");
+                Log.d(TAG, "Attempting to sign out user... ");
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
                 startActivity(intent);
-
             }
         });
 
@@ -278,6 +279,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 if (pickupMarker != null && destMarker!= null) {
+                    Log.d(TAG, "btnRequestRide clicked");
                     //Creates new instance of the RideRequest fragment that we pass variables to
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -579,7 +581,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         currentRequest = req;
         Log.d(TAG, "Retrieved request: " + req.toString());
 
-        if(req.getStatus().equals(Request.STATUS_CANCELLED)) {
+        if(req.getStatus() == Request.STATUS_CANCELLED) {
             currentRequest = null;
             Log.d(TAG, "Status = CANCELLED");
         }
