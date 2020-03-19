@@ -12,7 +12,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d627a9fa-bcd4-43d3-abee-fb2d97694991" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/example/android/arrival/RiderMapActivityTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/example/android/arrival/RiderMapActivityTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RideRequestConfFrag.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/arrival/Activities/RideRequestConfFrag.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -73,7 +72,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Android App.code-app">
+  <component name="RunManager" selected="Android Instrumented Tests.testLowCostOffer()">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -378,10 +377,10 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testCostOffer()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
-      <module name="CMPUT301-Arrival-code-app" />
+    <configuration name="testLowCostOffer()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="code-app" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="testCostOffer" />
+      <option name="METHOD_NAME" value="testLowCostOffer" />
       <option name="CLASS_NAME" value="com.example.android.arrival.RiderMapActivityTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -476,11 +475,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Android Instrumented Tests.testLowCostOffer()" />
         <item itemvalue="Android Instrumented Tests.testBlankCostOffer()" />
         <item itemvalue="Android Instrumented Tests.RiderMapActivityTest" />
         <item itemvalue="Android Instrumented Tests.testOpenSearchFrag...()" />
         <item itemvalue="Android Instrumented Tests.testBlankRideRequest()" />
-        <item itemvalue="Android Instrumented Tests.testCostOffer()" />
       </list>
     </recent_temporary>
   </component>

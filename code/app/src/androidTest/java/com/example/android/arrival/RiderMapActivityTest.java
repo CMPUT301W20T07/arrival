@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.android.arrival.Activities.RiderMapActivity;
+import com.google.protobuf.StringValue;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -231,6 +232,32 @@ public class RiderMapActivityTest {
 
         solo.clickOnButton("OK");
         assertTrue(solo.searchText("Fare offer cannot be empty"));
+    }
+
+    /**
+     * Testing the offer needs to be at least the recommend cost
+     */
+    @Test
+    public void testLowCostOffer() {
+        solo.assertCurrentActivity("wrong activity", RiderMapActivity.class);
+
+        solo.sleep(10000);
+
+        //Adding a random destination to the screen so we can get to the confirmation fragment
+        solo.clickOnScreen(200, 400);
+        solo.waitForView(R.id.pickDestPopUp);
+        solo.clickOnButton("Destination");
+        solo.sleep(2000);
+
+        solo.clickOnButton("Request Ride");
+        solo.sleep(2000);
+
+        assertTrue(solo.searchText("Recommended Cost"));
+        EditText yourOffer = (EditText) solo.getView(R.id.yourOfferValue);
+        yourOffer.setText("2.00");
+
+        solo.clickOnButton("OK");
+        assertTrue(solo.searchText("Offer must be at least the recommended"));
     }
 
 
