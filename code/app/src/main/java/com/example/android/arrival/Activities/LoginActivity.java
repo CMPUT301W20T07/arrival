@@ -6,13 +6,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.arrival.Dialogs.ForgotPasswordDialog;
 import com.example.android.arrival.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -34,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
 
     Button signIn;
     TextView signUp;
+    TextView forgot_password;
     EditText email;
     EditText password;
     EditText edit_name;
@@ -64,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
         edit_name = findViewById(R.id.user_name_editText);
+        forgot_password = findViewById(R.id.forgot_password);
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +83,15 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        forgot_password.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openForgotPasswordDialog();
+            }
+        });
+
+
     }
 
 
@@ -110,6 +125,9 @@ public class LoginActivity extends AppCompatActivity {
                     });
         }
         else {
+            Animation shake = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.shake);
+                email.startAnimation(shake);
+                password.startAnimation(shake);
                 Toast.makeText(LoginActivity.this, "Input relevant data", Toast.LENGTH_SHORT).show();
             }
     }
@@ -153,6 +171,11 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+
+    public void openForgotPasswordDialog() {
+        ForgotPasswordDialog.display(getSupportFragmentManager());
     }
 
 }
