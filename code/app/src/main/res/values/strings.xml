@@ -14,4 +14,6 @@
     <string name="search_hint">Enter location</string>
     <string name="star">*</string>
     <string name="sign_up_button"><u>Sign Up.</u></string>
+    <string name="forgot_password"><i><u>Forgot password?</u></i></string>
+    <string name="reset_message">An email will be sent to you after you enter the correct email address prompting you to reset your password.</string>
 </resources>
