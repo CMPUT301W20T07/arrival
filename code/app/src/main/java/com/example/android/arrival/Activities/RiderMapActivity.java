@@ -188,8 +188,11 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                 mMap.clear();
 
+                currRequest = null;
+
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
+                txtEndLocation.setText("");
             }
         }
     }
