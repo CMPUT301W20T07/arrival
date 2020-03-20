@@ -57,6 +57,16 @@
         app:layout_constraintTop_toBottomOf="@+id/text_to_convert" />
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/scanner"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="Sign out"
+        android:id="@+id/sign_out_google"
+        />
+
+    <Button
         android:id="@+id/btnRequestTest"
         android:layout_width="115dp"
         android:layout_height="40dp"

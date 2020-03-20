@@ -19,6 +19,11 @@ import android.widget.Toast;
 import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private Button genQRBTN;
     private EditText inputText;
     private static final int CAMERA_REQUEST = 100;
-
+    private Button signOut;
+    private GoogleSignInClient googleSignInClient;
     private Button btnRequestTest;
 
 
@@ -37,7 +43,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
         Button riderMapButton = (Button) findViewById(R.id.riderMapButton);
+        signOut = findViewById(R.id.sign_out_google);
+        signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                googleSignInClient.signOut().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
+                    }
+                });
+            }
+        });
 
         riderMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
 
     }
 

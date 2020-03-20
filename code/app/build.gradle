@@ -38,7 +38,7 @@ dependencies {
     implementation 'com.firebase:geofire:1.1.1'
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.google.firebase:firebase-core:17.2.3'
-    implementation 'com.google.firebase:firebase-auth:19.2.0'
+    implementation 'com.google.firebase:firebase-auth:19.3.0'
     implementation 'com.google.firebase:firebase-firestore:21.4.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
@@ -46,4 +46,5 @@ dependencies {
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.3.1'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.google.zxing:core:3.2.1'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
 }
