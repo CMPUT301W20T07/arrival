@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,14 +40,11 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     TextView signUp;
     EditText email;
     EditText password;
-    EditText edit_name;
-    String userType;
-    FirebaseAuth firebaseAuth;
-    FirebaseFirestore firestore;
     String TAG = "LoginActivity: ";
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
     AccountManager accountManager;
+    SignInButton signInGoogle;
 
 
     @Override
@@ -57,11 +55,14 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         setContentView(R.layout.activity_login);
 
         accountManager = AccountManager.getInstance();
+
         // View binding
         email = findViewById(R.id.login_email_editText);
         password = findViewById(R.id.login_passWord_editText);
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
+        signInGoogle = findViewById(R.id.sign_in_google_button);
+        signInGoogle.setSize(SignInButton.SIZE_ICON_ONLY);
 
 
         signIn.setOnClickListener(new View.OnClickListener() {

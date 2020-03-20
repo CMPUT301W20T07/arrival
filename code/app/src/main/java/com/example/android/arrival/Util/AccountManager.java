@@ -1,6 +1,7 @@
 package com.example.android.arrival.Util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -8,6 +9,8 @@ import androidx.annotation.NonNull;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,15 +37,15 @@ public class AccountManager {
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
     private FirebaseAuth firebaseAuth;
-
-    private FirebaseFirestore db;
+    private GoogleSignInOptions gso;
     private CollectionReference userRef;
     private CollectionReference riderRef;
     private CollectionReference driverRef;
 
 
+
     private AccountManager() {
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         userRef = db.collection("users");
         riderRef = db.collection("riders");
@@ -273,6 +276,10 @@ public class AccountManager {
     }
 
     public void signInWithGoogle() {
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
 
     }
 
