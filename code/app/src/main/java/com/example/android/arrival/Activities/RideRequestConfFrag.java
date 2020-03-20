@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -84,7 +85,6 @@ public class RideRequestConfFrag extends DialogFragment {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        ArrayList<Place> finalMarks = marks;
         return builder
                 .setView(view)
                 .setTitle("Confirm Ride Request")
@@ -92,15 +92,21 @@ public class RideRequestConfFrag extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO send the data to the request manager
-                        //lat and lon stored in pick and destination
-                        //get cost from the yourOfferValue textbox
-
                         Log.d(TAG, "Pressed OK");
-
-                        float currFare = Float.parseFloat(yourOfferValue.getText().toString());
-                        Request req = new Request("usr-map-test", pickup, destination, currFare);
-                        rm.openRequest(req, (RequestCallbackListener) getContext());
+                        float currFare = 0;
+                        if(yourOfferValue.getText().length() == 0){
+                            Toast.makeText(getContext(), "Fare offer cannot be empty", Toast.LENGTH_SHORT).show();
+                        }
+                        else if(Float.parseFloat(yourOfferValue.getText().toString()) <
+                                Float.parseFloat(recCostValue.getText().toString())){
+                            Toast.makeText(getContext(), "Offer must be at least the recommended",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            currFare = Float.parseFloat(yourOfferValue.getText().toString());
+                            Request req = new Request("usr-map-test", pickup, destination, currFare);
+                            rm.openRequest(req, (RequestCallbackListener) getContext());
+                        }
 
 
                     }}).create();
@@ -110,9 +116,7 @@ public class RideRequestConfFrag extends DialogFragment {
     // https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
-        // The math module contains a function
-        // named toRadians which converts from
-        // degrees to radians.
+        // The math module contains a function named toRadians which converts from degrees to radians.
         lon1 = Math.toRadians(lon1);
         lon2 = Math.toRadians(lon2);
         lat1 = Math.toRadians(lat1);
@@ -127,8 +131,7 @@ public class RideRequestConfFrag extends DialogFragment {
 
         double c = 2 * Math.asin(Math.sqrt(a));
 
-        // Radius of earth in kilometers. Use 3956
-        // for miles
+        // Radius of earth in kilometers.
         double r = 6371;
 
         // calculate the result

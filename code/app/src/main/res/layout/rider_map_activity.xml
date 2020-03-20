@@ -13,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/txtDriverLocation"
+        app:layout_constraintBottom_toTopOf="@+id/pickupLocation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,12 +31,12 @@
         android:text="Start"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/endTextView"
-        app:layout_constraintEnd_toStartOf="@+id/txtDriverLocation"
+        app:layout_constraintEnd_toStartOf="@+id/pickupLocation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/txtDriverLocation"
+        android:id="@+id/pickupLocation"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
@@ -44,7 +44,7 @@
         android:focusable="false"
         android:inputType="none"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/txtRiderLocation"
+        app:layout_constraintBottom_toTopOf="@+id/destLocation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/startTextView" />
@@ -59,12 +59,12 @@
         android:text="End"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/requestRide"
-        app:layout_constraintEnd_toStartOf="@+id/txtRiderLocation"
+        app:layout_constraintEnd_toStartOf="@+id/destLocation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/txtRiderLocation"
+        android:id="@+id/destLocation"
         android:layout_width="0dp"
         android:layout_height="51dp"
         android:layout_marginEnd="8dp"
