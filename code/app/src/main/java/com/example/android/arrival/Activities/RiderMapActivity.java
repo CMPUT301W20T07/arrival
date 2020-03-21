@@ -156,42 +156,45 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
     public void refresh() {
         Log.d(TAG, "refreshing...");
+        if(currRequest!=null) {
+            rm.getRequest(currRequest.getID(), this);
+        }
+    }
 
+    public void updateInfo() {
         if (currRequest == null) {
             txtStatus.setText("");
 
             mMap.clear();
-            addPickupMarker();
-            addDestMarker();
+            addPickupMarker(pickup.getLatLng());
+            addDestMarker(destination.getLatLng());
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
 
         } else {
-            rm.getRequest(currRequest.getID(), this);
+//            rm.getRequest(currRequest.getID(), this);
 
             Log.d(TAG, "currRequest is " + currRequest.toString());
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
             if (currRequest.getStatus() == Request.OPEN) {
                 mMap.clear();
-                addPickupMarker();
-                addDestMarker();
+                addPickupMarker(currRequest.getStartLocation().getLatLng());
+                addDestMarker(currRequest.getEndLocation().getLatLng());
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 mMap.clear();
-                addDestMarker();
+                addDestMarker(currRequest.getEndLocation().getLatLng());
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                 mMap.clear();
-
                 currRequest = null;
-
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 txtEndLocation.setText("");
@@ -638,11 +641,13 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
-            refresh();
+//            refresh();
         } else if(currRequest == null || !currRequest.equals(req)) {
             currRequest = req;
-            refresh();
+//            refresh();
         }
+
+        updateInfo();
     }
 
     @Override
@@ -662,5 +667,3 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 }
-
-
