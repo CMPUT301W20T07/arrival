@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -49,6 +50,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -86,13 +88,15 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     //ArrayList that holds the markers so we can add them again when the map reloads
     private ArrayList<Place> marks = new ArrayList<>();
 
-    private Request currentRequest;
+    private Request currRequest;
 
     private EditText txtStartLocation;
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
     private Button btnSignOut;
+    private TextView txtStatus;
+    private FloatingActionButton btnRefresh;
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -120,6 +124,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
         btnSignOut = findViewById(R.id.btnRiderSignout);
+        btnRefresh = findViewById(R.id.btnRiderRefresh);
+        txtStatus = findViewById(R.id.txtRiderStatus);
 
         btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,7 +138,14 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             }
         });
 
-        if(currentRequest == null) {
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh();
+            }
+        });
+
+        if(currRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
         } else {
@@ -141,6 +154,53 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    public void refresh() {
+        Log.d(TAG, "refreshing...");
+        if(currRequest!=null) {
+            rm.getRequest(currRequest.getID(), this);
+        }
+    }
+
+    public void updateInfo() {
+        if (currRequest == null) {
+            txtStatus.setText("");
+
+            mMap.clear();
+            addPickupMarker(pickup.getLatLng());
+            addDestMarker(destination.getLatLng());
+
+            btnRequestRide.setVisibility(View.VISIBLE);
+            btnCancelRide.setVisibility(View.INVISIBLE);
+
+        } else {
+//            rm.getRequest(currRequest.getID(), this);
+
+            Log.d(TAG, "currRequest is " + currRequest.toString());
+            txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
+
+            if (currRequest.getStatus() == Request.OPEN) {
+                mMap.clear();
+                addPickupMarker(currRequest.getStartLocation().getLatLng());
+                addDestMarker(currRequest.getEndLocation().getLatLng());
+
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.VISIBLE);
+
+            } else if (currRequest.getStatus() == Request.PICKED_UP) {
+                mMap.clear();
+                addDestMarker(currRequest.getEndLocation().getLatLng());
+
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                mMap.clear();
+                currRequest = null;
+                btnRequestRide.setVisibility(View.VISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                txtEndLocation.setText("");
+            }
+        }
+    }
 
     /**
      * Called when the map resumes from its previous state
@@ -148,15 +208,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onResume() {
         super.onResume();
-
-        Log.d(TAG, "onResume()...");
-
-        if (currentRequest == null) {
-            btnRequestRide.setVisibility(View.VISIBLE);
-            btnCancelRide.setVisibility(View.INVISIBLE);
-        } else {
-            btnRequestRide.setVisibility(View.INVISIBLE);
-            btnCancelRide.setVisibility(View.VISIBLE);
+        if(mMap != null) {
+            refresh();
         }
     }
 
@@ -169,7 +222,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         super.onPause();
         //active = false;
     }
-
 
     /**
      * When the map is ready to use we set it up for our specifications
@@ -278,6 +330,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnRequestRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // assert(!txtStartLocation.getText().toString().equals("") && !txtEndLocation.getText().toString().equals(""));
+
+                // Log.d(TAG, "btnRequestRide clicked");
+                // if (pickup != null && destination != null) {
                 if (pickupMarker != null && destMarker!= null) {
                     Log.d(TAG, "btnRequestRide clicked");
                     //Creates new instance of the RideRequest fragment that we pass variables to
@@ -298,8 +354,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentRequest.setStatus(Request.STATUS_CANCELLED);
-                rm.updateRequest(currentRequest, (RequestCallbackListener) v.getContext());
+                currRequest.setStatus(Request.CANCELLED);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
             }
         });
 
@@ -578,15 +634,20 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
-        currentRequest = req;
+
+        txtStatus.setText(Request.STATUS.get(req.getStatus()));
+
         Log.d(TAG, "Retrieved request: " + req.toString());
 
-        if(req.getStatus() == Request.STATUS_CANCELLED) {
-            currentRequest = null;
-            Log.d(TAG, "Status = CANCELLED");
+        if(req.getStatus() == Request.CANCELLED) {
+            currRequest = null;
+//            refresh();
+        } else if(currRequest == null || !currRequest.equals(req)) {
+            currRequest = req;
+//            refresh();
         }
 
-        onResume();
+        updateInfo();
     }
 
     @Override
@@ -606,5 +667,3 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 }
-
-

@@ -1,7 +1,6 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -21,18 +20,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.RequestCallbackListener;
 import com.example.android.arrival.Model.RequestManager;
 import com.example.android.arrival.R;
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -41,29 +36,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 //Drivers map, contains the driver's locations, markers of open requests
@@ -97,6 +82,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private Button btnCompleteRide;
     private Button btnSignOut;
     private FloatingActionButton btnRefresh;
+    private TextView txtStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +101,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
         btnCompleteRide = findViewById(R.id.driverCompleteRide);
         btnSignOut = findViewById(R.id.btnDriverSignout);
-        btnRefresh = findViewById(R.id.btnRefresh);
+        btnRefresh = findViewById(R.id.btnDriverRefresh);
+        txtStatus = findViewById(R.id.txtDriverStatus);
 
         btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +122,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
                 Log.d(TAG, "btnCancelRide clicked");
                 currRequest.setDriver(null);
-                currRequest.setStatus(Request.STATUS_OPEN);
+                currRequest.setStatus(Request.OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
             }
         });
@@ -146,7 +133,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 assert currRequest != null;
 
                 Log.d(TAG, "btnConfirmPickup clicked");
-                currRequest.setStatus(Request.STATUS_PICKED_UP);
+                currRequest.setStatus(Request.PICKED_UP);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
             }
         });
@@ -154,7 +141,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         btnCompleteRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currRequest.setStatus(Request.STATUS_COMPLETED);
+                currRequest.setStatus(Request.COMPLETED);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
                 // TODO: Bring up QR scanner
                 refresh();
@@ -186,13 +173,15 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             btnConfirmPickup.setVisibility(View.INVISIBLE);
             btnCompleteRide.setVisibility(View.INVISIBLE);
             txtRiderLocation.setText("");
+            txtStatus.setText("");
         } else {
             Log.d(TAG, "currRequest is " + currRequest.toString());
+            txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
             requestsList.clear();
             txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
 
-            if (currRequest.getStatus() == Request.STATUS_ACCEPTED) {
+            if (currRequest.getStatus() == Request.ACCEPTED) {
                 // Clear open requests from map, except currRequest
                 mMap.clear();
                 MarkerOptions mop = new MarkerOptions();
@@ -202,7 +191,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnConfirmPickup.setVisibility(View.VISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
-            } else if (currRequest.getStatus() == Request.STATUS_PICKED_UP) {
+            } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 // Clear open requests from map, except currRequest destination
                 mMap.clear();
                 MarkerOptions mop = new MarkerOptions();
@@ -212,7 +201,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.VISIBLE);
-            } else if(currRequest.getStatus() == Request.STATUS_COMPLETED) {
+            } else if(currRequest.getStatus() == Request.COMPLETED) {
                 rm.getOpenRequests(this);
 
                 btnCancelRide.setVisibility(View.INVISIBLE);
@@ -435,7 +424,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         if (req != null) {
             if (currRequest == null) {
                 currRequest = req;
-            } else if (req.getStatus() == Request.STATUS_OPEN) {
+            } else if (req.getStatus() == Request.OPEN) {
                 currRequest = null;
             }
         } else {
