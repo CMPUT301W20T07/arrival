@@ -22,7 +22,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.firestore.auth.User;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,6 +59,52 @@ public class AccountManager {
             instance = new AccountManager();
         }
         return instance;
+    }
+
+
+    /**
+     * this function returns user data to the callback listener
+     * @param listener callback listener to give values to
+     */
+    public void getUserData(final AccountCallbackListener listener) {
+
+        String uid = firebaseAuth.getCurrentUser().getUid();
+        String type = getAccountType(uid, listener);
+
+        if (type.equals(RIDER_TYPE_STRING)) {
+            DocumentReference documentReference = riderRef.document(uid);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Rider riderData = documentSnapshot.toObject(Rider.class);
+                    listener.onRiderDataRetrieved(riderData);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "get data onFailure: " + e.toString());
+                    listener.onDataRetrieveFail(e.toString());
+                }
+            });
+        }
+        else if (type.equals(DRIVER_TYPE_STRING)) {
+            DocumentReference documentReference = driverRef.document(uid);
+            documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    Driver driverData = documentSnapshot.toObject(Driver.class);
+                    listener.onDriverDataRetrieved(driverData);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "get data onFailure: " + e.toString());
+                    listener.onDataRetrieveFail(e.toString());
+
+                }
+            });
+        }
+
     }
 
     /**
@@ -176,7 +222,7 @@ public class AccountManager {
      * @param uid user id
      * @param listener callback listener that the function gives final output to
      */
-    public void getAccountType(String uid, final AccountCallbackListener listener) {
+    public String getAccountType(String uid, final AccountCallbackListener listener) {
 
 
         final String[] accountType = new String[1];
@@ -197,91 +243,9 @@ public class AccountManager {
             }
         });
 
-
+        return accountType[0];
     }
 
-    public void updateDriverInfo() {
-
-    }
-
-
-    public void updateRiderInfo() {
-
-    }
-
-    private void deleteDriverData(Context context, String uid) {
-
-        userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccess: deleteDriverData: deleted " + uid + " from users table");
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: deleteDriverData: failed to delete " + uid + " from users: " + e.toString());
-                Toast.makeText(context, "Account not deleted", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccess: deleteDriverData: deleted " + uid + " from drivers table");
-                Toast.makeText(context, "Data deleted successfully", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: deleteDriverData: failed to delete " + uid + " from drivers: " + e.toString());
-                Toast.makeText(context, "Account not deleted", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void deleteRiderData(Context context, String uid) {
-
-    }
-
-    private void deleteAccount(FirebaseUser user) {
-
-        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "onComplete: user account deleted from firebaseFireAuth");
-                }
-                else {
-                    Log.d(TAG, "onComplete: Failed to delete from firebaseFireAuth with error: " + task.getException().toString());
-                }
-            }
-        });
-    }
-
-    public void deleteCurrentUser (Context context, final AccountCallbackListener listener) {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        String uid = firebaseUser.getUid();
-        String accType = "hello";
-
-        if (accType.equals(DRIVER_TYPE_STRING)) {
-            deleteDriverData(context, uid);
-            deleteAccount(firebaseUser);
-        }
-        else {
-            deleteRiderData(context, uid);
-            deleteAccount(firebaseUser);
-        }
-
-    }
-
-    public void signInWithGoogle() {
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-
-    }
 
     /**
      * This function signs the user in
@@ -307,6 +271,99 @@ public class AccountManager {
             }
         });
 
+    }
+
+    /**
+     * this method deletes current user's account data from everywhere in firebase
+     * @param listener callback listener
+     */
+    public void deleteAccountData(final AccountCallbackListener listener) {
+
+
+
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        String uid = user.getUid();
+
+
+        userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+            // success listener for deleting user from users look up table
+
+            @Override
+            public void onSuccess(Void aVoid) {
+                String type = getAccountType(uid, listener);
+
+                if (type.equals(DRIVER_TYPE_STRING)) {
+                    driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                        // success listener for deleting driver from drivers table
+
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            firebaseAuth.getCurrentUser().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                                // success listener for deleting driver in firebase auth
+
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    listener.onAccountDeleted();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: firebaseAuthAccountDelete: " + e.toString());
+                                    listener.onAccountDeleteFailure(e.toString());
+                                }
+                            });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure: accountDataDeleted: " + e.toString());
+                            listener.onAccountDeleteFailure(e.toString());
+                        }
+                    });
+                }
+                else if (type.equals(RIDER_TYPE_STRING)) {
+                    riderRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                        // success listener for deleting rider data from riders table
+
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            firebaseAuth.getCurrentUser().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                                // on success listener for deleting user from firebase auth
+
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    listener.onAccountDeleted();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: firebaseAuthAccountDelete: " + e.toString());
+                                    listener.onAccountDeleteFailure(e.toString());
+                                }
+                            });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure: accountDataDeleted: " + e.toString());
+                            listener.onAccountDeleteFailure(e.toString());
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: delete from users Table:" + e.toString());
+                listener.onAccountDeleteFailure(e.toString());
+            }
+        });
     }
 
 

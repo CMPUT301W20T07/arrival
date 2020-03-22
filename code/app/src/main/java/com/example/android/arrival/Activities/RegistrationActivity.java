@@ -183,5 +183,30 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     public void onAccountCreationFailure(String e) {
         Toast.makeText(this, "There was an error creating your account... ", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
 }
 

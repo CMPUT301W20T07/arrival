@@ -10,7 +10,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.android.arrival.Model.Driver;
+import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.AccountCallbackListener;
+import com.example.android.arrival.Util.AccountManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,14 +25,14 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements AccountCallbackListener {
 
     public static final String TAG = "SplashActivity";
 
     FirebaseAuth firebaseAuth;
-    FirebaseAuth.AuthStateListener firebaseAuthListener;
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
+    AccountManager accountManager;
 
 
     @Override
@@ -38,6 +42,7 @@ public class SplashActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
+        accountManager = AccountManager.getInstance();
 
         // Makes sure the account is still valid
         if(user != null) {
@@ -47,7 +52,7 @@ public class SplashActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // User still exits
                         Log.d(TAG, "User = " + user.getEmail());
-                        checkUserType(user.getUid());
+                        accountManager.getAccountType(user.getUid(), SplashActivity.this);
                     } else {
                         // User no longer exists, send to login screen
                         Log.d(TAG, "User is null.");
@@ -65,45 +70,62 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * checks user type
-     * @param uid takes in userID to search the users document on firestore
-     * @return userType
-     */
-    public void checkUserType(String uid){
 
+    @Override
+    public void onAccountSignIn(String userType) {
+        if (userType.equals(DRIVER_TYPE_STRING)) {
+            Intent intent = new Intent(SplashActivity.this, DriverMapActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else if (userType.equals(RIDER_TYPE_STRING)){
+            Intent intent = new Intent(SplashActivity.this, RiderMapActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else {
+            Toast.makeText(SplashActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
+        }
+    }
 
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        DocumentReference documentReference = firestore.collection("users").document(uid);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String docData = documentSnapshot.get("type").toString();
-                Log.d(TAG, "onSuccess: " + docData);
-                if (docData.equals(DRIVER_TYPE_STRING)) {
-                    Intent intent = new Intent(SplashActivity.this, DriverMapActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                else if (docData.equals(RIDER_TYPE_STRING)){
-                    Intent intent = new Intent(SplashActivity.this, RiderMapActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                else {
-                    Log.d(TAG, "onComplete: " + uid + " " + docData);
-                    Toast.makeText(SplashActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
-                }
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure: could not get document: " + uid);
-                        Toast.makeText(SplashActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
-                    }
-                });
+    @Override
+    public void onSignInFailure(String e) {
+        Log.d(TAG, "onFailure: could not get document: " + e);
+        Toast.makeText(SplashActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
 
     }
 
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
 }

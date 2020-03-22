@@ -15,11 +15,8 @@ import androidx.fragment.app.DialogFragment;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.R;
-<<<<<<< HEAD
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-=======
->>>>>>> 46d1812830821611b7da51a85696b63f8b09950f
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
