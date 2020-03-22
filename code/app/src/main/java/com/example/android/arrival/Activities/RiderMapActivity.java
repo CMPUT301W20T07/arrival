@@ -106,7 +106,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-    private Button btnSignOut;
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
     private Toolbar toolbar2;
