@@ -63,6 +63,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -109,6 +110,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
     private Toolbar toolbar2;
+    private FirebaseAuth firebaseAuth;
+
 
     @Override
     public void onBackPressed() {
@@ -146,12 +149,22 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         txtEndLocation = findViewById(R.id.destLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
-        btnSignOut = findViewById(R.id.btnRiderSignout);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
         drawer = findViewById(R.id.rider_drawer_layout);
         NavigationView navigationView = findViewById(R.id.rider_navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView userName = headerView.findViewById(R.id.userName);
+        TextView userEmailAddress = headerView.findViewById(R.id.userEmailAddress);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String userName2 = user.getDisplayName();
+        String userEmail = user.getEmail();
+
+        userName.setText(userName2);
+        userEmailAddress.setText(userEmail);
 
         //Setting Navigation View click listener
         navigationView.setNavigationItemSelectedListener(this);

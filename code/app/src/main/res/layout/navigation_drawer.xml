@@ -21,12 +21,14 @@
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
         android:text="@string/account_name"
+        android:id="@+id/userName"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
+        android:id="@+id/userEmailAddress"
         android:text="@string/user_email_name"
         />
 
