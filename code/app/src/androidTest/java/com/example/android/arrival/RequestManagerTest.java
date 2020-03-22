@@ -8,8 +8,8 @@ import androidx.test.rule.ActivityTestRule;
 import com.example.android.arrival.Activities.RequestTestActivity;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
+import com.example.android.arrival.Util.RequestCallbackListener;
+import com.example.android.arrival.Util.RequestManager;
 import com.robotium.solo.Solo;
 
 import org.junit.Before;
