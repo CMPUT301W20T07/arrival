@@ -1,8 +1,13 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +29,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
@@ -61,13 +68,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.sql.Types.NULL;
 
 
-public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
 
     private RequestManager rm;
+    private DrawerLayout drawer;
 
     //Declaring variables for use later
     private GoogleMap mMap;
@@ -97,6 +106,17 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private Button btnSignOut;
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
+    private Toolbar toolbar2;
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -126,6 +146,23 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnSignOut = findViewById(R.id.btnRiderSignout);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
+        toolbar2 = findViewById(R.id.toolbar2);
+        drawer = findViewById(R.id.rider_drawer_layout);
+
+        //Set transparent toolbar
+        toolbar2.setBackgroundColor(Color.TRANSPARENT);
+        setSupportActionBar(toolbar2);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        ActionBarDrawerToggle newToggle = new ActionBarDrawerToggle(this, drawer, toolbar2, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(newToggle);
+        newToggle.syncState();
+
+        Window currentWindow = this.getWindow();
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+
 
         btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
