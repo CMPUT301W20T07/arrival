@@ -82,7 +82,6 @@ public class RideRequestConfFrag extends DialogFragment {
             recCostValue.setText(format.format(recCost));
 
             yourOfferValue.setText(format.format(recCost));
-
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -108,6 +107,7 @@ public class RideRequestConfFrag extends DialogFragment {
                             Request req = new Request("usr-map-test", pickup, destination, currFare);
                             rm.openRequest(req, (RequestCallbackListener) getContext());
                         }
+
 
                     }}).create();
     }
