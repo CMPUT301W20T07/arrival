@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -60,6 +61,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -71,7 +73,7 @@ import java.util.List;
 import static java.sql.Types.NULL;
 
 
-public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener {
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "RiderMapActivity";
 
@@ -118,6 +120,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
+
     /**
      * When activity is initially called we set up some basic location items needed later
      *
@@ -148,6 +151,10 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
         drawer = findViewById(R.id.rider_drawer_layout);
+        NavigationView navigationView = findViewById(R.id.rider_navigation_view);
+
+        //Setting Navigation View click listener
+        navigationView.setNavigationItemSelectedListener(this);
 
         //Set transparent toolbar
         toolbar2.setBackgroundColor(Color.TRANSPARENT);
@@ -164,17 +171,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
 
 
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "btnSignOut Clicked");
-                Log.d(TAG, "Attempting to sign out user... ");
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
-
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,6 +185,21 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
         }
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sign_out_button:
+                Log.d(TAG, "btnSignOut Clicked");
+                Log.d(TAG, "Attempting to sign out user... ");
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return true;
     }
 
     public void refresh() {
