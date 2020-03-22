@@ -12,7 +12,6 @@
     tools:openDrawer="start"
     >
 
-<!--    <include layout="@layout/activity_maps"></include>-->
     <include layout="@layout/rider_map_layout"></include>
 
     <LinearLayout
@@ -28,120 +27,7 @@
             android:layout_marginTop="1dp"
             android:elevation="1dp"
             />
-
-        <FrameLayout
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            >
-
-<!--            <include layout="@layout/activity_maps"></include>-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/startTextView"-->
-<!--                android:layout_width="90dp"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_marginEnd="16dp"-->
-<!--                android:gravity="center_vertical"-->
-<!--                android:text="Start"-->
-<!--                android:textSize="18sp"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/endTextView"-->
-<!--                app:layout_constraintEnd_toStartOf="@+id/pickupLocation"-->
-<!--                app:layout_constraintHorizontal_bias="0.5"-->
-<!--                app:layout_constraintStart_toStartOf="parent" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/pickupLocation"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:cursorVisible="false"-->
-<!--                android:focusable="false"-->
-<!--                android:inputType="none"-->
-<!--                android:textSize="12sp"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/destLocation"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintHorizontal_bias="0.5"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/startTextView" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/endTextView"-->
-<!--                android:layout_width="90dp"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_marginEnd="16dp"-->
-<!--                android:gravity="center_vertical"-->
-<!--                android:text="End"-->
-<!--                android:textSize="18sp"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/requestRide"-->
-<!--                app:layout_constraintEnd_toStartOf="@+id/destLocation"-->
-<!--                app:layout_constraintHorizontal_bias="0.5"-->
-<!--                app:layout_constraintStart_toStartOf="parent" />-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/destLocation"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="51dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:cursorVisible="false"-->
-<!--                android:ems="10"-->
-<!--                android:focusable="false"-->
-<!--                android:inputType="none"-->
-<!--                android:textSize="12sp"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/requestRide"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintHorizontal_bias="0.5"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/endTextView" />-->
-
-<!--            <Button-->
-<!--                android:id="@+id/requestRide"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginBottom="8dp"-->
-<!--                android:backgroundTint="#03A9F4"-->
-<!--                android:text="Request Ride"-->
-<!--                android:textColor="@android:color/background_light"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/btnRiderSignout" />-->
-
-<!--            <Button-->
-<!--                android:id="@+id/cancelRide"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginBottom="8dp"-->
-<!--                android:backgroundTint="#03A9F4"-->
-<!--                android:text="Cancel Ride"-->
-<!--                android:textColor="@android:color/background_light"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/btnRiderSignout" />-->
-
-
-<!--            <TextView-->
-<!--                android:id="@+id/txtRiderStatus"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:layout_marginBottom="8dp"-->
-<!--                android:text="STATUS"-->
-<!--                android:textAlignment="textEnd"-->
-<!--                app:layout_constraintBottom_toBottomOf="@+id/map"-->
-<!--                app:layout_constraintEnd_toEndOf="parent" />-->
-
-<!--            <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--                android:id="@+id/btnRiderRefresh"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_marginTop="8dp"-->
-<!--                android:clickable="true"-->
-<!--                android:src="@android:drawable/ic_popup_sync"-->
-<!--                app:backgroundTint="@color/colorPrimary"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-        </FrameLayout>
+        
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
