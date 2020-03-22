@@ -105,7 +105,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-    private Button btnSignOut;
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
     private Toolbar toolbar2;
@@ -146,7 +145,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         txtEndLocation = findViewById(R.id.destLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
-        btnSignOut = findViewById(R.id.btnRiderSignout);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
