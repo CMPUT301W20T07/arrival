@@ -197,6 +197,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
                 break;
         }
         return true;
