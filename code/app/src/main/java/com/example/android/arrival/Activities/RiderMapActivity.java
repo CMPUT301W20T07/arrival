@@ -216,7 +216,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
         } else {
-            rm.getRequest("1", this);
+            // FOR TESTING: If you want to test and spare the time of
+            // creating a new request, uncomment this line. Then you
+            // can just manipulate it in FireBase and refresh with the
+            // refresh button. Ex. changing status. Doc w/ ID = 1
+            // rm.getRequest("1", this);
         }
     }
 
@@ -233,8 +237,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             btnPayment.setVisibility(View.INVISIBLE);
 
         } else {
-//            rm.getRequest(currRequest.getID(), this);
-
             Log.d(TAG, "currRequest is " + currRequest.toString());
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
@@ -721,10 +723,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
-//            refresh();
         } else if(currRequest == null || !currRequest.equals(req)) {
             currRequest = req;
-//            refresh();
         }
 
         updateInfo();
