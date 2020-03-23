@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
@@ -19,6 +20,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
@@ -51,8 +53,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -93,6 +105,11 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private Button btnRequestRide;
     private Button btnCancelRide;
     private Button btnSignOut;
+
+    private FirebaseFirestore db;
+    private ValueEventListener postListener;
+
+    //final FirebaseDatabase database = null;
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -139,7 +156,101 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
         }
+
+
+       /* //Get the drivers location to calculate the distance from the marker selected
+        CollectionReference cr = db.collection("requests").document(String.valueOf(currentRequest)).collection("status");
+        DataSnapshot ds = (DataSnapshot) cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        Log.d(TAG, "something");
+                    }
+                });*/
+
+
+       // save code
+/*        db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
+                .whereEqualTo("status","0")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.d(TAG, "Listen failed:" + e);
+                            return;
+                        }
+                        Log.d(TAG, "open request!");
+                    }
+                });*/
+
+//        final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
+//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//                if (e!= null) {
+//                    Log.w(TAG, "Listen failed.", e);
+//                    return;
+//                }
+//                if (documentSnapshot != null && documentSnapshot.exists()) {
+//                    Log.d(TAG, "Current data: " +  documentSnapshot.getData());
+//                }
+//                else {
+//                    Log.d(TAG, "Current data: null");
+//                }
+//            }
+//        });
+
+//        postListener = new ValueEventListener() {
+//
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                Post post = dataSnapshot.getValue(Post.class);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
+//            }
+//        };
+//        db.addValueEventListener(postListener);
+
+
     }
+
+
+    final DocumentReference docRef = (DocumentReference) db.collection("requests").document(String.valueOf(currentRequest))
+            .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        Log.d(TAG, "Current data: " + documentSnapshot.getData());
+                    } else {
+                        Log.d(TAG, "Current data: null");
+                    }
+                }
+            });
+
+
+
+//    final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
+//    docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//        @Override
+//        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//            if (e!= null) {
+//                Log.w(TAG, "Listen failed.", e);
+//                return;
+//            }
+//            if (documentSnapshot != null && documentSnapshot.exists()) {
+//                Log.d(TAG, "Current data: " +  documentSnapshot.getData());
+//            }
+//            else {
+//                Log.d(TAG, "Current data: null");
+//            }
+//        }
+//    });
 
 
     /**
