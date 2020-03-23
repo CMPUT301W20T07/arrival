@@ -37,7 +37,23 @@ public class ContactDriverActivity extends AppCompatActivity {
 
         final String email_text = (String) email.getText();
 
-        
+        email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //String to = "email@ualberta.ca";
+                Intent intent2 = new Intent(Intent.ACTION_SEND);
+
+                //intent2.putExtra(Intent.EXTRA_EMAIL, email);
+                //intent2.setData(Uri.parse("mailto:"));
+                intent2.setType("*/*");
+                intent2.putExtra(Intent.EXTRA_EMAIL, "something");
+                //intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                //intent.putExtra(Intent.EXTRA_STREAM, attachment);
+                if (intent2.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent2);
+                }
+            }
+        });
 
 //        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "Your Phone_number"));
 //        startActivity(intent);
