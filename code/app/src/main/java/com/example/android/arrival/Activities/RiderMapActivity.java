@@ -217,7 +217,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
-    final DocumentReference docRef = (DocumentReference) db.collection("requests").document(String.valueOf(currentRequest))
+    /*final DocumentReference docRef = (DocumentReference) db.collection("requests").document(String.valueOf(currentRequest))
             .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -232,7 +232,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                     }
                 }
             });
-
+*/
 
 
 //    final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));

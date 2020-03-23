@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.android.arrival.R;
 
 public class ContactDriverActivity extends AppCompatActivity {
+
     TextView phoneNum;
     //String phoneNum = "7801234567";
     TextView email;
@@ -45,8 +46,8 @@ public class ContactDriverActivity extends AppCompatActivity {
 
                 //intent2.putExtra(Intent.EXTRA_EMAIL, email);
                 //intent2.setData(Uri.parse("mailto:"));
-                intent2.setType("*/*");
-                intent2.putExtra(Intent.EXTRA_EMAIL, "something");
+
+                intent2.putExtra(Intent.EXTRA_EMAIL, email_text);
                 //intent.putExtra(Intent.EXTRA_SUBJECT, subject);
                 //intent.putExtra(Intent.EXTRA_STREAM, attachment);
                 if (intent2.resolveActivity(getPackageManager()) != null) {
@@ -55,8 +56,8 @@ public class ContactDriverActivity extends AppCompatActivity {
             }
         });
 
-//        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "Your Phone_number"));
-//        startActivity(intent);
+
 
     }
+
 }
