@@ -16,8 +16,9 @@ public class Request implements Serializable {
     public static final int OPEN = 0;
     public static final int ACCEPTED = 1;
     public static final int PICKED_UP = 2;
-    public static final int COMPLETED = 3;
-    public static final int CANCELLED = 4;
+    public static final int AWAITING_PAYMENT = 3;
+    public static final int COMPLETED = 4;
+    public static final int CANCELLED = 5;
 
     public static final Map<Integer, String> STATUS;
 
@@ -26,6 +27,7 @@ public class Request implements Serializable {
         tmap.put(OPEN, "OPEN");
         tmap.put(ACCEPTED, "ACCEPTED");
         tmap.put(PICKED_UP, "PICKED UP");
+        tmap.put(AWAITING_PAYMENT, "AWAITING PAYMENT");
         tmap.put(COMPLETED, "COMPLETED");
         tmap.put(CANCELLED, "CANCELLED");
         STATUS = Collections.unmodifiableMap(tmap);

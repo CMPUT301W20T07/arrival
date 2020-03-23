@@ -61,8 +61,8 @@ public class DisplayQRDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)
-                .setTitle("Show QR Code")
-                .setNegativeButton("Cancel", null).create();
+                .setTitle("Payment")
+                .setNegativeButton("CLOSE", null).create();
 
     }
 
