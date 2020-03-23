@@ -17,8 +17,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
+import com.example.android.arrival.Util.RequestCallbackListener;
+import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
 
 import java.text.DecimalFormat;
@@ -82,7 +82,6 @@ public class RideRequestConfFrag extends DialogFragment {
             recCostValue.setText(format.format(recCost));
 
             yourOfferValue.setText(format.format(recCost));
-
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -108,6 +107,7 @@ public class RideRequestConfFrag extends DialogFragment {
                             Request req = new Request("usr-map-test", pickup, destination, currFare);
                             rm.openRequest(req, (RequestCallbackListener) getContext());
                         }
+
 
                     }}).create();
     }
