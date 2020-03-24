@@ -24,8 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
+import com.example.android.arrival.Util.RequestCallbackListener;
+import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -112,6 +112,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 

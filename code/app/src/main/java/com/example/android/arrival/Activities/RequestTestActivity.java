@@ -13,8 +13,8 @@ import android.widget.ListView;
 
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
+import com.example.android.arrival.Util.RequestCallbackListener;
+import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
