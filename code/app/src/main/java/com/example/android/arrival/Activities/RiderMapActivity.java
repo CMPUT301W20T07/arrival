@@ -135,6 +135,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         txtStartLocation = findViewById(R.id.pickupLocation);
         txtEndLocation = findViewById(R.id.destLocation);
@@ -172,19 +173,12 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
 
 
-       /* //Get the drivers location to calculate the distance from the marker selected
-        CollectionReference cr = db.collection("requests").document(String.valueOf(currentRequest)).collection("status");
-        DataSnapshot ds = (DataSnapshot) cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        Log.d(TAG, "something");
-                    }
-                });*/
 
-
-       // save code
-/*        db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
-                .whereEqualTo("status","0")
+        /**
+         * Listens to an accepted request from a driver from firebase
+         */
+        db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
+                .whereEqualTo("status","2")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -192,41 +186,15 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                             Log.d(TAG, "Listen failed:" + e);
                             return;
                         }
-                        Log.d(TAG, "open request!");
+                        Log.d(TAG, "accepted request!");
+                        Log.d(TAG, "size:" + String.valueOf(queryDocumentSnapshots.size()));
+                        Log.d(TAG, "queryDocSnapshots:" + String.valueOf(queryDocumentSnapshots));
+                        /*Request req = (Request) queryDocumentSnapshots.toObjects(Request.class);
+//                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
+//                        Log.d(TAG, "documents: " + String.valueOf(documents));
+                        Log.d(TAG, "req: " + req);*/
                     }
-                });*/
-
-//        final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
-//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-//                if (e!= null) {
-//                    Log.w(TAG, "Listen failed.", e);
-//                    return;
-//                }
-//                if (documentSnapshot != null && documentSnapshot.exists()) {
-//                    Log.d(TAG, "Current data: " +  documentSnapshot.getData());
-//                }
-//                else {
-//                    Log.d(TAG, "Current data: null");
-//                }
-//            }
-//        });
-
-//        postListener = new ValueEventListener() {
-//
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                Post post = dataSnapshot.getValue(Post.class);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
-//            }
-//        };
-//        db.addValueEventListener(postListener);
-
+                });
 
     }
 
@@ -278,40 +246,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
-    /*final DocumentReference docRef = (DocumentReference) db.collection("requests").document(String.valueOf(currentRequest))
-            .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (e != null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-                    if (documentSnapshot != null && documentSnapshot.exists()) {
-                        Log.d(TAG, "Current data: " + documentSnapshot.getData());
-                    } else {
-                        Log.d(TAG, "Current data: null");
-                    }
-                }
-            });
-*/
 
-
-//    final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
-//    docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//        @Override
-//        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-//            if (e!= null) {
-//                Log.w(TAG, "Listen failed.", e);
-//                return;
-//            }
-//            if (documentSnapshot != null && documentSnapshot.exists()) {
-//                Log.d(TAG, "Current data: " +  documentSnapshot.getData());
-//            }
-//            else {
-//                Log.d(TAG, "Current data: null");
-//            }
-//        }
-//    });
 
 
     /**
