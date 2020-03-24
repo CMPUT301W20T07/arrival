@@ -164,7 +164,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
          * Listens to an accepted request from a driver from firebase
          */
         db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
-                .whereEqualTo("status","1")
+                .whereEqualTo("status","2")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -172,7 +172,13 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                             Log.d(TAG, "Listen failed:" + e);
                             return;
                         }
-                        Log.d(TAG, "open request!");
+                        Log.d(TAG, "accepted request!");
+                        Log.d(TAG, "size:" + String.valueOf(queryDocumentSnapshots.size()));
+                        Log.d(TAG, "queryDocSnapshots:" + String.valueOf(queryDocumentSnapshots));
+                        /*Request req = (Request) queryDocumentSnapshots.toObjects(Request.class);
+//                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
+//                        Log.d(TAG, "documents: " + String.valueOf(documents));
+                        Log.d(TAG, "req: " + req);*/
                     }
                 });
 
