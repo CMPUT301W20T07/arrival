@@ -127,9 +127,8 @@ public class ScanQRDialog extends DialogFragment {
         super.onAttach(context);
         if(context instanceof  OnFragmentInteractionListener){
             listener = (OnFragmentInteractionListener) context;
-        }
-        else {
-            throw new RuntimeException(context.toString() + "must implement OnFragmentInteractionListener");
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
         }
     }
 

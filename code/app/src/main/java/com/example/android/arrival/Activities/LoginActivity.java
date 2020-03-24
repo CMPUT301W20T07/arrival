@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -88,7 +89,6 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         signUp.setOnClickListener(view -> {
             Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
             startActivity(intent);
-            finish();
         });
 
         forgot_password.setOnClickListener(new View.OnClickListener() {
@@ -183,6 +183,26 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
     @Override
     public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
 
     }
 

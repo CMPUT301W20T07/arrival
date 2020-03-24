@@ -1,14 +1,5 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,29 +9,49 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.DisplayQRDialog;
+import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.R;
+import com.example.android.arrival.Util.AccountCallbackListener;
+import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.example.android.arrival.R;
-import com.google.android.gms.location.LocationCallback;
-//import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -52,34 +63,29 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+//import com.google.android.gms.common.api.GoogleApiClient;
 
 
-public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, AccountCallbackListener,
+        RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "RiderMapActivity";
 
     private RequestManager rm;
+    private DrawerLayout drawer;
 
     //Declaring variables for use later
     private GoogleMap mMap;
@@ -106,9 +112,27 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-    private Button btnSignOut;
+    private Button btnPayment;
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
+    private Toolbar toolbar2;
+    private AccountManager accountManager;
+    private TextView userName;
+    private TextView userEmailAddress;
+    private ImageView profilePhoto;
+
+
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
+
 
     private FirebaseFirestore db;
     private ValueEventListener postListener;
@@ -135,77 +159,91 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
-        db = FirebaseFirestore.getInstance();
+        accountManager = AccountManager.getInstance();
 
         txtStartLocation = findViewById(R.id.pickupLocation);
         txtEndLocation = findViewById(R.id.destLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
-        btnSignOut = findViewById(R.id.btnRiderSignout);
+        btnPayment = findViewById(R.id.btnRiderShowQR);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
+        toolbar2 = findViewById(R.id.toolbar2);
+        drawer = findViewById(R.id.rider_drawer_layout);
+        NavigationView navigationView = findViewById(R.id.rider_navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        userName = headerView.findViewById(R.id.userName);
+        userEmailAddress = headerView.findViewById(R.id.userEmailAddress);
+        profilePhoto = headerView.findViewById(R.id.user_profile_pic);
 
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
+
+
+
+        //Setting Navigation View click listener
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //Set transparent toolbar
+        toolbar2.setBackgroundColor(Color.TRANSPARENT);
+        setSupportActionBar(toolbar2);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        ActionBarDrawerToggle newToggle = new ActionBarDrawerToggle(this, drawer, toolbar2, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(newToggle);
+        newToggle.syncState();
+
+        Window currentWindow = this.getWindow();
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        accountManager.getUserData(this);
+        accountManager.getProfilePhoto(this);
+
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Refresh button clicked");
+                refresh();
+            }
+        });
+
+        updateInfo();
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sign_out_button:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
-            }
-        });
-
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refresh();
-            }
-        });
-
-        if(currRequest == null) {
-            btnRequestRide.setVisibility(View.VISIBLE);
-            btnCancelRide.setVisibility(View.INVISIBLE);
-        } else {
-            btnRequestRide.setVisibility(View.INVISIBLE);
-            btnCancelRide.setVisibility(View.VISIBLE);
+                break;
         }
-
-
-
-        /**
-         * Listens to an accepted request from a driver from firebase
-         */
-        db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
-                .whereEqualTo("status","2")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.d(TAG, "Listen failed:" + e);
-                            return;
-                        }
-                        Log.d(TAG, "accepted request!");
-                        Log.d(TAG, "size:" + String.valueOf(queryDocumentSnapshots.size()));
-                        Log.d(TAG, "queryDocSnapshots:" + String.valueOf(queryDocumentSnapshots));
-                        /*Request req = (Request) queryDocumentSnapshots.toObjects(Request.class);
-//                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
-//                        Log.d(TAG, "documents: " + String.valueOf(documents));
-                        Log.d(TAG, "req: " + req);*/
-                    }
-                });
-
+        return true;
     }
 
     public void refresh() {
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
+        } else {
+            // FOR TESTING: If you want to test and spare the time of
+            // creating a new request, uncomment this line. Then you
+            // can just manipulate it in FireBase and refresh with the
+            // refresh button. Ex. changing status. Doc w/ ID = 1
+            // rm.getRequest("1", this);
         }
     }
 
     public void updateInfo() {
+
+        if(mMap == null) {
+            return;
+        }
+
         if (currRequest == null) {
             txtStatus.setText("");
 
@@ -215,10 +253,9 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
+            btnPayment.setVisibility(View.INVISIBLE);
 
         } else {
-//            rm.getRequest(currRequest.getID(), this);
-
             Log.d(TAG, "currRequest is " + currRequest.toString());
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
@@ -229,6 +266,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
+                btnPayment.setVisibility(View.INVISIBLE);
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 mMap.clear();
@@ -236,12 +274,20 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-            } else if(currRequest.getStatus() == Request.COMPLETED) {
-                mMap.clear();
-                currRequest = null;
-                btnRequestRide.setVisibility(View.VISIBLE);
+                btnPayment.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.AWAITING_PAYMENT) {
+                btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-                txtEndLocation.setText("");
+                btnPayment.setVisibility(View.VISIBLE);
+
+            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                    mMap.clear();
+                    currRequest = null;
+                    btnRequestRide.setVisibility(View.VISIBLE);
+                    btnCancelRide.setVisibility(View.INVISIBLE);
+                    btnPayment.setVisibility(View.INVISIBLE);
+                    txtEndLocation.setText("");
             }
         }
     }
@@ -403,6 +449,17 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             public void onClick(View v) {
                 currRequest.setStatus(Request.CANCELLED);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Generating QR...");
+                // TODO: Indicate to the user that a QR payment is loading
+                FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
+                DisplayQRDialog displayQRDialog = DisplayQRDialog.newInstance(currRequest.generateID());
+                displayQRDialog.show(fm, "generate");
             }
         });
 
@@ -688,10 +745,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
-//            refresh();
         } else if(currRequest == null || !currRequest.equals(req)) {
             currRequest = req;
-//            refresh();
         }
 
         updateInfo();
@@ -711,6 +766,75 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
+
+    }
+
+    @Override
+    public void onAccountSignIn(String userType) {
+
+    }
+
+    @Override
+    public void onSignInFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+
+        userName.setText(rider.getName());
+        userEmailAddress.setText(rider.getEmail());
+
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+        Glide.with(this).load(uri).into(profilePhoto);
+        Log.d(TAG, "onPhotoReceived: " + uri.toString());
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
 
     }
 }

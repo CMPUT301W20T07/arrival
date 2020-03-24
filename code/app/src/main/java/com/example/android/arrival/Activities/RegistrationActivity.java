@@ -1,10 +1,14 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -13,29 +17,31 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.android.arrival.Dialogs.CarDetailsDialog;
 import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.Model.User;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.material.snackbar.Snackbar;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
 
 public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener, AccountCallbackListener {
 
     private static final String TAG = "Registration";
+    private static final int GALLERY_RC = 100;
+    private static final int PHOTO_RC = 150;
     private EditText txtName;
     private EditText txtPhoneNumber;
     private EditText txtEmail;
@@ -43,10 +49,12 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     private Button btnDriverSignUp;
     private Button btnRiderSignUp;
     private Car driverCar;
-
+    private CircularImageView profileImage;
     private AccountManager accountManager;
+    private Uri filePath = null;
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
+    private static String IMAGE_DIRECTORY = "Arrival";
 
 
     @Override
@@ -64,8 +72,16 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         txtPassword = findViewById(R.id.register_password_editText);
         btnDriverSignUp = findViewById(R.id.sign_up_driver);
         btnRiderSignUp = findViewById(R.id.sign_up_rider);
+        profileImage = findViewById(R.id.profile_image);
 
         // Set on click listeners
+
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPictureDialog();
+            }
+        });
         btnDriverSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,11 +98,50 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    // https://demonuts.com/pick-image-gallery-camera-android/
+    private void showPictureDialog() {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
+        pictureDialog.setTitle("Select Action");
+        String[] pictureDialogItems = {
+                "Select photo from gallery" };
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            chooseFromGallery();
+                        }
+                    }
+                });
+        pictureDialog.show();
     }
 
+
+    private void chooseFromGallery() {
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        gallery.setType("image/");
+        startActivityForResult(gallery, GALLERY_RC);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: " + requestCode);
+        if (requestCode == GALLERY_RC &&data != null) {
+            try {
+                filePath = data.getData();
+                Bitmap bitmap = null;
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filePath);
+                profileImage.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, "onActivityResult: " + e.toString());
+            }
+
+            Log.d(TAG, "onActivityResult: " + filePath.toString());
+
+        }
+    }
 
     public void riderSignUp() {
         String em = txtEmail.getText().toString();
@@ -111,7 +166,10 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (uPhoneNumber.isEmpty()) {
             txtPhoneNumber.setError("Please input your phoneNumber");
         }
-        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+        if (filePath == null) {
+            Snackbar.make(profileImage, "Please input a photo", Snackbar.LENGTH_SHORT).show();
+        }
+        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty() && filePath == null)) {
             Rider rider = new Rider(em, uName, uPhoneNumber);
             accountManager.createRiderAccount(rider, pwd, this);
         } else {
@@ -168,12 +226,13 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     @Override
     public void onAccountCreated(String accountType) {
         if (accountType.equals(RIDER_TYPE_STRING)) {
+            accountManager.uploadProfilePhoto(filePath, this);
             Toast.makeText(this, "You have been registered as a rider", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(RegistrationActivity.this, RiderMapActivity.class));
             finish();
         }
         else if (accountType.equals(DRIVER_TYPE_STRING)){
-            Toast.makeText(this, "You have been registered as a rider", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You have been registered as a driver", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(RegistrationActivity.this, DriverMapActivity.class));
             finish();
         }
@@ -206,6 +265,27 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     @Override
     public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+        Toast.makeText(this, "Profile image uploaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+        Toast.makeText(this, "Profile failed to upload", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
 
     }
 }
