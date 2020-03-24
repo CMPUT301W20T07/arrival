@@ -1,18 +1,13 @@
 package com.example.android.arrival.Util;
 
-import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -24,8 +19,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -44,7 +37,6 @@ public class AccountManager {
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
     private FirebaseAuth firebaseAuth;
-    private GoogleSignInOptions gso;
     private CollectionReference userRef;
     private CollectionReference riderRef;
     private CollectionReference driverRef;
