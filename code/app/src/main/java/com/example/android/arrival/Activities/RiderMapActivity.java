@@ -159,16 +159,9 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
 
 
-       /* //Get the drivers location to calculate the distance from the marker selected
-        CollectionReference cr = db.collection("requests").document(String.valueOf(currentRequest)).collection("status");
-        DataSnapshot ds = (DataSnapshot) cr.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        Log.d(TAG, "something");
-                    }
-                });*/
-
-
+    /**
+    * Listens for an accepted request from a driver from firebase
+    */
        // save code
         db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
                 .whereEqualTo("status","1")
@@ -182,77 +175,6 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         Log.d(TAG, "open request!");
                     }
                 });
-
-//        final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
-//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-//                if (e!= null) {
-//                    Log.w(TAG, "Listen failed.", e);
-//                    return;
-//                }
-//                if (documentSnapshot != null && documentSnapshot.exists()) {
-//                    Log.d(TAG, "Current data: " +  documentSnapshot.getData());
-//                }
-//                else {
-//                    Log.d(TAG, "Current data: null");
-//                }
-//            }
-//        });
-
-//        postListener = new ValueEventListener() {
-//
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                Post post = dataSnapshot.getValue(Post.class);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
-//            }
-//        };
-//        db.addValueEventListener(postListener);
-
-
-    }
-
-
-    /*final DocumentReference docRef = (DocumentReference) db.collection("requests").document(String.valueOf(currentRequest))
-            .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                    if (e != null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-                    if (documentSnapshot != null && documentSnapshot.exists()) {
-                        Log.d(TAG, "Current data: " + documentSnapshot.getData());
-                    } else {
-                        Log.d(TAG, "Current data: null");
-                    }
-                }
-            });
-*/
-
-
-//    final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
-//    docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//        @Override
-//        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-//            if (e!= null) {
-//                Log.w(TAG, "Listen failed.", e);
-//                return;
-//            }
-//            if (documentSnapshot != null && documentSnapshot.exists()) {
-//                Log.d(TAG, "Current data: " +  documentSnapshot.getData());
-//            }
-//            else {
-//                Log.d(TAG, "Current data: null");
-//            }
-//        }
-//    });
-
 
     /**
      * Called when the map resumes from its previous state
