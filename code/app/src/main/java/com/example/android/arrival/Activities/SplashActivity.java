@@ -128,4 +128,14 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
     public void onAccountDeleteFailure(String e) {
 
     }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
 }
