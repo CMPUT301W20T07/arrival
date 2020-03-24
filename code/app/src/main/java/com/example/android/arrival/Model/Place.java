@@ -98,6 +98,14 @@ public class Place implements Comparable<Place>, Serializable {
 //        }
 //    }
 
+    public boolean equals(Place place) {
+        if (this.address.compareToIgnoreCase(place.address) == 0 || this.name.compareToIgnoreCase(place.name) == 0
+                || (this.getLat() == place.getLat() && this.getLon() == place.getLon())) {
+            return true;
+        }
+        return false;
+    }
+
     //Returns 0 if they are the same and 1 if they are different
     @Override
     public int compareTo(Place place){
