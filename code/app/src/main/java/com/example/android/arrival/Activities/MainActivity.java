@@ -202,4 +202,14 @@ public class MainActivity extends AppCompatActivity implements AccountCallbackLi
     public void onAccountDeleteFailure(String e) {
         Toast.makeText(this, "Account not deleted", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
 }

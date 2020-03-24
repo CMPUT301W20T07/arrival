@@ -2,6 +2,7 @@ package com.example.android.arrival.Util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +24,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.auth.User;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +46,8 @@ public class AccountManager {
     private CollectionReference userRef;
     private CollectionReference riderRef;
     private CollectionReference driverRef;
+    FirebaseStorage storage;
+
 
 
 
@@ -50,6 +57,7 @@ public class AccountManager {
         userRef = db.collection("users");
         riderRef = db.collection("riders");
         driverRef = db.collection("drivers");
+        storage = FirebaseStorage.getInstance();
 
 
     }
@@ -135,8 +143,8 @@ public class AccountManager {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "User onFailure: " + e);
-
+                            Log.d(TAG, "User onFailure: " + e.toString());
+                            listener.onAccountCreationFailure(e.toString());
                         }
                     });
 
@@ -151,7 +159,7 @@ public class AccountManager {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-
+                            listener.onAccountCreationFailure(e.toString());
                             Log.d(TAG, "Driver onFailure: " + e);
 
                         }
@@ -159,6 +167,7 @@ public class AccountManager {
                 }
                 else {
                     Log.d(TAG, "onComplete: create driver:" + task.getException().toString());
+                    listener.onAccountCreationFailure(task.getException().toString());
                 }
             }
         });
@@ -191,6 +200,7 @@ public class AccountManager {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.d(TAG, "User onFailure: " + e);
+                            listener.onAccountCreationFailure(e.toString());
                         }
                     });
 
@@ -201,17 +211,17 @@ public class AccountManager {
                         public void onSuccess(Void aVoid) {
                             listener.onAccountCreated(RIDER_TYPE_STRING);
                         }
-                    })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "Rider onFailure: " + e);
-
-                                }
-                            });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "Rider onFailure: " + e);
+                            listener.onAccountCreationFailure(e.toString());
+                        }
+                    });
                 }
                 else {
                     Log.d(TAG, "onComplete: create rider:" + task.getException().toString());
+                    listener.onAccountCreationFailure(task.getException().toString());
                 }
             }
         });
@@ -362,6 +372,25 @@ public class AccountManager {
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "onFailure: delete from users Table:" + e.toString());
                 listener.onAccountDeleteFailure(e.toString());
+            }
+        });
+    }
+
+    public void uploadProfilePhoto(@NonNull Uri filePath, AccountCallbackListener listener) {
+
+        String uid = firebaseAuth.getCurrentUser().getUid();
+        StorageReference ref = storage.getReference().child("images/" + uid);
+        ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.d(TAG, "onSuccess: " + ref.getPath());
+                listener.onImageUpload();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: " + e.toString());
+                listener.onImageUploadFailure(e.toString());
             }
         });
     }

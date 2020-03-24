@@ -22,4 +22,7 @@ public interface AccountCallbackListener {
     void onAccountDeleted();
     void onAccountDeleteFailure(String e);
 
+    void onImageUpload();
+    void onImageUploadFailure(String e);
+
 }
