@@ -236,6 +236,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     public void updateInfo() {
+
+        if(mMap == null) {
+            return;
+        }
+
         if (currRequest == null) {
             txtStatus.setText("");
 
