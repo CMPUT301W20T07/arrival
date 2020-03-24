@@ -159,10 +159,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
 
 
-    /**
-    * Listens for an accepted request from a driver from firebase
-    */
-       // save code
+
+        /**
+         * Listens to an accepted request from a driver from firebase
+         */
         db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
                 .whereEqualTo("status","1")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -175,6 +175,12 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         Log.d(TAG, "open request!");
                     }
                 });
+
+    }
+
+
+
+
 
     /**
      * Called when the map resumes from its previous state
