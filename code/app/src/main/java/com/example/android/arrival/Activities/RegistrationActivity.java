@@ -141,8 +141,6 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
             Log.d(TAG, "onActivityResult: " + filePath.toString());
 
         }
-
-
     }
 
     public void riderSignUp() {
@@ -234,7 +232,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
             finish();
         }
         else if (accountType.equals(DRIVER_TYPE_STRING)){
-            Toast.makeText(this, "You have been registered as a rider", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You have been registered as a driver", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(RegistrationActivity.this, DriverMapActivity.class));
             finish();
         }
@@ -278,6 +276,17 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     @Override
     public void onImageUploadFailure(String e) {
         Toast.makeText(this, "Profile failed to upload", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
+
     }
 }
 
