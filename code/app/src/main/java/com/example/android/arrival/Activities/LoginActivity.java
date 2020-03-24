@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -192,6 +193,16 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
     @Override
     public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
 
     }
 
