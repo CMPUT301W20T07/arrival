@@ -1,5 +1,7 @@
 package com.example.android.arrival.Util;
 
+import android.net.Uri;
+
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,4 +27,6 @@ public interface AccountCallbackListener {
     void onImageUpload();
     void onImageUploadFailure(String e);
 
+    void onPhotoReceived(Uri uri);
+    void onPhotoReceiveFailure(String e);
 }
