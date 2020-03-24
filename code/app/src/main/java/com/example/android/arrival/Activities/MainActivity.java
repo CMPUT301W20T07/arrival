@@ -84,9 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
-
 
     public void openScanner() {
         ScanQRDialog scanQRDialog = new ScanQRDialog();
