@@ -143,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements AccountCallbackLi
         if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
         }
-
     }
 
     public void openRiderMaps(){

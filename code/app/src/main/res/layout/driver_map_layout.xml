@@ -16,6 +16,7 @@
         app:layout_constraintBottom_toTopOf="@+id/startTextView"
         ></include>
 
+
     <TextView
         android:id="@+id/startTextView"
         android:layout_width="90dp"
@@ -23,15 +24,15 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_vertical"
-        android:text="Start"
+        android:text="Your Location"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/endTextView"
-        app:layout_constraintEnd_toStartOf="@+id/pickupLocation"
+        app:layout_constraintEnd_toStartOf="@+id/txtDriverLocation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/pickupLocation"
+        android:id="@+id/txtDriverLocation"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
@@ -39,7 +40,7 @@
         android:focusable="false"
         android:inputType="none"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/destLocation"
+        app:layout_constraintBottom_toTopOf="@+id/txtRiderLocation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/startTextView" />
@@ -51,15 +52,15 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         android:gravity="center_vertical"
-        android:text="End"
+        android:text="Rider Location"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/requestRide"
-        app:layout_constraintEnd_toStartOf="@+id/destLocation"
+        app:layout_constraintBottom_toTopOf="@+id/driverCancelRide"
+        app:layout_constraintEnd_toStartOf="@+id/txtRiderLocation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/destLocation"
+        android:id="@+id/txtRiderLocation"
         android:layout_width="0dp"
         android:layout_height="51dp"
         android:layout_marginEnd="8dp"
@@ -68,59 +69,85 @@
         android:focusable="false"
         android:inputType="none"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/requestRide"
+        app:layout_constraintBottom_toTopOf="@+id/driverCancelRide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/endTextView" />
 
     <Button
-        android:id="@+id/requestRide"
+        android:id="@+id/driverConfirmPickup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
-        android:visibility="invisible"
-        android:text="Request Ride"
+        android:text="CONFIRM PICKUP"
         android:textColor="@android:color/background_light"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/driverCancelRide"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnDriverSignout"
+        app:layout_constraintStart_toStartOf="@+id/driverCompleteRide" />
 
     <Button
-        android:id="@+id/cancelRide"
+        android:id="@+id/driverCancelRide"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
-        android:visibility="invisible"
-        android:text="Cancel Ride"
+        android:text="CANCEL RIDE"
         android:textColor="@android:color/background_light"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/driverConfirmPickup" />
 
     <Button
-        android:id="@+id/btnRiderShowQR"
+        android:id="@+id/driverCompleteRide"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
-        android:visibility="invisible"
-        android:text="DISPLAY QR PAYMENT"
+        android:text="COMPLETE RIDE"
         android:textColor="@android:color/background_light"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/btnDriverSignout" />
 
+    <Button
+        android:id="@+id/btnDriverScanQR"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#03A9F4"
+        android:text="SCAN QR CODE"
+        android:textColor="@android:color/background_light"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnDriverSignout" />
+
+    <Button
+        android:id="@+id/btnDriverSignout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#03A9F4"
+        android:text="SIGN OUT"
+        android:textColor="@android:color/background_light"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/txtRiderStatus"
+        android:id="@+id/txtDriverStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -131,15 +158,15 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnRiderRefresh"
+        android:id="@+id/btnDriverRefresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
         android:src="@android:drawable/ic_popup_sync"
         app:backgroundTint="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/txtRiderStatus"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/txtDriverStatus"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

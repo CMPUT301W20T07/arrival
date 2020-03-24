@@ -1,6 +1,8 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -9,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,6 +26,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
@@ -54,9 +58,10 @@ import java.util.Map;
 //Drivers map, contains the driver's locations, markers of open requests
 //when marker is pressed info pops up about marker
 
-public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
+public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener{
 
     private static final String TAG = "DriverMapActivity";
+    private static final int CAMERA_REQUEST = 100;
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -80,10 +85,12 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private Button btnCancelRide;
     private Button btnConfirmPickup;
     private Button btnCompleteRide;
+    private Button btnScanQR;
     private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,12 +101,16 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
 
+        // Get camera permissions
+        checkPermissions(getApplicationContext());
+
         // Bind components
         txtDriverLocation = findViewById(R.id.txtDriverLocation);
         txtRiderLocation = findViewById(R.id.txtRiderLocation);
         btnCancelRide = findViewById(R.id.driverCancelRide);
         btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
         btnCompleteRide = findViewById(R.id.driverCompleteRide);
+        btnScanQR = findViewById(R.id.btnDriverScanQR);
         btnSignOut = findViewById(R.id.btnDriverSignout);
         btnRefresh = findViewById(R.id.btnDriverRefresh);
         txtStatus = findViewById(R.id.txtDriverStatus);
@@ -142,10 +153,17 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         btnCompleteRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currRequest.setStatus(Request.COMPLETED);
+                currRequest.setStatus(Request.AWAITING_PAYMENT);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
-                // TODO: Bring up QR scanner
                 refresh();
+            }
+        });
+
+        btnScanQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Opening scanner...");
+                openScanner();
             }
         });
 
@@ -161,18 +179,30 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        refresh();
+        updateInfo();
     }
 
     public void refresh() {
         Log.d(TAG, "refreshing...");
+        if(currRequest!=null) {
+            rm.getRequest(currRequest.getID(), this);
+        } else {
+            // FOR TESTING: If you want to test and spare the time of
+            // creating a new request, uncomment this line. Then you
+            // can just manipulate it in FireBase and refresh with the
+            // refresh button. Ex. changing status. Doc w/ ID = 1
+            // rm.getRequest("1", this);
+        }
+    }
 
+    public void updateInfo() {
         if (currRequest == null) {
             rm.getOpenRequests(this);
 
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnConfirmPickup.setVisibility(View.INVISIBLE);
             btnCompleteRide.setVisibility(View.INVISIBLE);
+            btnScanQR.setVisibility(View.INVISIBLE);
             txtRiderLocation.setText("");
             txtStatus.setText("");
         } else {
@@ -192,6 +222,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnConfirmPickup.setVisibility(View.VISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
+                btnScanQR.setVisibility(View.INVISIBLE);
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 // Clear open requests from map, except currRequest destination
                 mMap.clear();
@@ -202,15 +233,43 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.VISIBLE);
-            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                btnScanQR.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.AWAITING_PAYMENT) {
+                // Clear open requests from map, except currRequest destination
+                mMap.clear();
+                MarkerOptions mop = new MarkerOptions();
+                mop.position(currRequest.getEndLocation().getLatLng());
+                mMap.addMarker(mop);
+
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                btnCompleteRide.setVisibility(View.INVISIBLE);
+                btnScanQR.setVisibility(View.VISIBLE);
+
+            } else if (currRequest.getStatus() == Request.COMPLETED) {
                 rm.getOpenRequests(this);
 
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
+                btnScanQR.setVisibility(View.INVISIBLE);
                 txtRiderLocation.setText("");
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void checkPermissions(Context context){
+        if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
+        }
+    }
+
+    public void openScanner() {
+        FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
+        ScanQRDialog scanQRDialog = new ScanQRDialog();
+        scanQRDialog.show(fm, "scan");
     }
 
     /**
@@ -421,18 +480,18 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
-        Log.d(TAG, "Retrieved req: " + req.toString());
-        if (req != null) {
-            if (currRequest == null) {
-                currRequest = req;
-            } else if (req.getStatus() == Request.OPEN) {
-                currRequest = null;
-            }
-        } else {
+
+        txtStatus.setText(Request.STATUS.get(req.getStatus()));
+
+        Log.d(TAG, "Retrieved request: " + req.toString());
+
+        if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
+        } else if(currRequest == null || !currRequest.equals(req)) {
+            currRequest = req;
         }
 
-        refresh();
+        updateInfo();
     }
 
     /**
@@ -465,6 +524,11 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
 
+    }
+
+    @Override
+    public void onDonePressed(String s) {
+        // TODO: I have no idea what this is supposed to do - Reilly
     }
 }
 
