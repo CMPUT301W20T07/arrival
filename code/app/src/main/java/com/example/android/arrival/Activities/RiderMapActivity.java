@@ -131,6 +131,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         txtStartLocation = findViewById(R.id.pickupLocation);
         txtEndLocation = findViewById(R.id.destLocation);
@@ -169,8 +170,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
 
 
        // save code
-/*        db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
-                .whereEqualTo("status","0")
+        db.collection("requests").document(String.valueOf(currentRequest)).collection("status")
+                .whereEqualTo("status","1")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -180,7 +181,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         }
                         Log.d(TAG, "open request!");
                     }
-                });*/
+                });
 
 //        final DocumentReference docRef = db.collection("requests").document(String.valueOf(currentRequest));
 //        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
