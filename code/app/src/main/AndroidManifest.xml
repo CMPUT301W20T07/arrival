@@ -54,11 +54,15 @@
         </activity>
 
         <activity
-            android:name=".Activities.RiderMapActivity">
+            android:name=".Activities.RiderMapActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
         </activity>
 
         <activity
-            android:name=".Activities.DriverMapActivity">
+            android:name=".Activities.DriverMapActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
         </activity>
 
         <activity android:name=".Activities.LoginActivity" />
