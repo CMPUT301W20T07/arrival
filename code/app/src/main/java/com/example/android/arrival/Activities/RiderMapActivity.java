@@ -83,7 +83,7 @@ import static java.sql.Types.NULL;
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "RiderMapActivity";
-    private static final int REFRESH_INTERVAL = 1000 * 45; // 30 seconds in millis
+    private static final int REFRESH_INTERVAL = 1000 * 45; // 45 seconds in millis
 
     private RequestManager rm;
     private DrawerLayout drawer;
