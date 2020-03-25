@@ -168,7 +168,21 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
         String uName = txtName.getText().toString();
-        String uPhoneNumber = txtPhoneNumber.getText().toString(); 
+        String uPhoneNumber = txtPhoneNumber.getText().toString();
+//        FirebaseInstanceId.getInstance().getInstanceId()
+//                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                        if (!task.isSuccessful()) {
+//                            Log.w(TAG, "getInstanceId failed", task.getException());
+//                            return;
+//                        }
+//                        // Get new Instance ID token
+//                        uTokenId = task.getResult().getToken();
+//                    }
+//                });
+//
+//        Log.d(TAG, "Token id: " + uTokenId);
 
 
         if (!Patterns.EMAIL_ADDRESS.matcher(em).matches()) {
@@ -205,6 +219,18 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         String uName = txtName.getText().toString();
         String uPhoneNumber = txtPhoneNumber.getText().toString();
 
+//        FirebaseInstanceId.getInstance().getInstanceId()
+//                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                        if (!task.isSuccessful()) {
+//                            Log.w(TAG, "getInstanceId failed", task.getException());
+//                            return;
+//                        }
+//                        // Get new Instance ID token
+//                        uTokenId = task.getResult().getToken();
+//                    }
+//                });
 
         // Check for empty input
         if (em.isEmpty()) {
