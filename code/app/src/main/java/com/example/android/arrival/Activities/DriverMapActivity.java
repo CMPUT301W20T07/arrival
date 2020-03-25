@@ -14,8 +14,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -27,7 +29,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.arrival.Dialogs.ScanQRDialog;
+import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.Model.User;
+import com.example.android.arrival.Util.AccountCallbackListener;
+import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
@@ -51,6 +58,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,19 +66,20 @@ import java.util.Map;
 //Drivers map, contains the driver's locations, markers of open requests
 //when marker is pressed info pops up about marker
 
-public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener{
+public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener {
 
     private static final String TAG = "DriverMapActivity";
     private static final int CAMERA_REQUEST = 100;
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
+    private Location currentLocation;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private String riderID;
+    private String driverName;
     public boolean zoom = true;
-    static boolean active = false;
+    static boolean currentActivity = false;
     private int index;
 
     ArrayList<Request> requestsList = new ArrayList<>();
@@ -100,6 +109,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
+        AccountManager.getInstance().getUserData(DriverMapActivity.this);
 
         // Get camera permissions
         checkPermissions(getApplicationContext());
@@ -136,6 +146,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                rm.getOpenRequests(DriverMapActivity.this);
             }
         });
 
@@ -315,6 +328,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 Bundle args = new Bundle();
                 args.putSerializable("currentRequest", currRequest);
                 args.putSerializable("markerLocation", markers);
+                args.putSerializable("driverName", driverName);
+                args.putSerializable("driverLat", currentLocation.getLatitude());
+                args.putSerializable("driverLon", currentLocation.getLongitude());
 
                 AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
                 acceptRequestConfFrag.setArguments(args);
@@ -334,6 +350,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         public void onLocationResult(LocationResult locationResult) {
             for (Location location : locationResult.getLocations()) {
                 mMap.setMyLocationEnabled(true);
+                currentLocation = location;
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -343,14 +360,14 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
                 }
 
-                if (active) {
+                if (currentActivity) {
 
 //                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
                     Map<String, Object> map = new HashMap<>();
                     map.put("lat", location.getLatitude());
                     map.put("lon", location.getLongitude());
 
-                    fb.collection("availableDrivers").document("driver1")
+                    fb.collection("availableDrivers").document(driverName)
                             .set(map)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -381,7 +398,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         map.put("lat", null);
         map.put("lon", null);
 
-        fb.collection("availableDrivers").document("driver1")
+        fb.collection("availableDrivers").document(driverName)
                 .set(map)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -405,7 +422,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onResume() {
         super.onResume();
-        active = true;
+        currentActivity = true;
 
         refresh();
     }
@@ -416,7 +433,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onPause() {
         super.onPause();
-        active = false;
+        currentActivity = false;
     }
 
     /**
@@ -529,6 +546,74 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onDonePressed(String s) {
         // TODO: I have no idea what this is supposed to do - Reilly
+    }
+
+    @Override
+    public void onAccountSignIn(String userType) {
+
+    }
+
+    @Override
+    public void onSignInFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+        User user = driver;
+        driverName = user.getName();
+
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
+
     }
 }
 
