@@ -35,9 +35,14 @@ public class Notifications extends FirebaseMessagingService {
         sendNotification(remoteMessage.getNotification().getBody());
     }
 
+    /**
+     * Called whenever a new token is generated
+     * @param token : Device token ID
+     */
     @Override
     public void onNewToken(@NonNull String token) {
         Log.d(TAG, "Refreshed token: " + token);
+        //TODO update firebase with new token if necessary
 
     }
 
@@ -59,6 +64,7 @@ public class Notifications extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setContentText(messageBody)
+                        .setSmallIcon(R.id.arrival_logo)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);

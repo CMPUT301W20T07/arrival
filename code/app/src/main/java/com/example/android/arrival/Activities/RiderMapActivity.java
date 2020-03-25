@@ -52,6 +52,7 @@ import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.SendNotification;
 import com.google.android.gms.location.LocationCallback;
 //import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -202,6 +203,10 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             public void onClick(View v) {
                 Log.d(TAG, "Refresh button clicked");
                 refresh();
+
+                Intent intent = new Intent(RiderMapActivity.this, SendNotification.class);
+                startActivity(intent);
+
             }
         });
 
@@ -215,7 +220,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             case R.id.sign_out_button:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
-                FirebaseAuth.getInstance().signOut();
+                //FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
