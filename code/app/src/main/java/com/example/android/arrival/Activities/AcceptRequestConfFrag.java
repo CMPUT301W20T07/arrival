@@ -79,11 +79,10 @@ public class AcceptRequestConfFrag extends DialogFragment {
             double distanceFromDriverToLocation = distance(startLocation.getLat(), driverLat, startLocation.getLon(), driverLon);
             distanceToCust.setText(format.format((int) distanceFromDriverToLocation));
 
-            double distance2 = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
-            custDistanceToDestination.setText(format.format((int) distance2));
+            double distanceFromRiderStartToEnd = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
+            custDistanceToDestination.setText(format.format((int) distanceFromRiderStartToEnd));
 
-            double recTime = distance2;
-            estTime.setText(format.format((int) (distance2 / 180)));
+            estTime.setText(format.format((int) (distanceFromRiderStartToEnd / 180)));
 
             custPaymentOffer.setText(format.format(fare));
         }

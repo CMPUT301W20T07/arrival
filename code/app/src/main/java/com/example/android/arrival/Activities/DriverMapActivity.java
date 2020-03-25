@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -78,7 +79,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String driverName;
     public boolean zoom = true;
-    static boolean active = false;
+    static boolean currentActivity = false;
     private int index;
 
     ArrayList<Request> requestsList = new ArrayList<>();
@@ -145,6 +146,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                rm.getOpenRequests(DriverMapActivity.this);
             }
         });
 
@@ -356,7 +360,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
                 }
 
-                if (active) {
+                if (currentActivity) {
 
 //                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
                     Map<String, Object> map = new HashMap<>();
@@ -418,7 +422,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onResume() {
         super.onResume();
-        active = true;
+        currentActivity = true;
 
         refresh();
     }
@@ -429,7 +433,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onPause() {
         super.onPause();
-        active = false;
+        currentActivity = false;
     }
 
     /**
