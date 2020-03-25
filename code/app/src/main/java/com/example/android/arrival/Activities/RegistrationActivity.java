@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener, AccountCallbackListener {
@@ -55,6 +56,8 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
     private static String IMAGE_DIRECTORY = "Arrival";
+
+
 
 
     @Override
@@ -85,6 +88,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         btnDriverSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 CarDetailsDialog carDetailsDialog = new CarDetailsDialog();
                 carDetailsDialog.show(getSupportFragmentManager(), "car");
             }

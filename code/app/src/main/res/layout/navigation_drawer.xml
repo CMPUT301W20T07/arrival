@@ -11,7 +11,7 @@
     android:backgroundTintMode="src_atop"
     >
 
-    <ImageView
+    <com.mikhaellopez.circularimageview.CircularImageView
         android:id="@+id/user_profile_pic"
         android:layout_width="100dp"
         android:layout_height="100dp"
