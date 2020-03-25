@@ -54,6 +54,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -361,14 +363,29 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 }
 
                 if (currentActivity) {
-
 //                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("lat", location.getLatitude());
-                    map.put("lon", location.getLongitude());
+                    Map<String, Object> driverInfo = new HashMap<>();
+                    driverInfo.put("lat", location.getLatitude());
+                    driverInfo.put("lon", location.getLongitude());
+                    if (currRequest == null)
+                    {
+                        driverInfo.put("currentRequestID", null);
+                        driverInfo.put("currentRequestStatus", null);
+                    }
+                    else {
+                        if (currRequest.getStatus() == 0 && currRequest.getStatus() == 4 && currRequest.getStatus() == 5) {
+                            driverInfo.put("currentRequestID", null);
+                            driverInfo.put("currentRequestStatus", null);
+                        }
+                        else {
+                            driverInfo.put("currentRequestID", currRequest.getID());
+                            driverInfo.put("currentRequestStatus", currRequest.getStatus());
+                        }
+                    }
 
-                    fb.collection("availableDrivers").document(driverName)
-                            .set(map)
+                    CollectionReference collectionReference = fb.collection("availableDrivers");
+                    collectionReference.document(driverName)
+                            .set(driverInfo)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -381,6 +398,20 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                                     Log.w("driverLocation", "not updated", e);
                                 }
                             });
+
+                    collectionReference.document(driverName)
+                            .get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            int driverOpenRequest = (int) documentSnapshot.get("currentRequestStatus");
+                            if (driverOpenRequest == 0)
+                            {
+
+                            }
+                            //When driver opens the map find current request
+                        }
+                    });
                 }
             }
         }
@@ -524,6 +555,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.clear();
 
         for (int i = 0; i < requestsList.size(); i++) {
+
             MarkerOptions markerOptions = new MarkerOptions();
 
             Request request = requestsList.get(i);
