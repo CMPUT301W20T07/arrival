@@ -1,11 +1,12 @@
 package com.example.android.arrival.Model;
 
+import android.graphics.Bitmap;
+
 public class User {
 
     private String email;
     private String name;
     private String phoneNumber;
-
 
     public User() {
         // Must have a constructor with no params to be pulled as Object from FireStore.
