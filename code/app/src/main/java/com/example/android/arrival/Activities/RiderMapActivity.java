@@ -1,18 +1,5 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -40,20 +27,31 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.example.android.arrival.R;
-import com.google.android.gms.location.LocationCallback;
-//import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -65,23 +63,24 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.sql.Types.NULL;
+//import com.google.android.gms.common.api.GoogleApiClient;
 
 
-public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, AccountCallbackListener, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, AccountCallbackListener,
+        RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "RiderMapActivity";
 
@@ -113,6 +112,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
+    private Button btnPayment;
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
     private Toolbar toolbar2;
@@ -133,6 +133,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
+
+    private FirebaseFirestore db;
+    private ValueEventListener postListener;
+
+    //final FirebaseDatabase database = null;
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -160,6 +165,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         txtEndLocation = findViewById(R.id.destLocation);
         btnRequestRide = findViewById(R.id.requestRide);
         btnCancelRide = findViewById(R.id.cancelRide);
+        btnPayment = findViewById(R.id.btnRiderShowQR);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
@@ -192,21 +198,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         accountManager.getUserData(this);
         accountManager.getProfilePhoto(this);
 
-
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Refresh button clicked");
                 refresh();
             }
         });
 
-        if(currRequest == null) {
-            btnRequestRide.setVisibility(View.VISIBLE);
-            btnCancelRide.setVisibility(View.INVISIBLE);
-        } else {
-            btnRequestRide.setVisibility(View.INVISIBLE);
-            btnCancelRide.setVisibility(View.VISIBLE);
-        }
+        updateInfo();
     }
 
 
@@ -229,10 +229,21 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
+        } else {
+            // FOR TESTING: If you want to test and spare the time of
+            // creating a new request, uncomment this line. Then you
+            // can just manipulate it in FireBase and refresh with the
+            // refresh button. Ex. changing status. Doc w/ ID = 1
+            // rm.getRequest("1", this);
         }
     }
 
     public void updateInfo() {
+
+        if(mMap == null) {
+            return;
+        }
+
         if (currRequest == null) {
             txtStatus.setText("");
 
@@ -242,10 +253,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
+            btnPayment.setVisibility(View.INVISIBLE);
 
         } else {
-//            rm.getRequest(currRequest.getID(), this);
-
             Log.d(TAG, "currRequest is " + currRequest.toString());
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
@@ -256,6 +266,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
+                btnPayment.setVisibility(View.INVISIBLE);
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 mMap.clear();
@@ -263,15 +274,26 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-            } else if(currRequest.getStatus() == Request.COMPLETED) {
-                mMap.clear();
-                currRequest = null;
-                btnRequestRide.setVisibility(View.VISIBLE);
+                btnPayment.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.AWAITING_PAYMENT) {
+                btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-                txtEndLocation.setText("");
+                btnPayment.setVisibility(View.VISIBLE);
+
+            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                    mMap.clear();
+                    currRequest = null;
+                    btnRequestRide.setVisibility(View.VISIBLE);
+                    btnCancelRide.setVisibility(View.INVISIBLE);
+                    btnPayment.setVisibility(View.INVISIBLE);
+                    txtEndLocation.setText("");
             }
         }
     }
+
+
+
 
     /**
      * Called when the map resumes from its previous state
@@ -427,6 +449,17 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             public void onClick(View v) {
                 currRequest.setStatus(Request.CANCELLED);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+            }
+        });
+
+        btnPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Generating QR...");
+                // TODO: Indicate to the user that a QR payment is loading
+                FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
+                DisplayQRDialog displayQRDialog = DisplayQRDialog.newInstance(currRequest.generateID());
+                displayQRDialog.show(fm, "generate");
             }
         });
 
@@ -712,10 +745,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
-//            refresh();
         } else if(currRequest == null || !currRequest.equals(req)) {
             currRequest = req;
-//            refresh();
         }
 
         updateInfo();

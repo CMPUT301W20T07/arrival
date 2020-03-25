@@ -1,6 +1,8 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -9,10 +11,13 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -23,7 +28,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.arrival.Dialogs.ScanQRDialog;
+import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.Model.User;
+import com.example.android.arrival.Util.AccountCallbackListener;
+import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
@@ -47,6 +58,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,18 +66,20 @@ import java.util.Map;
 //Drivers map, contains the driver's locations, markers of open requests
 //when marker is pressed info pops up about marker
 
-public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
+public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener {
 
     private static final String TAG = "DriverMapActivity";
+    private static final int CAMERA_REQUEST = 100;
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
+    private Location currentLocation;
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private String riderID;
+    private String driverName;
     public boolean zoom = true;
-    static boolean active = false;
+    static boolean currentActivity = false;
     private int index;
 
     ArrayList<Request> requestsList = new ArrayList<>();
@@ -80,10 +94,12 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private Button btnCancelRide;
     private Button btnConfirmPickup;
     private Button btnCompleteRide;
+    private Button btnScanQR;
     private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +109,10 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
+        AccountManager.getInstance().getUserData(DriverMapActivity.this);
+
+        // Get camera permissions
+        checkPermissions(getApplicationContext());
 
         // Bind components
         txtDriverLocation = findViewById(R.id.txtDriverLocation);
@@ -100,6 +120,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         btnCancelRide = findViewById(R.id.driverCancelRide);
         btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
         btnCompleteRide = findViewById(R.id.driverCompleteRide);
+        btnScanQR = findViewById(R.id.btnDriverScanQR);
         btnSignOut = findViewById(R.id.btnDriverSignout);
         btnRefresh = findViewById(R.id.btnDriverRefresh);
         txtStatus = findViewById(R.id.txtDriverStatus);
@@ -125,6 +146,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 currRequest.setDriver(null);
                 currRequest.setStatus(Request.OPEN);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                rm.getOpenRequests(DriverMapActivity.this);
             }
         });
 
@@ -142,10 +166,17 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         btnCompleteRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currRequest.setStatus(Request.COMPLETED);
+                currRequest.setStatus(Request.AWAITING_PAYMENT);
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
-                // TODO: Bring up QR scanner
                 refresh();
+            }
+        });
+
+        btnScanQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Opening scanner...");
+                openScanner();
             }
         });
 
@@ -161,18 +192,30 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        refresh();
+        updateInfo();
     }
 
     public void refresh() {
         Log.d(TAG, "refreshing...");
+        if(currRequest!=null) {
+            rm.getRequest(currRequest.getID(), this);
+        } else {
+            // FOR TESTING: If you want to test and spare the time of
+            // creating a new request, uncomment this line. Then you
+            // can just manipulate it in FireBase and refresh with the
+            // refresh button. Ex. changing status. Doc w/ ID = 1
+            // rm.getRequest("1", this);
+        }
+    }
 
+    public void updateInfo() {
         if (currRequest == null) {
             rm.getOpenRequests(this);
 
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnConfirmPickup.setVisibility(View.INVISIBLE);
             btnCompleteRide.setVisibility(View.INVISIBLE);
+            btnScanQR.setVisibility(View.INVISIBLE);
             txtRiderLocation.setText("");
             txtStatus.setText("");
         } else {
@@ -192,6 +235,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnConfirmPickup.setVisibility(View.VISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
+                btnScanQR.setVisibility(View.INVISIBLE);
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 // Clear open requests from map, except currRequest destination
                 mMap.clear();
@@ -202,15 +246,43 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.VISIBLE);
-            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                btnScanQR.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.AWAITING_PAYMENT) {
+                // Clear open requests from map, except currRequest destination
+                mMap.clear();
+                MarkerOptions mop = new MarkerOptions();
+                mop.position(currRequest.getEndLocation().getLatLng());
+                mMap.addMarker(mop);
+
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnConfirmPickup.setVisibility(View.INVISIBLE);
+                btnCompleteRide.setVisibility(View.INVISIBLE);
+                btnScanQR.setVisibility(View.VISIBLE);
+
+            } else if (currRequest.getStatus() == Request.COMPLETED) {
                 rm.getOpenRequests(this);
 
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
+                btnScanQR.setVisibility(View.INVISIBLE);
                 txtRiderLocation.setText("");
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void checkPermissions(Context context){
+        if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
+        }
+    }
+
+    public void openScanner() {
+        FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
+        ScanQRDialog scanQRDialog = new ScanQRDialog();
+        scanQRDialog.show(fm, "scan");
     }
 
     /**
@@ -256,6 +328,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 Bundle args = new Bundle();
                 args.putSerializable("currentRequest", currRequest);
                 args.putSerializable("markerLocation", markers);
+                args.putSerializable("driverName", driverName);
+                args.putSerializable("driverLat", currentLocation.getLatitude());
+                args.putSerializable("driverLon", currentLocation.getLongitude());
 
                 AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
                 acceptRequestConfFrag.setArguments(args);
@@ -275,6 +350,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         public void onLocationResult(LocationResult locationResult) {
             for (Location location : locationResult.getLocations()) {
                 mMap.setMyLocationEnabled(true);
+                currentLocation = location;
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -284,14 +360,14 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
                 }
 
-                if (active) {
+                if (currentActivity) {
 
 //                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
                     Map<String, Object> map = new HashMap<>();
                     map.put("lat", location.getLatitude());
                     map.put("lon", location.getLongitude());
 
-                    fb.collection("availableDrivers").document("driver1")
+                    fb.collection("availableDrivers").document(driverName)
                             .set(map)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -322,7 +398,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         map.put("lat", null);
         map.put("lon", null);
 
-        fb.collection("availableDrivers").document("driver1")
+        fb.collection("availableDrivers").document(driverName)
                 .set(map)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -346,7 +422,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onResume() {
         super.onResume();
-        active = true;
+        currentActivity = true;
 
         refresh();
     }
@@ -357,7 +433,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onPause() {
         super.onPause();
-        active = false;
+        currentActivity = false;
     }
 
     /**
@@ -421,18 +497,18 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
-        Log.d(TAG, "Retrieved req: " + req.toString());
-        if (req != null) {
-            if (currRequest == null) {
-                currRequest = req;
-            } else if (req.getStatus() == Request.OPEN) {
-                currRequest = null;
-            }
-        } else {
+
+        txtStatus.setText(Request.STATUS.get(req.getStatus()));
+
+        Log.d(TAG, "Retrieved request: " + req.toString());
+
+        if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
+        } else if(currRequest == null || !currRequest.equals(req)) {
+            currRequest = req;
         }
 
-        refresh();
+        updateInfo();
     }
 
     /**
@@ -464,6 +540,79 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
+
+    }
+
+    @Override
+    public void onDonePressed(String s) {
+        // TODO: I have no idea what this is supposed to do - Reilly
+    }
+
+    @Override
+    public void onAccountSignIn(String userType) {
+
+    }
+
+    @Override
+    public void onSignInFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+        User user = driver;
+        driverName = user.getName();
+
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
 
     }
 }
