@@ -453,7 +453,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onPause() {
         super.onPause();
-        active = false;
+        boolean active = false;
         handler.removeCallbacks(periodicUpdate);
         currentActivity = false;
     }
