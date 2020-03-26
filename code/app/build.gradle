@@ -50,4 +50,5 @@ dependencies {
     implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.mikhaellopez:circularimageview:4.2.0'
+    implementation 'com.google.firebase:firebase-database:19.2.1'
 }

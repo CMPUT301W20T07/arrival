@@ -1,6 +1,8 @@
 package com.example.android.arrival.Activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +12,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
@@ -70,7 +74,6 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
             finish();
         }
     }
-
 
     @Override
     public void onAccountSignIn(String userType) {
@@ -147,6 +150,16 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }

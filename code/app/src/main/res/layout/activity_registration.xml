@@ -29,7 +29,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:hint="Name"
-        android:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:inputType="textPersonName"
@@ -43,7 +44,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/user_name_editText"
-        android:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:hint="Phone Number"
@@ -58,7 +60,8 @@
         android:inputType="textEmailAddress"
         android:textColorHint="@color/white"
         android:hint="Email"
-        android:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"
         android:textColor="@color/white"
         app:layout_constraintTop_toBottomOf="@id/user_phone_number_editText"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -71,7 +74,8 @@
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:autofillHints=""
-        android:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"
         android:hint="Password"
         android:inputType="textPassword"
         android:textColor="@color/white"
@@ -89,7 +93,10 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/profile_image"
         android:src="@drawable/profile"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        app:civ_border_color="@color/lightColor"
+        app:civ_border_width="3dp"
+        />
 
 
     <LinearLayout

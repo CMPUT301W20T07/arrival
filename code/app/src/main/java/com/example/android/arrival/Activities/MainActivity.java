@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements AccountCallbackLi
         deleteAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                accountManager.deleteAccountData(MainActivity.this);
+                //accountManager.deleteAccountData(MainActivity.this);
             }
         });
     }
@@ -217,6 +217,16 @@ public class MainActivity extends AppCompatActivity implements AccountCallbackLi
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }
