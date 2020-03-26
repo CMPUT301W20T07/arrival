@@ -20,6 +20,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
@@ -70,6 +71,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     private static final String TAG = "DriverMapActivity";
     private static final int CAMERA_REQUEST = 100;
+    private static final int REFRESH_INTERVAL = 1000 * 45; // 45 seconds in millis
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -86,6 +88,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     private FirebaseFirestore fb;
     private RequestManager rm;
+
+    private Handler handler;
 
     private Request currRequest;
 
@@ -110,6 +114,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
+
+        handler = new Handler();
 
         // Get camera permissions
         checkPermissions(getApplicationContext());
@@ -205,8 +211,21 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             // can just manipulate it in FireBase and refresh with the
             // refresh button. Ex. changing status. Doc w/ ID = 1
             // rm.getRequest("1", this);
+            rm.getOpenRequests(this);
         }
     }
+
+    private Runnable periodicUpdate = new Runnable() {
+        @Override
+        public void run() {
+            if(handler!= null) {
+                handler.postDelayed(periodicUpdate, REFRESH_INTERVAL);
+                refresh();
+            } else {
+                handler = new Handler();
+            }
+        }
+    };
 
     public void updateInfo() {
         if (currRequest == null) {
@@ -425,6 +444,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         currentActivity = true;
 
         refresh();
+        periodicUpdate.run();
     }
 
     /**
@@ -433,6 +453,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onPause() {
         super.onPause();
+        active = false;
+        handler.removeCallbacks(periodicUpdate);
         currentActivity = false;
     }
 

@@ -122,10 +122,7 @@ public class MainActivity extends AppCompatActivity implements AccountCallbackLi
                 accountManager.deleteAccountData(MainActivity.this);
             }
         });
-
-
     }
-
 
     public void openScanner() {
         ScanQRDialog scanQRDialog = new ScanQRDialog();
