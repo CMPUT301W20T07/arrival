@@ -46,8 +46,7 @@ before_install:
   - wget https://services.gradle.org/distributions/gradle-5.3-bin.zip
   - unzip -qq gradle-5.3-bin.zip
   - export GRADLE_HOME=$PWD/gradle-5.3
-  - export PATH=$GRADLE_HOME/bin:$PATH
-  
+  - export PATH=$GRADLE_HOME/bin:$PATH  
   # Build the project
   - gradle -v
   
