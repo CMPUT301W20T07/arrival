@@ -292,5 +292,15 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     public void onPhotoReceiveFailure(String e) {
 
     }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
+
+    }
 }
 

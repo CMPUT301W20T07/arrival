@@ -21,7 +21,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.RiderProfileScreen"></activity>
+        <activity android:name=".Activities.RiderProfileScreenActivity"></activity>
         <activity android:name=".Activities.RequestTestActivity" />
         <activity android:name=".Activities.RegistrationActivity" />
         <!--

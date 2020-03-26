@@ -4,37 +4,97 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.RiderProfileScreen">
+    android:background="@drawable/login_screen_photo"
+    android:backgroundTint="@color/blackTint"
+    android:backgroundTintMode="src_atop"
+    tools:context=".Activities.RiderProfileScreenActivity">
 
-    <com.mikhaellopez.circularimageview.CircularImageView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:src="@mipmap/ic_launcher"
-        app:civ_border_width="5dp"
-        app:civ_border_color="@color/lightColor"
-        android:scaleType="centerCrop"
+    <ImageView
+        android:id="@+id/arrival_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="285dp"
+        android:padding="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="10dp"/>
+        app:srcCompat="@drawable/arrival_logo"
+        tools:srcCompat="@drawable/arrival_logo" />
 
 
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/circularImageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="10dp"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_launcher"
+        app:civ_border_color="@color/colorPrimary"
+        app:civ_border_width="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/arrival_logo" />
+    <TextView
+        android:id="@+id/name_TV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="1dp"
+        android:text="Name"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/circularImageView" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginHorizontal="10dp"
-        android:id="@+id/user_phone_number_editText"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/deleteAccountButton"
+        app:layout_constraintTop_toBottomOf="@id/arrival_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="1dp"
+        android:text="Email"
+        android:textSize="20sp"
+        android:padding="8dp"
+        android:id="@+id/update_email"
+        android:background="@drawable/edit_text_box"
+        android:textColor="@color/white"
+
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/update_email"
+        app:layout_constraintBottom_toTopOf="@id/update_info_btn"
+        android:layout_marginHorizontal="10dp"
+        android:id="@+id/update_phone"
         android:background="@drawable/edit_text_box"
         android:padding="8dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="20sp"
         android:hint="Phone Number"
         android:inputType="phone"
         android:autofillHints="XXX-XXX-XXXX" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="Update"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/delete_account_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/sign_in_button_background"
+        android:textColor="@color/white"
+        android:id="@+id/update_info_btn"
+        />
+
 
 
     <Button
@@ -42,14 +102,15 @@
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:text="Delete Account"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:background="@drawable/sign_in_button_background"
         android:textColor="@color/white"
-        android:id="@+id/deleteAccountButton"
+        android:id="@+id/delete_account_button"
         />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
