@@ -1,7 +1,9 @@
 package com.example.android.arrival.Util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -22,62 +24,69 @@ import java.util.Map;
 /**
  * Singleton object used to control all notifications for the app
  */
-public class SendNotification {
+public class Notification {
+    private Notification instance;
+    private RequestQueue queue;
+    private Context context;
+    private String token;
+    private String title;
+    private String body;
     final private String URL = "https://fcm.googleapis.com/fcm/send";
     final private String serverKey = "key=" + "AIzaSyB5YNvm0-OupW84u7bv2fqHM3y17pr9vKg";
     final private String contentType = "application/json";
 
     final String TAG = "NOTIFICATION TAG";
-    private static SendNotification instance;
 
 
-    private RequestQueue queue;
 
-    private static String TOKEN;
-
-
-    private SendNotification(String TOKEN){
-        SendNotification.TOKEN = TOKEN;
+    private Notification(Context ctx, String to, String subject, String message){
+        context = ctx;
+        token = to;
+        title = subject;
+        body = message;
+        queue = getRequestQueue();
     }
 
-    public static SendNotification getInstance() {
+    public Notification getInstance(Context context) {
         if(instance == null) {
-            instance = new SendNotification(TOKEN);
+            instance = new Notification(context, token, title, body);
         }
         return instance;
     }
 
+    private RequestQueue getRequestQueue() {
+        if (getRequestQueue() == null) {
+            queue = Volley.newRequestQueue(context.getApplicationContext());
+        }
+        return queue;
+    }
 
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        //TOKEN = "c1i0UmO9QL-Xt_ou61AIb_:APA91bEAx4HB07amyw1qMG2a5aak4ojw-ITJnqhYQV8HuWFxkiLYdpqlOT22SGhNfPJSALUU0cQrv0zYhC1UAvPxP6gAhXp8mhY3rqvmFDInl8XE6mCSUX53mTlN01SHGvBsWo8_kw0l";
-//        //queue = Volley.newRequestQueue(this);
-//        //TOKEN = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
-//
-//        sendNotification();
+//    public <T> void addToRequestQueue(Request<T> req) {
+//        getRequestQueue().add(req);
 //    }
+
+
 
     //TODO cite the youtube tutorial
     public void sendNotification() {
-        //queue = Volley.newRequestQueue(getInstance());
         JSONObject object = new JSONObject();
         try {
-            object.put("to", TOKEN);
+            object.put("to", token);
             JSONObject notificationObj = new JSONObject();
-            notificationObj.put("title", "TestTokenSend");
-            notificationObj.put("body", "Please fucking work");
+            notificationObj.put("title", title);
+            notificationObj.put("body", body);
             object.put("notification", notificationObj);
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, URL, object,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            //Codes here will run on success
+                            Log.d("TAG", "Response: " + response);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //Codes here will run on error
+                    Log.e("TAG", "Error: " + error.toString());
                 }
             }
             ){
@@ -97,3 +106,14 @@ public class SendNotification {
 
     }
 }
+
+
+
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        //TOKEN = "c1i0UmO9QL-Xt_ou61AIb_:APA91bEAx4HB07amyw1qMG2a5aak4ojw-ITJnqhYQV8HuWFxkiLYdpqlOT22SGhNfPJSALUU0cQrv0zYhC1UAvPxP6gAhXp8mhY3rqvmFDInl8XE6mCSUX53mTlN01SHGvBsWo8_kw0l";
+//        //queue = Volley.newRequestQueue(this);
+//        //TOKEN = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
+//
+//        sendNotification();
+//    }

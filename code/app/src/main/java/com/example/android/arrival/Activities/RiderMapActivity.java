@@ -52,7 +52,6 @@ import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
-import com.example.android.arrival.Util.SendNotification;
 import com.google.android.gms.location.LocationCallback;
 //import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -203,10 +202,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             public void onClick(View v) {
                 Log.d(TAG, "Refresh button clicked");
                 refresh();
-
-                Intent intent = new Intent(RiderMapActivity.this, SendNotification.class);
-                startActivity(intent);
-
             }
         });
 
