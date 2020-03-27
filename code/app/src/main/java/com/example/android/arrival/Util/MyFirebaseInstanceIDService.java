@@ -1,4 +1,4 @@
-package com.example.android.arrival;
+package com.example.android.arrival.Util;
 
 import android.app.Service;
 import android.content.Intent;

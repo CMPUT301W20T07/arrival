@@ -126,6 +126,8 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         }
     }
 
+
+
     @Override
     public void onAccountSignIn(String accountType) {
         Log.d(TAG, "onAccountSignIn: " + accountType);

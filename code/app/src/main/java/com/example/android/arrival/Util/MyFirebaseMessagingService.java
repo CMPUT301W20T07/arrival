@@ -13,14 +13,26 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.android.arrival.Activities.LoginActivity;
 import com.example.android.arrival.Activities.MainActivity;
 import com.example.android.arrival.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-public class Notifications extends FirebaseMessagingService {
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class MyFirebaseMessagingService extends FirebaseMessagingService implements AccountCallbackListener {
     private static final String TAG = "Notifications";
+    private AccountManager am;
+    private FirebaseAuth fb;
+    private FirebaseFirestore db;
+
 
 
     @Override
@@ -32,7 +44,7 @@ public class Notifications extends FirebaseMessagingService {
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
-        sendNotification(remoteMessage.getNotification().getBody());
+        sendNotification(remoteMessage.getNotification().getBody(), remoteMessage.getNotification().getTitle());
     }
 
     /**
@@ -42,7 +54,26 @@ public class Notifications extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         Log.d(TAG, "Refreshed token: " + token);
-        //TODO update firebase with new token if necessary
+
+        am = AccountManager.getInstance();
+        fb = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        FirebaseUser user = fb.getCurrentUser();
+        String uid = user.getUid();
+        String type = am.getAccountType(uid, this);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("tokenId", token);
+
+        if (type.equals("rider")) {
+            DocumentReference rider = db.collection("riders").document(uid);
+            rider.update(updates);
+        }
+        else if (type.equals("driver")) {
+            DocumentReference driver = db.collection("drivers").document(uid);
+            driver.update(updates);
+        }
 
     }
 
@@ -50,10 +81,11 @@ public class Notifications extends FirebaseMessagingService {
     /**
      * Create and show a simple notification containing the received FCM message.
      *
-     * @param messageBody FCM message body received.
+     * @param messageBody : String of the body of the message
+     * @param title : String of the title of the message
      */
-    private void sendNotification(String messageBody) {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void sendNotification(String messageBody, String title) {
+        Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -63,6 +95,7 @@ public class Notifications extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
+                        .setContentTitle(title)
                         .setContentText(messageBody)
                         .setSmallIcon(R.id.arrival_logo)
                         .setAutoCancel(true)

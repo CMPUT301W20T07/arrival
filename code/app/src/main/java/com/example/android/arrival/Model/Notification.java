@@ -1,8 +1,6 @@
-package com.example.android.arrival.Util;
+package com.example.android.arrival.Model;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -39,7 +37,7 @@ public class Notification {
 
 
 
-    private Notification(Context ctx, String to, String subject, String message){
+    public Notification(Context ctx, String to, String subject, String message){
         context = ctx;
         token = to;
         title = subject;
@@ -55,15 +53,11 @@ public class Notification {
     }
 
     private RequestQueue getRequestQueue() {
-        if (getRequestQueue() == null) {
+        if (queue == null) {
             queue = Volley.newRequestQueue(context.getApplicationContext());
         }
         return queue;
     }
-
-//    public <T> void addToRequestQueue(Request<T> req) {
-//        getRequestQueue().add(req);
-//    }
 
 
 
