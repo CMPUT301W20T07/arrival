@@ -59,4 +59,8 @@ before_install:
 #    - ./gradlew build connectedCheck
 #    - ./gradlew test jacocoTestReport coverall
    
+addons:
+  apt:
+    packages:
+      ant
    
