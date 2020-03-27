@@ -251,6 +251,12 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 mop.position(currRequest.getStartLocation().getLatLng());
                 mMap.addMarker(mop);
 
+                Log.d("notifications", currRequest.getRider());
+
+//                //Testing notification
+//                notif.sendNotification();
+//                String TOKEN = fb.collection("riders").document(currRequest.getRider()).get().;
+
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnConfirmPickup.setVisibility(View.VISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);

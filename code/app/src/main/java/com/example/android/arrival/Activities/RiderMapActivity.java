@@ -1,5 +1,6 @@
 package com.example.android.arrival.Activities;
 
+
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -53,6 +54,7 @@ import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
+import com.example.android.arrival.Model.Notification;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -72,14 +74,17 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ValueEventListener;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 //import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -188,8 +193,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         profilePhoto = headerView.findViewById(R.id.user_profile_pic);
 
 
-
-
         //Setting Navigation View click listener
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -213,6 +216,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onClick(View v) {
                 refresh();
+                String TOKENJess = "e57Wwg5MRW2HGzdCwvqdGp:APA91bGll5e4Xr1FtTXvwmSOGtt9Q815n6L8322Lbab7LaJ8b2_tcRqAO9Y88Ngw8gHFqqAN2a0ojoJTvbiZ63FCuIpULUFWFFC3PbDjPT5wgxJRW2G4jvNc5moN8jpgThG_fxhoWacX";
+                //String TOKENNana = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
+                Notification notification = new Notification(getApplicationContext(), TOKENJess,
+                        "Ride Request Status Update", "A driver has accepted your request");
+                notification.sendNotification();
             }
         });
 
@@ -245,7 +253,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             case R.id.sign_out_button:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
-                FirebaseAuth.getInstance().signOut();
+                //FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
