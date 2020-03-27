@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditText
+        android:id="@+id/authenticate_password"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:autofillHints=""
+        android:hint="@string/password_prompt"
+        android:inputType="textPassword"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/authenticate_email"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"/>
+
+    <EditText
+        android:id="@+id/authenticate_email"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/prompt_email"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

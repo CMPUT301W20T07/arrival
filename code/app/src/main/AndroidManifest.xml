@@ -7,7 +7,7 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -21,9 +21,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.RequestTestActivity"></activity>
-        <activity android:name=".Activities.RegistrationActivity"></activity>
-
+        <activity android:name=".Activities.RiderProfileScreenActivity"></activity>
+        <activity android:name=".Activities.RequestTestActivity" />
+        <activity android:name=".Activities.RegistrationActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -34,13 +34,9 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_api_key"
-        />
-
-<!--        <meta-data-->
-<!--            android:name="com.google.android.geo.API_KEY"-->
-<!--            android:value="@string/google_maps_key" />-->
-
+            android:value="@string/google_maps_api_key" /> <!-- <meta-data -->
+        <!-- android:name="com.google.android.geo.API_KEY" -->
+        <!-- android:value="@string/google_maps_key" /> -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -50,29 +46,27 @@
 
         <activity
             android:name=".Activities.MapsActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
-
+            android:label="@string/title_activity_maps"></activity>
         <activity
             android:name=".Activities.RiderMapActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".Activities.DriverMapActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".Activities.LoginActivity" />
 
         <activity android:name=".Model.Notification" />
 
-
-        <activity android:name=".Activities.MainActivity">
         </activity>
-        <activity android:name=".Activities.SplashActivity"
+
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:label="@string/title_activity_login" />
+        <activity android:name=".Activities.MainActivity"></activity>
+      
+        <activity
+            android:name=".Activities.SplashActivity"
+
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -80,6 +74,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
         <service
             android:name=".Util.MyFirebaseMessagingService"

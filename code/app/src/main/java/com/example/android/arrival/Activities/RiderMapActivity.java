@@ -1,19 +1,10 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,7 +15,10 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -39,22 +33,32 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Model.Notification;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.example.android.arrival.R;
-import com.google.android.gms.location.LocationCallback;
-//import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -66,24 +70,36 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ValueEventListener;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, AccountCallbackListener, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
+//import com.google.android.gms.common.api.GoogleApiClient;
+
+
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, AccountCallbackListener,
+        RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "RiderMapActivity";
+    private static final int REFRESH_INTERVAL = 1000 * 45; // 45 seconds in millis
 
     private RequestManager rm;
     private DrawerLayout drawer;
+
+//    private AlarmManager am;
+    private Handler handler;
 
     //Declaring variables for use later
     private GoogleMap mMap;
@@ -132,6 +148,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
 
+    private FirebaseFirestore db;
+    private ValueEventListener postListener;
+
+    //final FirebaseDatabase database = null;
+
     /**
      * When activity is initially called we set up some basic location items needed later
      *
@@ -152,6 +173,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
+//        am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        handler = new Handler();
         accountManager = AccountManager.getInstance();
 
         txtStartLocation = findViewById(R.id.pickupLocation);
@@ -192,7 +215,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Refresh button clicked");
                 refresh();
                 String TOKENJess = "e57Wwg5MRW2HGzdCwvqdGp:APA91bGll5e4Xr1FtTXvwmSOGtt9Q815n6L8322Lbab7LaJ8b2_tcRqAO9Y88Ngw8gHFqqAN2a0ojoJTvbiZ63FCuIpULUFWFFC3PbDjPT5wgxJRW2G4jvNc5moN8jpgThG_fxhoWacX";
                 //String TOKENNana = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
@@ -202,9 +224,28 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RiderMapActivity.this, RiderProfileScreenActivity.class));
+            }
+        });
+
         updateInfo();
     }
 
+    private Runnable periodicUpdate = new Runnable() {
+        @Override
+        public void run() {
+            if(handler!= null) {
+                handler.postDelayed(periodicUpdate, REFRESH_INTERVAL);
+//                Log.d(TAG, "Handler update...");
+                refresh();
+            } else {
+                handler = new Handler();
+            }
+        }
+    };
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -230,13 +271,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             // creating a new request, uncomment this line. Then you
             // can just manipulate it in FireBase and refresh with the
             // refresh button. Ex. changing status. Doc w/ ID = 1
-            // rm.getRequest("1", this);
+             rm.getRequest("1", this);
         }
     }
 
     public void updateInfo() {
 
         if(mMap == null) {
+            Log.d(TAG, "null map");
             return;
         }
 
@@ -265,6 +307,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnPayment.setVisibility(View.INVISIBLE);
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
+                addPickupMarker(currRequest.getStartLocation().getLatLng());
                 mMap.clear();
                 addDestMarker(currRequest.getEndLocation().getLatLng());
 
@@ -288,15 +331,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
+
+
+
     /**
      * Called when the map resumes from its previous state
      */
     @Override
     public void onResume() {
         super.onResume();
-        if(mMap != null) {
-            refresh();
-        }
+//        am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + REFRESH_INTERVAL, REFRESH_INTERVAL, refresh);
+
+        refresh();
+        periodicUpdate.run();
     }
 
     /**
@@ -307,6 +354,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "map on pause");
         super.onPause();
         //active = false;
+        handler.removeCallbacks(periodicUpdate);
     }
 
     /**
@@ -557,7 +605,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
         txtEndLocation.setText(destination.getAddress());
 
-        marks.add(1, destination);
+        if(marks.size() == 0 ) {
+            marks.add(0, null);
+            marks.add(1, destination);
+        } else {
+            marks.add(1, destination);
+        }
 
         addLine();
     }
@@ -828,6 +881,16 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }

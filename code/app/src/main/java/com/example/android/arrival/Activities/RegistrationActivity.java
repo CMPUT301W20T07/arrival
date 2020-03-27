@@ -40,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener, AccountCallbackListener {
@@ -62,6 +63,8 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     private static String IMAGE_DIRECTORY = "Arrival";
 
     private String uTokenId = "";
+
+
 
 
     @Override
@@ -106,6 +109,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         btnDriverSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 CarDetailsDialog carDetailsDialog = new CarDetailsDialog();
                 carDetailsDialog.show(getSupportFragmentManager(), "car");
             }
@@ -309,6 +313,16 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }

@@ -28,29 +28,31 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:autofillHints=""
-        android:backgroundTint="@color/colorPrimary"
-        android:hint="Password"
+        android:hint="@string/password_prompt"
         android:inputType="textPassword"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_email_editText" />
+        app:layout_constraintTop_toBottomOf="@+id/login_email_editText"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"/>
 
     <EditText
         android:id="@+id/login_email_editText"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorPrimary"
         android:hint="@string/prompt_email"
-        android:inputType=""
+        android:inputType="textEmailAddress"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"/>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_google_button"
