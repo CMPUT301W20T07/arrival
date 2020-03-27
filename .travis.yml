@@ -55,6 +55,3 @@ before_install:
   
   # The app will now automatically be installed and tested via
   # the command `gradle connectedCheck`
-script:
-  #- ./gradlew connectedCheck
-  - ./code/gradlew check
