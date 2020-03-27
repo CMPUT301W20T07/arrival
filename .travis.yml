@@ -36,7 +36,7 @@ before_install:
     # Get gradle
   - pwd  # for debuggin to find gradlew
   - ls -la
-  - chmod +x ./gradlew
+  - chmod +x ./code/gradlew
   - wget https://services.gradle.org/distributions/gradle-5.3-bin.zip
   - unzip -qq gradle-5.3-bin.zip
   - export GRADLE_HOME=$PWD/gradle-5.3
