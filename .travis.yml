@@ -39,7 +39,7 @@ licenses:
 
 before_install:
   - wget --no-check-certificate https://downloads.apache.org/ant/binaries/apache-ant-1.10.6-bin.tar.gz
-  - tar -xzvf apache-ant-1.10.1-bin.tar.gz
+  - tar -xzvf apache-ant-1.10.6-bin.tar.gz
   - export PATH=`pwd`/apache-ant-1.10.1/bin:$PATH
   - echo $(ant -version)
   # Accept sdk licenses
