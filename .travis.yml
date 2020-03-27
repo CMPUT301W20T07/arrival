@@ -34,6 +34,8 @@ before_install:
   - yes | sdkmanager "platforms;android-26"
   
     # Get gradle
+  - pwd  # for debuggin to find gradlew
+  - ls -la
   - chmod +x ./gradlew
   - wget https://services.gradle.org/distributions/gradle-5.3-bin.zip
   - unzip -qq gradle-5.3-bin.zip
