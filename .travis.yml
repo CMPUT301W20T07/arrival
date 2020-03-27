@@ -1,7 +1,6 @@
 language: android
 jdk: oraclejdk8
 
-
 env:
   global:
     - ANDROID_TARGET=android-26
@@ -35,7 +34,7 @@ before_install:
   - yes | sdkmanager "platforms;android-26"
   
     # Get gradle
-  - chmod +x gradlew
+  - chmod +x ./gradlew
   - wget https://services.gradle.org/distributions/gradle-5.3-bin.zip
   - unzip -qq gradle-5.3-bin.zip
   - export GRADLE_HOME=$PWD/gradle-5.3
