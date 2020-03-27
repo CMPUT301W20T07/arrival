@@ -57,4 +57,4 @@ before_install:
   # the command `gradle connectedCheck`
 script:
   #- ./gradlew connectedCheck
-  - ./gradlew check
+  - ./code/gradlew check
