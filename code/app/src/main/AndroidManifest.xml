@@ -57,7 +57,7 @@
 
         <activity android:name=".Model.Notification" />
 
-        </activity>
+
 
         <activity
             android:name=".ui.login.LoginActivity"

@@ -76,7 +76,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ValueEventListener;
+//import com.google.firebase.database.ValueEventListener;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -149,7 +149,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     private FirebaseFirestore db;
-    private ValueEventListener postListener;
+    //private ValueEventListener postListener;
 
     //final FirebaseDatabase database = null;
 

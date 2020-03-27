@@ -303,7 +303,7 @@ public class AccountManager {
      * this method deletes current user's account data from everywhere in firebase
      * @param listener callback listener
      */
-    public void deleteAccountData(final AccountCallbackListener listener) {
+    public void deleteAccountData(String email, String password, final AccountCallbackListener listener) {
 
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -337,8 +337,7 @@ public class AccountManager {
                                         @Override
                                         public void onSuccess(Void aVoid) {
 
-                                            AuthCredential authCredential = EmailAuthProvider.getCredential(email, 
-                                                                                                           );
+                                            AuthCredential authCredential = EmailAuthProvider.getCredential(email, password);
 
                                             user.reauthenticate(authCredential).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override

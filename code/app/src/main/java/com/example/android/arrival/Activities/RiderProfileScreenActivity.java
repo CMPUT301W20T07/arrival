@@ -1,5 +1,6 @@
 package com.example.android.arrival.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -27,6 +28,10 @@ import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.IOException;
@@ -227,7 +232,21 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
             if (dialogChoice == DELETE_RC) {
                 accountManager.deleteAccountData(credentials[0], credentials[1], RiderProfileScreenActivity.this);
             } else if (dialogChoice == UPDATE_RC) {
-                Rider rider = new Rider(email.getText().toString(), name.getText().toString(), phoneNumber.getText().toString());
+                String[] token = new String[1];
+                FirebaseInstanceId.getInstance().getInstanceId()
+                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                if (!task.isSuccessful()) {
+                                    Log.w(TAG, "getInstanceId failed", task.getException());
+                                    return;
+                                }
+                                // Get new Instance ID token
+                                token[0] = task.getResult().getToken();
+                                Log.d(TAG, token[0]);
+                            }
+                        });
+                Rider rider = new Rider(email.getText().toString(), name.getText().toString(), phoneNumber.getText().toString(), token[0]);
                 accountManager.updateRiderAccount(rider, credentials[0], credentials[1], RiderProfileScreenActivity.this);
             }
         }
