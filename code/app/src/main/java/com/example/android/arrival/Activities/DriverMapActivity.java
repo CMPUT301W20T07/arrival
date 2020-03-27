@@ -31,6 +31,7 @@ import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.SendNotification;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -77,6 +78,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     private FirebaseFirestore fb;
     private RequestManager rm;
+    private SendNotification notif;
 
     private Request currRequest;
 
@@ -218,6 +220,12 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 MarkerOptions mop = new MarkerOptions();
                 mop.position(currRequest.getStartLocation().getLatLng());
                 mMap.addMarker(mop);
+
+                Log.d("notifications", currRequest.getRider());
+
+//                //Testing notification
+//                notif.sendNotification();
+//                String TOKEN = fb.collection("riders").document(currRequest.getRider()).get().;
 
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnConfirmPickup.setVisibility(View.VISIBLE);
