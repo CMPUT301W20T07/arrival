@@ -72,6 +72,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
         FirebaseUser user = fb.getCurrentUser();
         userID = user.getUid();
         am.getAccountType(userID, this);
+        
     }
 
     public void updateToken(String type) {
