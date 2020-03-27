@@ -1,6 +1,5 @@
 language: android
-jdk: oraclejdk8
-install: ant deps
+
 
 env:
   global:
@@ -39,7 +38,7 @@ before_install:
   - yes | sdkmanager "platforms;android-29"
 
   # Get gradle
-  - chmod +x code/gradlew
+  - chmod +x gradlew
   - wget https://services.gradle.org/distributions/gradle-5.6.4-bin.zip
   - unzip -qq gradle-5.6.4-bin.zip
   - export GRADLE_HOME=$PWD/gradle-5.6.4
@@ -56,3 +55,7 @@ before_install:
   
   # The app will now automatically be installed and tested via
   # the command `gradle connectedCheck`
+
+script:
+  #- ./gradlew connectedCheck
+  - ./gradlew check
