@@ -35,7 +35,7 @@ licenses:
     - 'google-gdk-license-.+'
     
 before_install:
-  - yes | sdkmanager "platforms;android-26"
+  - yes | sdkmanager "platforms;android-29"
   
     # Get gradle
   - chmod +x ./code/gradlew
