@@ -29,10 +29,11 @@ android:
     # The line should look like this after interpolation:
     # - sys-img-armeabi-v7a-android-22
     - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+    
 licenses:
-    - 'android-sdk-preview-license-52d11cd2'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
+    
 before_install:
   - yes | sdkmanager "platforms;android-26"
   
@@ -54,7 +55,7 @@ before_install:
   
   # The app will now automatically be installed and tested via
   # the command `gradle connectedCheck`
-script:
+ script:
    - cd ./code
    - ./gradlew build connectedCheck
    - ./gradlew test jacocoTestReport coverall
