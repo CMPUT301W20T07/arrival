@@ -194,9 +194,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             public void onClick(View v) {
                 Log.d(TAG, "Refresh button clicked");
                 refresh();
-                //String TOKENJess = "c1i0UmO9QL-Xt_ou61AIb_:APA91bEAx4HB07amyw1qMG2a5aak4ojw-ITJnqhYQV8HuWFxkiLYdpqlOT22SGhNfPJSALUU0cQrv0zYhC1UAvPxP6gAhXp8mhY3rqvmFDInl8XE6mCSUX53mTlN01SHGvBsWo8_kw0l";
-                String TOKENNana = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
-                Notification notification = new Notification(getApplicationContext(), TOKENNana,
+                String TOKENJess = "e57Wwg5MRW2HGzdCwvqdGp:APA91bGll5e4Xr1FtTXvwmSOGtt9Q815n6L8322Lbab7LaJ8b2_tcRqAO9Y88Ngw8gHFqqAN2a0ojoJTvbiZ63FCuIpULUFWFFC3PbDjPT5wgxJRW2G4jvNc5moN8jpgThG_fxhoWacX";
+                //String TOKENNana = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
+                Notification notification = new Notification(getApplicationContext(), TOKENJess,
                         "Ride Request Status Update", "A driver has accepted your request");
                 notification.sendNotification();
             }

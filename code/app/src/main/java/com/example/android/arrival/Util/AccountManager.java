@@ -309,8 +309,6 @@ public class AccountManager {
      */
     public void deleteAccountData(final AccountCallbackListener listener) {
 
-
-
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
         String uid = user.getUid();

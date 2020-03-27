@@ -15,6 +15,8 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.android.arrival.Activities.LoginActivity;
 import com.example.android.arrival.Activities.MainActivity;
+import com.example.android.arrival.Model.Driver;
+import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,12 +29,14 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class MyFirebaseMessagingService extends FirebaseMessagingService implements AccountCallbackListener {
+public class MyFirebaseMessagingService extends FirebaseMessagingService implements AccountCallbackListener {
     private static final String TAG = "Notifications";
     private AccountManager am;
     private FirebaseAuth fb;
     private FirebaseFirestore db;
 
+    //Need a null constructor for instantiation
+    public MyFirebaseMessagingService() {}
 
 
     @Override
@@ -63,16 +67,17 @@ public abstract class MyFirebaseMessagingService extends FirebaseMessagingServic
         String uid = user.getUid();
         String type = am.getAccountType(uid, this);
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("tokenId", token);
+        if (type != null) {
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("tokenId", token);
 
-        if (type.equals("rider")) {
-            DocumentReference rider = db.collection("riders").document(uid);
-            rider.update(updates);
-        }
-        else if (type.equals("driver")) {
-            DocumentReference driver = db.collection("drivers").document(uid);
-            driver.update(updates);
+            if (type.equals("rider")) {
+                DocumentReference rider = db.collection("riders").document(uid);
+                rider.update(updates);
+            } else if (type.equals("driver")) {
+                DocumentReference driver = db.collection("drivers").document(uid);
+                driver.update(updates);
+            }
         }
 
     }
@@ -114,5 +119,70 @@ public abstract class MyFirebaseMessagingService extends FirebaseMessagingServic
         }
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    @Override
+    public void onAccountSignIn(String userType) {
+
+    }
+
+    @Override
+    public void onSignInFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
+
     }
 }
