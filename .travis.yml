@@ -1,4 +1,13 @@
 language: android
+jdk: oraclejdk8
+
+
+env:
+  global:
+    - ANDROID_TARGET=android-26
+    - ANDROID_ABI=armeabi-v7a
+
+
 android:
   components:
     - tools # to get the new `repository-11.xml`
@@ -6,9 +15,46 @@ android:
     - platform-tools
     - build-tools-28.0.3
     - android-26
+    - extra
+    
+    #Additional components
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+    
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests.
+    # The line should look like this after interpolation:
+    # - sys-img-armeabi-v7a-android-22
+    - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 before_install:
   - yes | sdkmanager "platforms;android-26"
+  
+    # Get gradle
+  - chmod +x gradlew
+  - wget https://services.gradle.org/distributions/gradle-5.3-bin.zip
+  - unzip -qq gradle-5.3-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-5.3
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  
+  # Build the project
+  - gradle -v
+  
+  # Start the emulator
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+  
+  # The app will now automatically be installed and tested via
+  # the command `gradle connectedCheck`
 script:
    - cd ./code
    - ./gradlew build connectedCheck
    - ./gradlew test jacocoTestReport coverall
+   
+   
