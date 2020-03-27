@@ -1,6 +1,8 @@
 package com.example.android.arrival.Activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,8 +16,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.android.arrival.Dialogs.ForgotPasswordDialog;
 import com.example.android.arrival.Model.Driver;
@@ -44,6 +49,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     private static final String DRIVER_TYPE_STRING = "driver";
     AccountManager accountManager;
     SignInButton signInGoogle;
+    private static final int STORAGE_REQUEST = 1;
     GoogleSignInClient googleSignInClient;
 
 
@@ -55,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         setContentView(R.layout.activity_login);
 
         accountManager = AccountManager.getInstance();
+        requestStoragePermission();
 
         // View binding
         email = findViewById(R.id.login_email_editText);
@@ -101,6 +108,33 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
     }
 
+    public void requestStoragePermission() {
+
+        if(ContextCompat.checkSelfPermission(LoginActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "requestStoragePermission: requesting");
+            ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_REQUEST);
+        }
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == STORAGE_REQUEST) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "Enable storage permissions to set profile photo", Toast.LENGTH_LONG);
+            }
+        }
+    }
+
+
+    /**
+     * basic error checking for user input
+     */
     public void signUserIn () {
         String emailStr = email.getText().toString();
         String passwordStr = password.getText().toString();
@@ -203,6 +237,16 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 
