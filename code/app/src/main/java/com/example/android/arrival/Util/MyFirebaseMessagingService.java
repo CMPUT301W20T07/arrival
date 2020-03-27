@@ -35,6 +35,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     private FirebaseAuth fb;
     private FirebaseFirestore db;
 
+    private String newToken;
+    private String userID;
+
     //Need a null constructor for instantiation
     public MyFirebaseMessagingService() {}
 
@@ -59,28 +62,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     public void onNewToken(@NonNull String token) {
         Log.d(TAG, "Refreshed token: " + token);
 
+        newToken = token;
+
+
         am = AccountManager.getInstance();
         fb = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         FirebaseUser user = fb.getCurrentUser();
-        String uid = user.getUid();
-        String type = am.getAccountType(uid, this);
-
-        if (type != null) {
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("tokenId", token);
-
-            if (type.equals("rider")) {
-                DocumentReference rider = db.collection("riders").document(uid);
-                rider.update(updates);
-            } else if (type.equals("driver")) {
-                DocumentReference driver = db.collection("drivers").document(uid);
-                driver.update(updates);
-            }
-        }
-
+        userID = user.getUid();
+        am.getAccountType(userID, this);
     }
+
+    public void updateToken(String type) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("tokenId", newToken);
+
+        if (type.equals("rider")) {
+            DocumentReference rider = db.collection("riders").document(userID);
+            rider.update(updates);
+        } else if (type.equals("driver")) {
+            DocumentReference driver = db.collection("drivers").document(userID);
+            driver.update(updates);
+        }
+    }
+
 
 
     /**
@@ -123,6 +129,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
 
     @Override
     public void onAccountSignIn(String userType) {
+
+        if (userType != null) {
+            updateToken(userType);
+        }
 
     }
 
@@ -183,6 +193,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }
