@@ -3,7 +3,7 @@ jdk: oraclejdk8
 
 env:
   global:
-    - ANDROID_TARGET=android-26
+    - ANDROID_TARGET=android-22
     - ANDROID_ABI=armeabi-v7a
 
 
@@ -21,6 +21,9 @@ android:
     - extra-google-m2repository
     - extra-android-m2repository
     
+    # The SDK version used to compile your project
+    - $ANDROID_TARGET
+    
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests.
     # The line should look like this after interpolation:
@@ -34,8 +37,6 @@ before_install:
   - yes | sdkmanager "platforms;android-26"
   
     # Get gradle
-  - pwd  # for debuggin to find gradlew
-  - ls -la
   - chmod +x ./code/gradlew
   - wget https://services.gradle.org/distributions/gradle-5.3-bin.zip
   - unzip -qq gradle-5.3-bin.zip
