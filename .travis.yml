@@ -44,6 +44,7 @@ before_install:
   - export PATH=$GRADLE_HOME/bin:$PATH
   
   # Build the project
+  - cd code
   - gradle -v
   
 #   # Start the emulator
