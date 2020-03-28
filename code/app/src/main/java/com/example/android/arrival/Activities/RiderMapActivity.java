@@ -173,6 +173,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rider_map_activity);
 
+
         //Location service that can get a users location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -283,6 +284,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 startActivity(intent);
                 finish();
                 break;
+
         }
         return true;
     }
@@ -316,7 +318,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
-            btnPayment.setVisibility(View.INVISIBLE);
+            //btnPayment.setVisibility(View.INVISIBLE);
 
         } else {
             Log.d(TAG, "currRequest is " + currRequest.toString());
@@ -329,7 +331,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
-                btnPayment.setVisibility(View.INVISIBLE);
+                //btnPayment.setVisibility(View.INVISIBLE);
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 addPickupMarker(currRequest.getStartLocation().getLatLng());
@@ -338,19 +340,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-                btnPayment.setVisibility(View.INVISIBLE);
+                //btnPayment.setVisibility(View.INVISIBLE);
 
             } else if(currRequest.getStatus() == Request.AWAITING_PAYMENT) {
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-                btnPayment.setVisibility(View.VISIBLE);
+                //btnPayment.setVisibility(View.VISIBLE);
 
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                     mMap.clear();
                     currRequest = null;
                     btnRequestRide.setVisibility(View.VISIBLE);
                     btnCancelRide.setVisibility(View.INVISIBLE);
-                    btnPayment.setVisibility(View.INVISIBLE);
+                    //btnPayment.setVisibility(View.INVISIBLE);
                     txtEndLocation.setText("");
             }
         }
@@ -518,16 +520,16 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
-        btnPayment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Generating QR...");
-                // TODO: Indicate to the user that a QR payment is loading
-                FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
-                DisplayQRDialog displayQRDialog = DisplayQRDialog.newInstance(currRequest.generateID());
-                displayQRDialog.show(fm, "generate");
-            }
-        });
+//        btnPayment.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d(TAG, "Generating QR...");
+//                // TODO: Indicate to the user that a QR payment is loading
+//                FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
+//                DisplayQRDialog displayQRDialog = DisplayQRDialog.newInstance(currRequest.generateID());
+//                displayQRDialog.show(fm, "generate");
+//            }
+//        });
 
         //This section of code will run when searchFragment sends over a place
         Intent intent = getIntent();
