@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -56,7 +57,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
@@ -529,6 +533,24 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
 
         Log.d(TAG, "Retrieved request: " + req.toString());
+        //Log.d(TAG, "Retrieved request: " + req.getDriver());
+        Query query = fb.collection("drivers").whereEqualTo("name", req.getDriver());
+        Log.d(TAG, "Query:" + query.toString());
+
+        fb.collection("drivers").whereEqualTo("name","driver")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e!= null) {
+                            Log.d(TAG, "Listen failed" + e);
+                        }
+                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
+                            Log.d(TAG, "In document snapshot");
+                            Log.d(TAG, "data: " + doc.getId() + "=>" + doc.getData());
+                        }
+                    }
+                });
+
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
