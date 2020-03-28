@@ -1,7 +1,6 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -103,7 +102,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
-    private Toolbar toolbar3;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
