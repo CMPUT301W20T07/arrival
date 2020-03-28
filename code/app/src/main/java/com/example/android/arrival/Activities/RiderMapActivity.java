@@ -25,6 +25,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -179,8 +180,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setPeekHeight(140);
 
-
-        //Set pickup butt
+        //Don't show keyboard when edittexts are clicked.
+        txtStartLocation.setInputType(InputType.TYPE_NULL);
+        txtEndLocation.setInputType(InputType.TYPE_NULL);
 
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {

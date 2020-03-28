@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -83,6 +84,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
+    private Toolbar toolbar3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

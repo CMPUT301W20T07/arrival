@@ -63,7 +63,7 @@ public class RiderMapActivityTest {
 
         solo.sleep(10000);
 
-        TextView start = (TextView) solo.getView(R.id.pickupLocation);
+        TextView start = (TextView) solo.getView(R.id.riderStartLocation);
         assertTrue(start.getText().length() > 0);
     }
 
@@ -75,8 +75,8 @@ public class RiderMapActivityTest {
     public void testClickingOnMap() {
         solo.assertCurrentActivity("Wrong activity", RiderMapActivity.class);
         RiderMapActivity activity = (RiderMapActivity) solo.getCurrentActivity();
-        TextView start = (TextView) solo.getView(R.id.pickupLocation);
-        TextView end = (TextView) solo.getView(R.id.destLocation);
+        TextView start = (TextView) solo.getView(R.id.riderStartLocation);
+        TextView end = (TextView) solo.getView(R.id.riderEndLocation);
 
         //Waits for the map to load
         solo.sleep(10000);
@@ -86,7 +86,6 @@ public class RiderMapActivityTest {
 
         //Changes the pickup location
         solo.clickOnScreen(60, 120);
-        solo.waitForView(R.id.pickDestPopUp);
         solo.clickOnButton("Pickup");
         solo.sleep(2000);
         String start2 = start.getText().toString();
@@ -99,7 +98,6 @@ public class RiderMapActivityTest {
 
         //Adds dest to the map and asserts that the textview now has text in it
         solo.clickOnScreen(500, 300);
-        solo.waitForView(R.id.pickDestPopUp);
         solo.clickOnButton("Destination");
         solo.sleep(2000);
         assertTrue(end.getText().length() > 0);
@@ -108,7 +106,6 @@ public class RiderMapActivityTest {
 
         //Changing the destination marker
         solo.clickOnScreen(200, 400);
-        solo.waitForView(R.id.pickDestPopUp);
         solo.clickOnButton("Destination");
         solo.sleep(2000);
         assertTrue(end.getText().length() > 0);
@@ -117,7 +114,6 @@ public class RiderMapActivityTest {
 
         solo.sleep(2000);
         solo.clickOnScreen(250, 125);
-        solo.waitForView(R.id.pickDestPopUp);
         solo.clickOnButton("Back");
         solo.sleep(2000);
         assertEquals(end2, end.getText().toString());
@@ -136,13 +132,12 @@ public class RiderMapActivityTest {
 
         solo.sleep(10000);
 
-        TextView start = (TextView) solo.getView(R.id.pickupLocation);
-        TextView end = (TextView) solo.getView(R.id.destLocation);
+        TextView start = (TextView) solo.getView(R.id.riderStartLocation);
+        TextView end = (TextView) solo.getView(R.id.riderEndLocation);
         String start1 = start.getText().toString();
 
         //Adding a random destination to the screen so we can test that its value doesn't change
         solo.clickOnScreen(200, 400);
-        solo.waitForView(R.id.pickDestPopUp);
         solo.clickOnButton("Destination");
         solo.sleep(2000);
 
@@ -171,7 +166,6 @@ public class RiderMapActivityTest {
 
         //Adding a random destination to the screen so we can test the ride request button
         solo.clickOnScreen(200, 400);
-        solo.waitForView(R.id.pickDestPopUp);
         solo.clickOnButton("Destination");
         solo.sleep(2000);
 
@@ -192,7 +186,7 @@ public class RiderMapActivityTest {
 
         //Adding a random destination to the screen so we can get to the confirmation fragment
         solo.clickOnScreen(200, 400);
-        solo.waitForView(R.id.pickDestPopUp);
+        /*solo.waitForView(R.id.pickDestPopUp);*/
         solo.clickOnButton("Destination");
         solo.sleep(2000);
 
@@ -219,7 +213,7 @@ public class RiderMapActivityTest {
 
         //Adding a random destination to the screen so we can get to the confirmation fragment
         solo.clickOnScreen(200, 400);
-        solo.waitForView(R.id.pickDestPopUp);
+        /*solo.waitForView(R.id.pickDestPopUp);*/
         solo.clickOnButton("Destination");
         solo.sleep(2000);
 
@@ -245,7 +239,7 @@ public class RiderMapActivityTest {
 
         //Adding a random destination to the screen so we can get to the confirmation fragment
         solo.clickOnScreen(200, 400);
-        solo.waitForView(R.id.pickDestPopUp);
+        /*solo.waitForView(R.id.pickDestPopUp);*/
         solo.clickOnButton("Destination");
         solo.sleep(2000);
 
