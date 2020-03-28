@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="230dp"
     android:gravity="bottom"
-    android:padding="16dp"
+    android:padding="17dp"
     android:background="@drawable/arrival_header"
     android:backgroundTint="@color/blackTint"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
