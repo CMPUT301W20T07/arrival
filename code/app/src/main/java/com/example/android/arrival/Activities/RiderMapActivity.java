@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -79,7 +80,9 @@ import com.google.firebase.auth.FirebaseAuth;
 //import com.google.firebase.database.ValueEventListener;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -798,6 +801,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
 
         Log.d(TAG, "Retrieved request: " + req.toString());
+        db.collection("requests").document(String.valueOf(currRequest)).collection("status")
+                .whereEqualTo("status","1")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.d(TAG, "Listen failed:" + e);
+                            return;
+                        }
+                        Log.d(TAG, "accepted request!");
+                    }
+                });
+
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
