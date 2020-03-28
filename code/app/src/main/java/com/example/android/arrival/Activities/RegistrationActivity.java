@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,13 +29,18 @@ import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener, AccountCallbackListener {
@@ -56,6 +62,10 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     private static final String DRIVER_TYPE_STRING = "driver";
     private static String IMAGE_DIRECTORY = "Arrival";
 
+    private String uTokenId = "";
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +74,20 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         setContentView(R.layout.activity_registration);
 
         accountManager = AccountManager.getInstance();
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        // Get new Instance ID token
+                        uTokenId = task.getResult().getToken();
+                        Log.d(TAG, uTokenId);
+                    }
+                });
 
         // Initialize UI component references
         txtName = findViewById(R.id.user_name_editText);
@@ -85,6 +109,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         btnDriverSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 CarDetailsDialog carDetailsDialog = new CarDetailsDialog();
                 carDetailsDialog.show(getSupportFragmentManager(), "car");
             }
@@ -93,7 +118,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         btnRiderSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                riderSignUp();
+                riderSignUp(uTokenId);
             }
         });
     }
@@ -143,7 +168,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         }
     }
 
-    public void riderSignUp() {
+    public void riderSignUp(String uTokenId) {
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
         String uName = txtName.getText().toString();
@@ -170,7 +195,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
             Snackbar.make(profileImage, "Please input a photo", Snackbar.LENGTH_SHORT).show();
         }
         if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty() && filePath == null)) {
-            Rider rider = new Rider(em, uName, uPhoneNumber);
+            Rider rider = new Rider(em, uName, uPhoneNumber, uTokenId);
             accountManager.createRiderAccount(rider, pwd, this);
         } else {
             Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show();
@@ -178,11 +203,12 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     }
 
 
-    public void driverSignUp() {
+    public void driverSignUp(String uTokenId) {
         String em = txtEmail.getText().toString();
         String pwd = txtPassword.getText().toString();
         String uName = txtName.getText().toString();
         String uPhoneNumber = txtPhoneNumber.getText().toString();
+
 
         // Check for empty input
         if (em.isEmpty()) {
@@ -198,7 +224,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
             txtPhoneNumber.setError("Please input your phoneNumber");
         }
         if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
-            Driver driver = new Driver(em, uName, uPhoneNumber, driverCar);
+            Driver driver = new Driver(em, uName, uPhoneNumber, uTokenId, driverCar);
             accountManager.createDriverAccount(driver, pwd, this);
         }
         else {
@@ -210,7 +236,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     @Override
     public void onDonePressed(Car car) {
         driverCar = car;
-        driverSignUp();
+        driverSignUp(uTokenId);
     }
 
     @Override
@@ -241,6 +267,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     @Override
     public void onAccountCreationFailure(String e) {
         Toast.makeText(this, "There was an error creating your account... ", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, e);
     }
 
     @Override
@@ -286,6 +313,16 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     @Override
     public void onPhotoReceiveFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }

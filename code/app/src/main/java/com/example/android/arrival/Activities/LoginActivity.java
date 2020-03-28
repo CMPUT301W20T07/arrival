@@ -1,6 +1,8 @@
 package com.example.android.arrival.Activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,8 +16,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.android.arrival.Dialogs.ForgotPasswordDialog;
 import com.example.android.arrival.Model.Driver;
@@ -29,7 +34,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements AccountCallbackListener {
 
@@ -44,6 +60,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     private static final String DRIVER_TYPE_STRING = "driver";
     AccountManager accountManager;
     SignInButton signInGoogle;
+    private static final int STORAGE_REQUEST = 1;
     GoogleSignInClient googleSignInClient;
 
 
@@ -55,6 +72,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         setContentView(R.layout.activity_login);
 
         accountManager = AccountManager.getInstance();
+        requestStoragePermission();
 
         // View binding
         email = findViewById(R.id.login_email_editText);
@@ -101,6 +119,33 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
     }
 
+    public void requestStoragePermission() {
+
+        if(ContextCompat.checkSelfPermission(LoginActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "requestStoragePermission: requesting");
+            ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_REQUEST);
+        }
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == STORAGE_REQUEST) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "Enable storage permissions to set profile photo", Toast.LENGTH_LONG);
+            }
+        }
+    }
+
+
+    /**
+     * basic error checking for user input
+     */
     public void signUserIn () {
         String emailStr = email.getText().toString();
         String passwordStr = password.getText().toString();
@@ -126,8 +171,12 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         }
     }
 
+
+
     @Override
     public void onAccountSignIn(String accountType) {
+        Log.d("TOKEN", "calling to check for token");
+        checkForToken(accountType);
         Log.d(TAG, "onAccountSignIn: " + accountType);
         if (accountType.equals(DRIVER_TYPE_STRING)) {
             Toast.makeText(this, "Signing in as driver...", Toast.LENGTH_SHORT).show();
@@ -206,10 +255,72 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
     }
 
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
+
+    }
+
 
     public void openForgotPasswordDialog() {
         ForgotPasswordDialog.display(getSupportFragmentManager());
     }
+
+    public void checkForToken(String type) {
+        Log.d("TOKEN", "In check for token");
+        FirebaseAuth fb = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        String[] token = new String[1];
+
+        FirebaseUser user = fb.getCurrentUser();
+        String uid = user.getUid();
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        // Get new Instance ID token
+                        token[0] = task.getResult().getToken();
+                        Log.d(TAG, token[0]);
+
+                        Log.d("TOKEN", "Token: " + token[0]);
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("tokenId", token[0]);
+
+                        if (type.equals("rider")) {
+                            DocumentReference rider = db.collection("riders").document(uid);
+                            rider.set(updates, SetOptions.merge());
+                            Log.d("TOKEN", "should have updated rider token");
+                        }
+                        else if (type.equals("driver")) {
+                            DocumentReference driver = db.collection("drivers").document(uid);
+                            driver.update(updates);
+                        }
+                    }
+                });
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 /* Code that handles sign in with google stuff
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
