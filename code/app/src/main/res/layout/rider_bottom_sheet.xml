@@ -15,7 +15,7 @@
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="280dp"
-        android:background="@color/white"
+        android:background="@drawable/rounded_bottom_sheet"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="true"
         >
@@ -44,12 +44,13 @@
 
 
                 <Button
-                    android:id="@+id/pickupButton"
-                    android:layout_width="100dp"
+                    android:id="@+id/pickupButtonRed"
+                    android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/pickup_button"
                     android:textColor="@color/white"
                     android:text="Pickup"
+                    android:textSize="20sp"
                     android:textAllCaps="false"
                     android:fontFamily="@font/product_sans_regular"
                     android:layout_weight="1"
@@ -57,22 +58,12 @@
 
                 <Button
                     android:id="@+id/destinationButton"
-                    android:layout_width="100dp"
+                    android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/destination_button"
                     android:textColor="@color/white"
                     android:text="Destination"
-                    android:textAllCaps="false"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/product_sans_regular"
-                    />
-                <Button
-                    android:id="@+id/refreshButton"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp"
-                    android:background="@drawable/refresh_button"
-                    android:textColor="@color/white"
-                    android:text="Refresh"
+                    android:textSize="20sp"
                     android:textAllCaps="false"
                     android:layout_weight="1"
                     android:fontFamily="@font/product_sans_regular"
@@ -81,10 +72,13 @@
             </LinearLayout>
 
             <EditText
+                android:id="@+id/riderStartLocation"
                 android:layout_width="350dp"
                 android:layout_height="50dp"
+                android:paddingBottom="20dp"
                 android:padding="16dp"
                 android:hint="Start"
+                android:textSize="14sp"
                 android:fontFamily="@font/product_sans_regular"
                 android:textColorHint="@color/blackTint"
                 android:backgroundTint="@color/blackTint"
@@ -92,26 +86,46 @@
                 />
 
             <EditText
+                android:id="@+id/riderEndLocation"
                 android:layout_width="350dp"
                 android:layout_height="50dp"
                 android:padding="16dp"
                 android:hint="End"
+                android:textSize="14sp"
                 android:fontFamily="@font/product_sans_regular"
                 android:textColorHint="@color/blackTint"
                 android:backgroundTint="@color/blackTint"
                 android:textColor="@color/black"
                 />
 
-            <Button
-                android:id="@+id/rideRequest"
-                android:layout_width="300dp"
-                android:layout_height="60dp"
-                android:background="@drawable/arrival_button_blue_long"
-                android:fontFamily="@font/product_sans_regular"
-                android:text="Request Ride"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                >
+
+                <Button
+                    android:id="@+id/rideRequest"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/arrival_button_blue_long"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Request Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+                <Button
+                    android:id="@+id/cancelRideRequest"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/arrival_button_blue_long"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Cancel Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
 
 
         </LinearLayout>
