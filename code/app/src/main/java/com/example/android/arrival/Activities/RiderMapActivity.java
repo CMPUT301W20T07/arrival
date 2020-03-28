@@ -137,14 +137,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private Toolbar toolbar2;
     private BottomSheetBehavior bottomSheetBehavior;
 
-//     private Button btnPayment;
+     private Button btnPayment;
 //     private TextView txtStatus;
 //     private FloatingActionButton btnRefresh;
 //     private Toolbar toolbar2;
-//     private AccountManager accountManager;
-//     private TextView userName;
-//     private TextView userEmailAddress;
-//     private ImageView profilePhoto;
+     private AccountManager accountManager;
+     private TextView userName;
+     private TextView userEmailAddress;
+     private ImageView profilePhoto;
 
 
     @Override
