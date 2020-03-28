@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/ride_history"
             android:icon="@drawable/ic_ride_history"
-            android:title="Ride History"/>
+            android:title="Ride History "/>
         <item android:id="@+id/reviews"
             android:icon="@drawable/ic_stars_black_24dp"
             android:title="Reviews"/>
