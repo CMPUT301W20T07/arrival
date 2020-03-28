@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.DriverMapActivity">
+    tools:context=".Activities.RiderMapActivity">
 
     <include layout="@layout/driver_map_layout"></include>
 
