@@ -8,8 +8,8 @@ public class Driver extends User {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-    public Driver(String email, String name, String phoneNumber, Car car) {
-        super(email, name, phoneNumber);
+    public Driver(String email, String name, String phoneNumber, String tokenId, Car car) {
+        super(email, name, phoneNumber, tokenId);
         this.car = car;
     }
 

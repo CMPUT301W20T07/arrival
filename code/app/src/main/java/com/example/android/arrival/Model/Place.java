@@ -121,4 +121,8 @@ public class Place implements Comparable<Place>, Serializable {
             return 1;
         }
     }
+
+    public String toString() {
+        return name;
+    }
 }
