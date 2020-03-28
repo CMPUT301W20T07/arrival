@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.accounts.Account;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -35,15 +37,21 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 
+import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.AccountCallbackListener;
+import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.location.LocationCallback;
@@ -76,11 +84,12 @@ import java.util.List;
 import static java.sql.Types.NULL;
 
 
-public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener {
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
 
     private RequestManager rm;
+    private AccountManager accountManager;
     private DrawerLayout drawer;
 
     //Declaring variables for use later
@@ -114,6 +123,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private FloatingActionButton btnRefresh;
     private Toolbar toolbar2;
     private BottomSheetBehavior bottomSheetBehavior;
+    private TextView userName;
+    private TextView userEmailAddress;
+    private ImageView profilePhoto;
 
     @Override
     public void onBackPressed() {
@@ -134,6 +146,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        accountManager = AccountManager.getInstance();
+        accountManager.getProfilePhoto(this);
+        accountManager.getUserData(this);
         setContentView(R.layout.rider_map_activity);
 
         //Location service that can get a users location
@@ -158,7 +173,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         pickupActivity = findViewById(R.id.pickupButtonRed);
         destActivity = findViewById(R.id.destinationButton);
 
+
         NavigationView navigationView = findViewById(R.id.rider_navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        userName = headerView.findViewById(R.id.userName);
+        userEmailAddress = headerView.findViewById(R.id.userEmailAddress);
+        profilePhoto = headerView.findViewById(R.id.user_profile_pic);
+
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RiderMapActivity.this, RiderProfileScreenActivity.class));
+            }
+        });
 
         //Setting Navigation View click listener
         navigationView.setNavigationItemSelectedListener(this);
@@ -728,6 +755,83 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
+
+    }
+
+    @Override
+    public void onAccountSignIn(String userType) {
+
+    }
+
+    @Override
+    public void onSignInFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+        userName.setText(rider.getName());
+        userEmailAddress.setText(rider.getEmail());
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+        Toast.makeText(this, e, Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+        Glide.with(this).load(uri).into(profilePhoto);
+        Log.d(TAG, "onPhotoReceived: " + uri.toString());
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
+        Toast.makeText(this, e,Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
 
     }
 }
