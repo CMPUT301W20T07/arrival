@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Activities.RiderMapActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/rider_map_layout">
+
+    </include>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        android:background="@drawable/rounded_bottom_sheet"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="true"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:fontFamily="@font/product_sans_regular"
+                android:text="Get Started With Your Ride."
+                android:textAlignment="center"
+                android:textColor="@color/blackTint"
+                android:textSize="20sp" />
+            
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+
+                <Button
+                    android:id="@+id/pickupButtonRed"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/pickup_button"
+                    android:textColor="@color/white"
+                    android:text="Pickup"
+                    android:textSize="20sp"
+                    android:textAllCaps="false"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:layout_weight="1"
+                    />
+
+                <Button
+                    android:id="@+id/destinationButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/destination_button"
+                    android:textColor="@color/white"
+                    android:text="Destination"
+                    android:textSize="20sp"
+                    android:textAllCaps="false"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/product_sans_regular"
+                    />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/riderStartLocation"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:paddingBottom="20dp"
+                android:padding="16dp"
+                android:hint="Start"
+                android:inputType="none"
+                android:textSize="14sp"
+                android:fontFamily="@font/product_sans_regular"
+                android:textColorHint="@color/blackTint"
+                android:backgroundTint="@color/blackTint"
+                android:textColor="@color/black"
+                />
+
+            <EditText
+                android:id="@+id/riderEndLocation"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:padding="16dp"
+                android:hint="End"
+                android:inputType="none"
+                android:textSize="14sp"
+                android:fontFamily="@font/product_sans_regular"
+                android:textColorHint="@color/blackTint"
+                android:backgroundTint="@color/blackTint"
+                android:textColor="@color/black"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                >
+
+                <Button
+                    android:id="@+id/rideRequest"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/arrival_button_blue_long"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Request Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+                <Button
+                    android:id="@+id/cancelRideRequest"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/arrival_button_blue_long"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Cancel Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

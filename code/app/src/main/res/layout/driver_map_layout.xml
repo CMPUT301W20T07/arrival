@@ -1,9 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+    android:id="@+id/driver_drawer_layout"
+    android:fitsSystemWindows="true"
+    tools:context=".Activities.DriverMapActivity"
+    tools:openDrawer="start"
+    >
+
+    <include layout="@layout/driver_map_activity"></include>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar3"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginTop="1dp"
+            android:elevation="1dp"
+            />
+
+    </LinearLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:id="@+id/driver_navigation_view"
+        app:headerLayout="@layout/navigation_drawer"
+        app:menu="@menu/driver_navigation_menu"
+        />
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
+<!-- 
     android:layout_height="match_parent">
 
     <include
@@ -170,3 +209,5 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+ --> -->

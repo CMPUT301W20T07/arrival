@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
@@ -70,6 +71,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -126,15 +129,22 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-    private Button btnPayment;
+
+    private Button pickupActivity;
+    private Button destActivity;
     private TextView txtStatus;
     private FloatingActionButton btnRefresh;
     private Toolbar toolbar2;
-    private AccountManager accountManager;
-    private TextView userName;
-    private TextView userEmailAddress;
-    private ImageView profilePhoto;
+    private BottomSheetBehavior bottomSheetBehavior;
 
+//     private Button btnPayment;
+//     private TextView txtStatus;
+//     private FloatingActionButton btnRefresh;
+//     private Toolbar toolbar2;
+//     private AccountManager accountManager;
+//     private TextView userName;
+//     private TextView userEmailAddress;
+//     private ImageView profilePhoto;
 
 
     @Override
@@ -177,15 +187,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         handler = new Handler();
         accountManager = AccountManager.getInstance();
 
-        txtStartLocation = findViewById(R.id.pickupLocation);
-        txtEndLocation = findViewById(R.id.destLocation);
-        btnRequestRide = findViewById(R.id.requestRide);
-        btnCancelRide = findViewById(R.id.cancelRide);
-        btnPayment = findViewById(R.id.btnRiderShowQR);
+
+        txtStartLocation = findViewById(R.id.riderStartLocation);
+        txtEndLocation = findViewById(R.id.riderEndLocation);
+        btnRequestRide = findViewById(R.id.rideRequest);
+        btnCancelRide = findViewById(R.id.cancelRideRequest);
+
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
         drawer = findViewById(R.id.rider_drawer_layout);
+        pickupActivity = findViewById(R.id.pickupButtonRed);
+        destActivity = findViewById(R.id.destinationButton);
+
         NavigationView navigationView = findViewById(R.id.rider_navigation_view);
         View headerView = navigationView.getHeaderView(0);
         userName = headerView.findViewById(R.id.userName);
@@ -209,8 +223,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
+
+        //Setting up Persistent Bottom Sheet
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setPeekHeight(140);
+
+        //Don't show keyboard when edittexts are clicked.
+        txtStartLocation.setInputType(InputType.TYPE_NULL);
+        txtEndLocation.setInputType(InputType.TYPE_NULL);
+
         accountManager.getUserData(this);
         accountManager.getProfilePhoto(this);
+
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -387,7 +412,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onMapClick(LatLng latLng) {
                 Log.d(TAG, "map was clicked");
-                View customView = getLayoutInflater().inflate(R.layout.pickup_dest_popup, null);
+                /*View customView = getLayoutInflater().inflate(R.layout.pickup_dest_popup, null);
 
                 PopupWindow popupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -396,7 +421,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 Button pickupActivity = customView.findViewById(R.id.pickupButton);
                 Button destActivity = customView.findViewById(R.id.destButton);
-                Button back = customView.findViewById(R.id.back);
+                Button back = customView.findViewById(R.id.back);*/
 
                 pickupActivity.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -405,7 +430,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                             pickupMarker.remove();
                         }
                         addPickupMarker(latLng);
-                        popupWindow.dismiss();
+                        /*popupWindow.dismiss();*/
 
                     }
                 });
@@ -417,16 +442,16 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                             destMarker.remove();
                         }
                         addDestMarker(latLng);
-                        popupWindow.dismiss();
+                        /*popupWindow.dismiss();*/
                     }
                 });
 
-                back.setOnClickListener(new View.OnClickListener() {
+                /*back.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         popupWindow.dismiss();
                     }
-                });
+                });*/
 
             }
         });
