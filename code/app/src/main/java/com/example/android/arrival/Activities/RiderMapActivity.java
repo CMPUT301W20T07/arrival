@@ -99,6 +99,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private Marker currentUserLocationMarker;
     private Marker pickupMarker;
     private Marker destMarker;
+    private Marker genericMarker;
     private Place pickup = new Place();
     private Place destination = new Place();
     private Place current = new Place();
@@ -344,16 +345,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onMapClick(LatLng latLng) {
                 Log.d(TAG, "map was clicked");
-                /*View customView = getLayoutInflater().inflate(R.layout.pickup_dest_popup, null);
 
-                PopupWindow popupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                popupWindow.showAtLocation(customView, Gravity.TOP, 0, 0);
-
-                Button pickupActivity = customView.findViewById(R.id.pickupButton);
-                Button destActivity = customView.findViewById(R.id.destButton);
-                Button back = customView.findViewById(R.id.back);*/
+                if (genericMarker != null) {
+                    genericMarker.remove();
+                }
+                addGenericMarker(latLng);
 
                 pickupActivity.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -361,6 +357,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                         if (pickupMarker != null){
                             pickupMarker.remove();
                         }
+                        genericMarker.remove();
                         addPickupMarker(latLng);
                         /*popupWindow.dismiss();*/
 
@@ -373,6 +370,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                         if (destMarker != null) {
                             destMarker.remove();
                         }
+                        genericMarker.remove();
                         addDestMarker(latLng);
                         /*popupWindow.dismiss();*/
                     }
@@ -554,6 +552,17 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         marks.add(1, destination);
 
         addLine();
+    }
+
+    public void addGenericMarker(LatLng latLng) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(true);
+
+        markerOptions.title("Select pick up or destination");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+        genericMarker = mMap.addMarker(markerOptions);
+
     }
 
 
