@@ -68,13 +68,18 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -90,6 +95,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     private RequestManager rm;
     private AccountManager accountManager;
+    private FirebaseFirestore fb;
     private DrawerLayout drawer;
 
     //Declaring variables for use later
@@ -161,6 +167,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
+        fb = FirebaseFirestore.getInstance();
 
         txtStartLocation = findViewById(R.id.riderStartLocation);
         txtEndLocation = findViewById(R.id.riderEndLocation);
@@ -220,12 +227,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
+
+
         if(currRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
         } else {
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
+            Log.d(TAG, "CurrRequest: " + currRequest.toString());
         }
     }
 
@@ -249,6 +259,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
+            Log.d(TAG, currRequest.toString());
         }
     }
 
@@ -685,6 +696,26 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
 
+    public void getDriverDetails(Request request) {
+        String reqId = request.getID();
+        //DocumentReference reqObj = fb.collection("requests").document(reqId);
+        final String[] driverUID = new String[1];
+
+
+        fb.collection("requests")
+                .document(reqId)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        driverUID[0] = documentSnapshot.get("driver").toString();
+                    }
+                });
+        Log.d(TAG, driverUID[0]);
+    }
+
+
+
     /**
      * Gets the results of the location permissions and acts accordingly
      * @param requestCode : int of what request we are calling
@@ -737,8 +768,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             currRequest = req;
 //            refresh();
         }
-
         updateInfo();
+
+        if (req == currRequest && req.getStatus() == Request.ACCEPTED){
+            getDriverDetails(req);
+        }
+
+
     }
 
     @Override
@@ -750,7 +786,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
-
+        Log.d(TAG, "onGetRiderRequestSucces" + snapshot.toString());
     }
 
     @Override
@@ -780,8 +816,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onRiderDataRetrieved(Rider rider) {
+        Log.d(TAG, "Getting rider data");
         userName.setText(rider.getName());
         userEmailAddress.setText(rider.getEmail());
+
+        rm.getRiderRequests("usr-map-test", this);
+        //rm.getRiderRequests(rider.getName(), this);
     }
 
     @Override
