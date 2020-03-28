@@ -135,14 +135,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView userEmailAddress;
     private ImageView profilePhoto;
 
-     private Button btnPayment;
-//     private TextView txtStatus;
-//     private FloatingActionButton btnRefresh;
-//     private Toolbar toolbar2;
-     private AccountManager accountManager;
-     private TextView userName;
-     private TextView userEmailAddress;
-     private ImageView profilePhoto;
+//     private Button btnPayment;
+////     private TextView txtStatus;
+////     private FloatingActionButton btnRefresh;
+////     private Toolbar toolbar2;
+//     private AccountManager accountManager;
+//     private TextView userName;
+//     private TextView userEmailAddress;
+//     private ImageView profilePhoto;
 
 
     @Override
@@ -186,13 +186,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         handler = new Handler();
         accountManager = AccountManager.getInstance();
 
-        txtStartLocation = findViewById(R.id.pickupLocation);
-        txtEndLocation = findViewById(R.id.destLocation);
-        btnRequestRide = findViewById(R.id.requestRide);
-        btnCancelRide = findViewById(R.id.cancelRide);
-        btnPayment = findViewById(R.id.btnRiderShowQR);
+        //txtStartLocation = findViewById(R.id.pickupLocation);
+//        txtEndLocation = findViewById(R.id.destLocation);
+//        btnRequestRide = findViewById(R.id.requestRide);
+//        btnCancelRide = findViewById(R.id.cancelRide);
+//        btnPayment = findViewById(R.id.btnRiderShowQR);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
-        txtStatus = findViewById(R.id.txtRiderStatus);
+//        txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
         drawer = findViewById(R.id.rider_drawer_layout);
         NavigationView navigationView = findViewById(R.id.rider_navigation_view);
