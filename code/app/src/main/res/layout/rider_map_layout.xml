@@ -2,14 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include
         layout="@layout/activity_maps"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         ></include>-->
+
 
     <!--<TextView
         android:id="@+id/startTextView"
@@ -76,6 +79,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
+        android:visibility="invisible"
         android:text="Request Ride"
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -90,12 +94,28 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#03A9F4"
+        android:visibility="invisible"
         android:text="Cancel Ride"
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />-->
 
+<!--     <Button
+        android:id="@+id/btnRiderShowQR"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#03A9F4"
+        android:visibility="invisible"
+        android:text="DISPLAY QR PAYMENT"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+ -->
 
     <TextView
         android:id="@+id/txtRiderStatus"
@@ -113,6 +133,7 @@
         android:id="@+id/btnRiderRefresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:layout_marginStart="352dp"
         android:layout_marginTop="596dp"
         android:layout_marginRight="336dp"
@@ -122,5 +143,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

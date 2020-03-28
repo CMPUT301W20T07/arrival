@@ -88,6 +88,7 @@ public class ForgotPasswordDialog extends DialogFragment {
                                 Toast.makeText(getContext(),"Please check your email address for a reset link.",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getContext(), LoginActivity.class);
                                 startActivity(intent);
+                                dismiss();
                             }
                             else{
                                 String errorMessage = task.getException().getMessage();

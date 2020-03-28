@@ -1,4 +1,4 @@
-package com.example.android.arrival.Model;
+package com.example.android.arrival.Util;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
