@@ -746,7 +746,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         Log.d(TAG, "Retrieved request: " + req.toString());
         db.collection("requests").document(String.valueOf(currRequest)).collection("status")
-                .whereEqualTo("status","0")
+                .whereEqualTo("status","1")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -754,7 +754,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                             Log.d(TAG, "Listen failed:" + e);
                             return;
                         }
-                        Log.d(TAG, "open request!");
+                        Log.d(TAG, "accepted request!");
                     }
                 });
 
