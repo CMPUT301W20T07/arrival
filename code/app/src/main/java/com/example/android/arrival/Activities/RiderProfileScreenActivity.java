@@ -55,12 +55,12 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_rider_profile_screen);
-
         accountManager = AccountManager.getInstance();
         accountManager.getUserData(this);
         accountManager.getProfilePhoto(this);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_rider_profile_screen);
+
 
 
         email = findViewById(R.id.update_email);
