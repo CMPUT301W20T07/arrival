@@ -147,7 +147,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         setContentView(R.layout.driver_map_activity);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
+        driverName = FirebaseAuth.getInstance().getCurrentUser().getUid();
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
@@ -182,6 +182,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         View bottomSheet = findViewById(R.id.driver_bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setPeekHeight(140);
+        bottomSheetBehavior.setHideable(false);
 
         //Setting Navigation View click listener
         navigationView.setNavigationItemSelectedListener(this);

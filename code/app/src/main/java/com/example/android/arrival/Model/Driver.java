@@ -1,6 +1,8 @@
 package com.example.android.arrival.Model;
 
-public class Driver extends User {
+import java.io.Serializable;
+
+public class Driver extends User implements Serializable {
 
     private Car car;
 

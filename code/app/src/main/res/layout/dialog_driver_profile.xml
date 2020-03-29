@@ -19,15 +19,12 @@
                 android:id="@+id/name_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:text="Name: "/>
 
             <TextView
                 android:id="@+id/driver_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -39,15 +36,12 @@
                 android:id="@+id/rating_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:text="Rating: "/>
 
             <TextView
                 android:id="@+id/driver_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -59,15 +53,12 @@
                 android:id="@+id/arrival_time_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:text="Estimated Arrival Time: "/>
 
             <TextView
                 android:id="@+id/arrival_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -75,19 +66,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/car_details_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:text="Car: "/>
+                android:text="Car: " />
 
             <TextView
                 android:id="@+id/car_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -99,14 +88,12 @@
                 android:id="@+id/license_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:text="License Plate: "/>
 
             <TextView
                 android:id="@+id/license_plate"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 />
 
         </LinearLayout>
@@ -119,15 +106,12 @@
                 android:id="@+id/phone_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:text="Phone Number: "/>
 
             <TextView
                 android:id="@+id/phone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -139,15 +123,12 @@
                 android:id="@+id/email_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:text="Email: "/>
 
             <TextView
                 android:id="@+id/driver_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

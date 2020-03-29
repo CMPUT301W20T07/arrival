@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -44,6 +45,8 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.DisplayQRDialog;
+import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
@@ -68,17 +71,26 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static java.sql.Types.NULL;
@@ -90,6 +102,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     private RequestManager rm;
     private AccountManager accountManager;
+    private FirebaseFirestore fb;
+    private FirebaseAuth auth;
     private DrawerLayout drawer;
 
     //Declaring variables for use later
@@ -99,6 +113,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private Marker currentUserLocationMarker;
     private Marker pickupMarker;
     private Marker destMarker;
+    private Marker genericMarker;
     private Place pickup = new Place();
     private Place destination = new Place();
     private Place current = new Place();
@@ -117,6 +132,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
+    private Button btnDriverDetails;
+    private Button btnMakePayment;
     private Button pickupActivity;
     private Button destActivity;
     private TextView txtStatus;
@@ -161,11 +178,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
+        fb = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         txtStartLocation = findViewById(R.id.riderStartLocation);
         txtEndLocation = findViewById(R.id.riderEndLocation);
         btnRequestRide = findViewById(R.id.rideRequest);
         btnCancelRide = findViewById(R.id.cancelRideRequest);
+        btnDriverDetails = findViewById(R.id.seeDriverDetails);
+        btnMakePayment = findViewById(R.id.makePayment);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
         toolbar2 = findViewById(R.id.toolbar2);
@@ -220,12 +241,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
+
+
         if(currRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
         } else {
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
+            Log.d(TAG, "CurrRequest: " + currRequest.toString());
         }
     }
 
@@ -249,6 +273,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
+            Log.d(TAG, currRequest.toString());
         }
     }
 
@@ -262,6 +287,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
+            btnDriverDetails.setVisibility(View.INVISIBLE);
+
+
+            pickupActivity.setClickable(true);
+            destActivity.setClickable(true);
+            btnRequestRide.setClickable(true);
+
 
         } else {
 //            rm.getRequest(currRequest.getID(), this);
@@ -269,13 +301,20 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             Log.d(TAG, "currRequest is " + currRequest.toString());
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
+            pickupActivity.setClickable(false);
+            destActivity.setClickable(false);
+            btnRequestRide.setClickable(false);
+
             if (currRequest.getStatus() == Request.OPEN) {
                 mMap.clear();
                 addPickupMarker(currRequest.getStartLocation().getLatLng());
                 addDestMarker(currRequest.getEndLocation().getLatLng());
 
-                btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 mMap.clear();
@@ -283,12 +322,31 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.VISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                 mMap.clear();
                 currRequest = null;
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 txtEndLocation.setText("");
+
+            } else if (currRequest.getStatus() == Request.AWAITING_PAYMENT){
+                btnMakePayment.setVisibility(View.VISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.ACCEPTED) {
+                mMap.clear();
+
+                btnDriverDetails.setVisibility(View.VISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
+                addDestMarker(currRequest.getEndLocation().getLatLng());
             }
         }
     }
@@ -344,16 +402,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onMapClick(LatLng latLng) {
                 Log.d(TAG, "map was clicked");
-                /*View customView = getLayoutInflater().inflate(R.layout.pickup_dest_popup, null);
 
-                PopupWindow popupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                popupWindow.showAtLocation(customView, Gravity.TOP, 0, 0);
-
-                Button pickupActivity = customView.findViewById(R.id.pickupButton);
-                Button destActivity = customView.findViewById(R.id.destButton);
-                Button back = customView.findViewById(R.id.back);*/
+                if (genericMarker != null) {
+                    genericMarker.remove();
+                }
+                addGenericMarker(latLng);
 
                 pickupActivity.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -361,6 +414,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                         if (pickupMarker != null){
                             pickupMarker.remove();
                         }
+                        genericMarker.remove();
                         addPickupMarker(latLng);
                         /*popupWindow.dismiss();*/
 
@@ -373,6 +427,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                         if (destMarker != null) {
                             destMarker.remove();
                         }
+                        genericMarker.remove();
                         addDestMarker(latLng);
                         /*popupWindow.dismiss();*/
                     }
@@ -449,6 +504,29 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
             }
         });
+
+        btnDriverDetails.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDriverDetails(currRequest);
+            }
+        }));
+
+        btnMakePayment.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date date = new Date();
+                String payment = "I " + currRequest.getRider() +  "am making a payment of " + currRequest.getFare() +
+                        "to " + currRequest.getDriver() + "on " + date;
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                DialogFragment fragment = DisplayQRDialog.newInstance(payment);
+                fragmentTransaction.add(0, fragment);
+                fragmentTransaction.commit();
+            }
+        }));
 
         //This section of code will run when searchFragment sends over a place
         Intent intent = getIntent();
@@ -554,6 +632,17 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         marks.add(1, destination);
 
         addLine();
+    }
+
+    public void addGenericMarker(LatLng latLng) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(true);
+
+        markerOptions.title("Select pick up or destination");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+        genericMarker = mMap.addMarker(markerOptions);
+
     }
 
 
@@ -685,6 +774,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
 
+    public void getDriverDetails(Request request) {
+        accountManager.getRequestDriverData(request.getDriver(), this);
+
+    }
+
+
+
     /**
      * Gets the results of the location permissions and acts accordingly
      * @param requestCode : int of what request we are calling
@@ -737,8 +833,10 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             currRequest = req;
 //            refresh();
         }
-
         updateInfo();
+
+
+
     }
 
     @Override
@@ -746,11 +844,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         // Convert the snapshot to objects that can be used to display information
         List<Request> openRequests = snapshot.toObjects(Request.class);
         Log.d(TAG, "getOpen() : " + openRequests.toString());
+        Request req = openRequests.get(0);
+
+        currRequest = req;
+//        if (currRequest.getStatus() == Request.ACCEPTED) {
+//            getDriverDetails(currRequest);
+//        }
     }
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
-
+        List<Request> riderCurrRequests = snapshot.toObjects(Request.class);
+        Log.d(TAG, "onGetRiderRequestSuccess" + riderCurrRequests);
+        currRequest = riderCurrRequests.get(0);
     }
 
     @Override
@@ -780,12 +886,34 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onRiderDataRetrieved(Rider rider) {
+        Log.d(TAG, "Getting rider data");
         userName.setText(rider.getName());
         userEmailAddress.setText(rider.getEmail());
+
+        FirebaseUser user = auth.getCurrentUser();
+
+        //rm.getRiderRequests("usr-map-test", this);
+        rm.getRiderRequests(user.getUid(), this);
     }
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
+//        String driverName = driver.getName();
+//        //String driverRating = driver.getRating();
+//        Car driverCar = driver.getCar();
+//        String vehicleDetails = driverCar.getYear() +  driverCar.getColor() +  driverCar.getMake() + driverCar.getModel();
+//        String licensePlate = driverCar.getPlate();
+//        String driverPhone = driver.getPhoneNumber();
+//        String driverEmail = driver.getEmail();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        DialogFragment fragment = DriverDetailsFragment.newInstance(driver);
+        fragmentTransaction.add(0, fragment);
+        fragmentTransaction.commit();
+
+
 
     }
 

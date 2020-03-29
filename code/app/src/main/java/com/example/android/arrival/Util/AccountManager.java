@@ -67,7 +67,6 @@ public class AccountManager {
         return instance;
     }
 
-
     /**
      * this function returns user data to the callback listener
      * @param listener callback listener to give values to
@@ -535,5 +534,25 @@ public class AccountManager {
         }
 
     }
+
+    public void getRequestDriverData(String uid, final AccountCallbackListener listener) {
+
+        DocumentReference documentReference = driverRef.document(uid);
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Driver driverData = documentSnapshot.toObject(Driver.class);
+                listener.onDriverDataRetrieved(driverData);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "get data onFailure: " + e.toString());
+                listener.onDataRetrieveFail(e.toString());
+
+            }
+        });
+    }
+
 
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 public class Request implements Serializable {
 
 //    public static final String STATUS_OPEN = "OPEN";
-    //    public static final String STATUS_ACCEPTED = "ACCEPTED";
+//    public static final String STATUS_ACCEPTED = "ACCEPTED";
 //    public static final String STATUS_CANCELLED = "CANCELLED";
 //    public static final String STATUS_COMPLETED = "COMPLETED";
 //    public static final String STATUS_DENIED = "DENIED";
