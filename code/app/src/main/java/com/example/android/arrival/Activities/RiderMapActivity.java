@@ -246,6 +246,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         if(currRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
+            btnDriverDetails.setVisibility(View.INVISIBLE);
+            btnMakePayment.setVisibility(View.INVISIBLE);
         } else {
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
@@ -288,6 +290,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnDriverDetails.setVisibility(View.INVISIBLE);
+            btnMakePayment.setVisibility(View.INVISIBLE);
 
 
             pickupActivity.setClickable(true);
