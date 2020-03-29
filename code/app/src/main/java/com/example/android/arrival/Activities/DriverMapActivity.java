@@ -53,6 +53,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -64,6 +65,7 @@ import java.util.Map;
 
 //Drivers map, contains the driver's locations, markers of open requests
 //when marker is pressed info pops up about marker
+//can accept requests, pick up riders, drop them off, and receive payment
 
 public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener {
 
@@ -353,8 +355,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             for (Location location : locationResult.getLocations()) {
                 mMap.setMyLocationEnabled(true);
                 currentLocation = location;
-//                Number currentRequestStatusNum = getCurrentRequestStatus();
-//                int currentRequestStatus = Integer.parseInt(String.valueOf(currentRequestStatusNum));
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
