@@ -8,7 +8,6 @@ import android.view.View;
 import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.R;
-import java.io.Serializable;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
