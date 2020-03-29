@@ -10,7 +10,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -19,7 +18,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -35,16 +33,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.AcceptRequestConfFrag;
 import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.Model.User;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
@@ -76,7 +73,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,6 +93,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String driverName;
+    private Driver mydriverObject;
     public boolean zoom = true;
     static boolean currentActivity = false;
     private int index;
@@ -108,16 +105,13 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private AccountManager accountManager;
 
     private Handler handler;
-
     private Request currRequest;
-
     private EditText txtDriverLocation;
     private EditText txtRiderLocation;
     private Button btnCancelRide;
     private Button btnConfirmPickup;
     private Button btnCompleteRide;
     private Button btnScanQR;
-    private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
     private Toolbar toolbarDriver;
@@ -203,18 +197,14 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
 
 
-        /*btnSignOut.setOnClickListener(new View.OnClickListener() {
+        headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "btnSignOut Clicked");
-                Log.d(TAG, "Attempting to sign out user... ");
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                Intent intent = new Intent(DriverMapActivity.this, DriverProfileScreenActivity.class);
+                intent.putExtra("driver", mydriverObject);
                 startActivity(intent);
-                finish();
             }
-        });*/
-
+        });
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -708,11 +698,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-        User user = driver;
-        driverName = user.getName();
-        String driverEmail = user.getEmail();
-        userName.setText(driverName);
+        String driversName = driver.getName();
+        String driverEmail = driver.getEmail();
+        userName.setText(driversName);
         userEmailAddress.setText(driverEmail);
+        mydriverObject = driver;
     }
 
     @Override
