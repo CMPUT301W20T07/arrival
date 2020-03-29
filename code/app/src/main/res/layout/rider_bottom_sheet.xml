@@ -17,7 +17,7 @@
         android:layout_height="280dp"
         android:background="@drawable/rounded_bottom_sheet"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:behavior_hideable="true"
+        app:behavior_hideable="false"
         >
 
         <LinearLayout
@@ -123,6 +123,28 @@
                     android:background="@drawable/arrival_button_blue_long"
                     android:fontFamily="@font/product_sans_regular"
                     android:text="Cancel Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/seeDriverDetails"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/arrival_button_blue_long"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Driver Details"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/makePayment"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/arrival_button_blue_long"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Make Payment"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="20sp" />

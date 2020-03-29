@@ -20,6 +20,7 @@ import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.example.android.arrival.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class RideRequestConfFrag extends DialogFragment {
 
     private Place pickup = new Place();
     private Place destination = new Place();
+    private String rider;
 
     static RideRequestConfFrag newInstance(ArrayList<Place> marks){
         //Bundles the parameters to be passed along later
@@ -49,7 +51,7 @@ public class RideRequestConfFrag extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         ArrayList<Place> marks = new ArrayList<>();
         DecimalFormat format = new DecimalFormat("0.00");
-
+        rider = FirebaseAuth.getInstance().getCurrentUser().getUid();
         super.onCreate(savedInstanceState);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.ride_request_fragment, null);
 
@@ -104,7 +106,7 @@ public class RideRequestConfFrag extends DialogFragment {
                         }
                         else {
                             currFare = Float.parseFloat(yourOfferValue.getText().toString());
-                            Request req = new Request("usr-map-test", pickup, destination, currFare);
+                            Request req = new Request(rider, pickup, destination, currFare);
                             rm.openRequest(req, (RequestCallbackListener) getContext());
                         }
 

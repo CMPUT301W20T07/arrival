@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         password = findViewById(R.id.login_passWord_editText);
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
-        signInGoogle = findViewById(R.id.sign_in_google_button);
+        //signInGoogle = findViewById(R.id.sign_in_google_button);
         forgot_password = findViewById(R.id.forgot_password);
 
         /* Code that handles sign in with google

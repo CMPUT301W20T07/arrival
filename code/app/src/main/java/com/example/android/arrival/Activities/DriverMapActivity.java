@@ -114,7 +114,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         setContentView(R.layout.driver_map_activity);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
+        driverName = FirebaseAuth.getInstance().getCurrentUser().getUid();
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
@@ -625,8 +625,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-        User user = driver;
-        driverName = user.getName();
 
 
     }
