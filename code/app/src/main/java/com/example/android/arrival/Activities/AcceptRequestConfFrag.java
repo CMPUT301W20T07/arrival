@@ -97,6 +97,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Log.d("AcceptRequestFrag", "OK clicked");
                         currRequest.setStatus(Request.ACCEPTED);
+                        //currRequest.setDriver(driverName);
                         currRequest.setDriver(driverName);
                         rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
                     }}).create();

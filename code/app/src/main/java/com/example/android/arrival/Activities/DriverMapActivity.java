@@ -709,9 +709,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onDriverDataRetrieved(Driver driver) {
         User user = driver;
-        driverName = user.getName();
+        String name = user.getName();
         String driverEmail = user.getEmail();
-        userName.setText(driverName);
+        userName.setText(name);
         userEmailAddress.setText(driverEmail);
     }
 
