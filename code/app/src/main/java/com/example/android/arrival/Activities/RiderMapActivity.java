@@ -310,8 +310,10 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 addPickupMarker(currRequest.getStartLocation().getLatLng());
                 addDestMarker(currRequest.getEndLocation().getLatLng());
 
-                btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.VISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
 
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
@@ -321,6 +323,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnDriverDetails.setVisibility(View.VISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
 
 
             } else if(currRequest.getStatus() == Request.COMPLETED) {
@@ -331,16 +335,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 txtEndLocation.setText("");
 
             } else if (currRequest.getStatus() == Request.AWAITING_PAYMENT){
+                btnMakePayment.setVisibility(View.VISIBLE);
                 btnDriverDetails.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
-                btnMakePayment.setVisibility(View.VISIBLE);
+
             } else if(currRequest.getStatus() == Request.ACCEPTED) {
                 mMap.clear();
 
+                btnDriverDetails.setVisibility(View.VISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
-                btnDriverDetails.setVisibility(View.VISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
 
                 addDestMarker(currRequest.getEndLocation().getLatLng());
                 //getDriverDetails(currRequest);
