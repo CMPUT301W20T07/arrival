@@ -572,7 +572,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         driverInfo.put("lon", currentLocation.getLongitude());
 
         fb.collection("availableDrivers").document(driverName)
-                .update(driverInfo)
+                .set(driverInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
