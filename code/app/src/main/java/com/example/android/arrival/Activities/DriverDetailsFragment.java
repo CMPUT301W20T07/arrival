@@ -2,7 +2,11 @@ package com.example.android.arrival.Activities;
 
 
 import androidx.annotation.NonNull;
+
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.android.arrival.Model.Car;
@@ -20,6 +24,11 @@ import androidx.fragment.app.DialogFragment;
 
 
 public class DriverDetailsFragment extends DialogFragment {
+    private static final String TAG = "driver_fragment";
+
+    String phoneNum = "7801234567";
+    TextView phoneDriver;
+    String driverPhone;
 
     static DriverDetailsFragment newInstance(Driver driver) {
         //Bundles the parameters to be passed along later
@@ -47,6 +56,8 @@ public class DriverDetailsFragment extends DialogFragment {
         TextView plate = view.findViewById(R.id.license_plate);
         TextView phone = view.findViewById(R.id.phone);
         TextView email = view.findViewById(R.id.driver_email);
+        phoneDriver = view.findViewById(R.id.phone_driver);
+
 
         //Gets the arguments from the bundle
         final Bundle args = getArguments();
@@ -60,8 +71,9 @@ public class DriverDetailsFragment extends DialogFragment {
             Car driverCar = driver.getCar();
             String vehicleDetails = driverCar.getYear() +  driverCar.getColor() +  driverCar.getMake() + driverCar.getModel();
             String licensePlate = driverCar.getPlate();
-            String driverPhone = driver.getPhoneNumber();
+            driverPhone = driver.getPhoneNumber();
             String driverEmail = driver.getEmail();
+
 
             name.setText(driverName);
             //rating.setText(driverRating);
@@ -72,7 +84,14 @@ public class DriverDetailsFragment extends DialogFragment {
             email.setText(driverEmail);
         }
 
-
+        phoneDriver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Clicked on phone number");
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel",driverPhone, null));
+                startActivity(intent);
+            }
+        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder

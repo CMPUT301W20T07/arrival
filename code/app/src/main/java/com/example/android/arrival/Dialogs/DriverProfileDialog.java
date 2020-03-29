@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -33,6 +36,12 @@ public class DriverProfileDialog extends DialogFragment {
     private TextView licensePlateHint;
     private TextView phoneNumHint;
     private TextView emailHint;
+
+    private TextView phoneDriver;
+
+    String phone = "7803401223";
+
+    String TAG = "DriverProfileDialog";
 
 
 
@@ -63,10 +72,7 @@ public class DriverProfileDialog extends DialogFragment {
         phoneNum = view.findViewById(R.id.phone);
         email = view.findViewById(R.id.email);
 
-
-        // new Car(make.getText().toString(), model.getText().toString(),
-        //                                year.getText().toString(), plate.getText().toString(), color.getText().toString()
-
+        phoneDriver = view.findViewById(R.id.phone_driver);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
@@ -74,6 +80,7 @@ public class DriverProfileDialog extends DialogFragment {
                 .setTitle("Your Driver")
                 .setNegativeButton("OK", null)
                 .create();
+        
     }
 
 
