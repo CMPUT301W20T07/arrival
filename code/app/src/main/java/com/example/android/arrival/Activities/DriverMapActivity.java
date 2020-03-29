@@ -74,6 +74,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private DrawerLayout drawerDriver;
     private TextView userName;
     private TextView userEmailAddress;
-    private ImageView profilePhoto;
+    private CircularImageView profilePhoto;
     private BottomSheetBehavior bottomSheetBehavior;
 
 
@@ -151,6 +152,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
+        accountManager.getProfilePhoto(this);
 
 
         handler = new Handler();
