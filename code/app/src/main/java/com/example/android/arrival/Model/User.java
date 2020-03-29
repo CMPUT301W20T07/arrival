@@ -1,20 +1,25 @@
 package com.example.android.arrival.Model;
 
-public class User {
+import android.graphics.Bitmap;
+
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private String email;
     private String name;
     private String phoneNumber;
-
+    private String tokenId;
 
     public User() {
         // Must have a constructor with no params to be pulled as Object from FireStore.
     }
 
-    public User(String email, String name, String phoneNumber) {
+    public User(String email, String name, String phoneNumber, String tokenId) {
         this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
+        this.tokenId = tokenId;
     }
 
     public String getEmail() {
@@ -40,4 +45,13 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public String getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(String tokenId) {
+        this.tokenId = tokenId;
+    }
+
 }

@@ -14,4 +14,13 @@
     <string name="search_hint">Enter location</string>
     <string name="star">*</string>
     <string name="sign_up_button"><u>Sign Up.</u></string>
+    <string name="forgot_password"><i><u>Forgot password?</u></i></string>
+    <string name="reset_message">An email will be sent to you after you enter the correct email address prompting you to reset your password.</string>
+    <string name="account_name">John Doe</string>
+    <string name="user_email_name">example@arrival.ca</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="password_prompt">Password</string>
+    <string name="current_email_prompt">Enter current email</string>
 </resources>

@@ -5,10 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_screen_photo"
-    android:backgroundTint="@color/blackTint"
-    android:backgroundTintMode="src_atop"
+    android:id="@+id/login_layout"
     >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_screen_photo"
+        android:cropToPadding="true"
+        android:tint="@color/blackTint"/>
 
     <ImageView
         android:id="@+id/arrival_logo"
@@ -28,29 +36,31 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:autofillHints=""
-        android:backgroundTint="@color/colorPrimary"
-        android:hint="Password"
+        android:hint="@string/password_prompt"
         android:inputType="textPassword"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_email_editText" />
+        app:layout_constraintTop_toBottomOf="@+id/login_email_editText"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"/>
 
     <EditText
         android:id="@+id/login_email_editText"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorPrimary"
         android:hint="@string/prompt_email"
-        android:inputType=""
+        android:inputType="textEmailAddress"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/edit_text_box"
+        android:padding="8dp"/>
 
     <Button
         android:id="@+id/sign_in_button"
@@ -70,7 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="42dp"
         android:padding="10dp"
-        android:text="Forgot your username or password?"
+        android:text="@string/forgot_password"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="normal"
@@ -79,7 +89,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_passWord_editText" />
+        app:layout_constraintTop_toBottomOf="@id/login_passWord_editText" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -88,7 +98,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/forgot_password">
+        app:layout_constraintTop_toBottomOf="@id/forgot_password">
 
         <TextView
             android:id="@+id/no_account"

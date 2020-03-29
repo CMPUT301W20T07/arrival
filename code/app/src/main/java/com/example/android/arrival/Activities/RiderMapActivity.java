@@ -1,10 +1,14 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -13,27 +17,41 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupWindow;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.DisplayQRDialog;
+import com.example.android.arrival.Dialogs.DriverDetailsFragment;
+import com.example.android.arrival.Dialogs.RideRequestConfFrag;
+import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.RequestCallbackListener;
-import com.example.android.arrival.Model.RequestManager;
+
+import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
+import com.example.android.arrival.Util.AccountCallbackListener;
+import com.example.android.arrival.Util.AccountManager;
+import com.example.android.arrival.Util.RequestCallbackListener;
+import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.location.LocationCallback;
 //import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -48,25 +66,33 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
-//TODO get a rideRequest confirmation fragment where user can edit the offer amount
-//TODO get distance between 2 markers to calculate the estimated cost and time
-//TODO send the RideRequest to the firebase (Might need Reilly for this) get it all packaged though
-
-public class RiderMapActivity extends FragmentActivity implements OnMapReadyCallback, RequestCallbackListener {
+public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
 
     private RequestManager rm;
-
+    private AccountManager accountManager;
+    private FirebaseFirestore fb;
+    private FirebaseAuth auth;
+    private DrawerLayout drawer;
+    private Rider myRiderObject;
     //Declaring variables for use later
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -74,9 +100,12 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     private Marker currentUserLocationMarker;
     private Marker pickupMarker;
     private Marker destMarker;
+    private Marker genericMarker;
     private Place pickup = new Place();
     private Place destination = new Place();
     private Place current = new Place();
+
+    private Polyline line;
 
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -84,13 +113,34 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     //ArrayList that holds the markers so we can add them again when the map reloads
     private ArrayList<Place> marks = new ArrayList<>();
 
-    private Request currentRequest;
+    private Request currRequest;
 
     private EditText txtStartLocation;
     private EditText txtEndLocation;
     private Button btnRequestRide;
     private Button btnCancelRide;
-    private Button btnSignOut;
+    private Button btnDriverDetails;
+    private Button btnMakePayment;
+    private Button pickupActivity;
+    private Button destActivity;
+    private TextView txtStatus;
+    private FloatingActionButton btnRefresh;
+    private Toolbar toolbar2;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private TextView userName;
+    private TextView userEmailAddress;
+    private ImageView profilePhoto;
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
+
 
     /**
      * When activity is initially called we set up some basic location items needed later
@@ -100,6 +150,9 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        accountManager = AccountManager.getInstance();
+        accountManager.getProfilePhoto(this);
+        accountManager.getUserData(this);
         setContentView(R.layout.rider_map_activity);
 
         //Location service that can get a users location
@@ -112,47 +165,204 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         rm = RequestManager.getInstance();
+        fb = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
-        txtStartLocation = findViewById(R.id.txtDriverLocation);
-        txtEndLocation = findViewById(R.id.txtRiderLocation);
-        btnRequestRide = findViewById(R.id.requestRide);
-        btnCancelRide = findViewById(R.id.cancelRide);
-        btnSignOut = findViewById(R.id.btnRiderSignout);
+        txtStartLocation = findViewById(R.id.riderStartLocation);
+        txtEndLocation = findViewById(R.id.riderEndLocation);
+        btnRequestRide = findViewById(R.id.rideRequest);
+        btnCancelRide = findViewById(R.id.cancelRideRequest);
+        btnDriverDetails = findViewById(R.id.seeDriverDetails);
+        btnMakePayment = findViewById(R.id.makePayment);
+        btnRefresh = findViewById(R.id.btnRiderRefresh);
+        txtStatus = findViewById(R.id.txtRiderStatus);
+        toolbar2 = findViewById(R.id.toolbar2);
+        drawer = findViewById(R.id.rider_drawer_layout);
+        pickupActivity = findViewById(R.id.pickupButtonRed);
+        destActivity = findViewById(R.id.destinationButton);
 
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
+
+        NavigationView navigationView = findViewById(R.id.rider_navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        userName = headerView.findViewById(R.id.userName);
+        userEmailAddress = headerView.findViewById(R.id.userEmailAddress);
+        profilePhoto = headerView.findViewById(R.id.user_profile_pic);
+
+        headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
+                Intent intent = new Intent(RiderMapActivity.this, RiderProfileScreenActivity.class);
+                intent.putExtra("rider", myRiderObject);
                 startActivity(intent);
-
             }
         });
 
-        if(currentRequest == null) {
+        //Setting Navigation View click listener
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //Set transparent toolbar
+        toolbar2.setBackgroundColor(Color.TRANSPARENT);
+        setSupportActionBar(toolbar2);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        ActionBarDrawerToggle newToggle = new ActionBarDrawerToggle(this, drawer, toolbar2, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(newToggle);
+        newToggle.syncState();
+
+        Window currentWindow = this.getWindow();
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        //Setting up Persistent Bottom Sheet
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setPeekHeight(140);
+
+        //Don't show keyboard when edittexts are clicked.
+        txtStartLocation.setInputType(InputType.TYPE_NULL);
+        txtEndLocation.setInputType(InputType.TYPE_NULL);
+
+
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh();
+            }
+        });
+
+
+
+        if(currRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
+            btnDriverDetails.setVisibility(View.INVISIBLE);
+            btnMakePayment.setVisibility(View.INVISIBLE);
         } else {
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
+            Log.d(TAG, "CurrRequest: " + currRequest.toString());
         }
     }
 
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sign_out_button:
+                Log.d(TAG, "btnSignOut Clicked");
+                Log.d(TAG, "Attempting to sign out user... ");
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(RiderMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+        }
+        return true;
+    }
+
+    public void refresh() {
+        Log.d(TAG, "refreshing...");
+        if(currRequest!=null) {
+            rm.getRequest(currRequest.getID(), this);
+            Log.d(TAG, currRequest.toString());
+        }
+    }
+
+    public void updateInfo() {
+        if (currRequest == null) {
+            txtStatus.setText("");
+
+            mMap.clear();
+            addPickupMarker(pickup.getLatLng());
+            addDestMarker(destination.getLatLng());
+
+            btnRequestRide.setVisibility(View.VISIBLE);
+            btnCancelRide.setVisibility(View.INVISIBLE);
+            btnDriverDetails.setVisibility(View.INVISIBLE);
+            btnMakePayment.setVisibility(View.INVISIBLE);
+
+
+            pickupActivity.setClickable(true);
+            destActivity.setClickable(true);
+            btnRequestRide.setClickable(true);
+
+
+        } else {
+//            rm.getRequest(currRequest.getID(), this);
+
+            Log.d(TAG, "currRequest is " + currRequest.toString());
+            txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
+
+            pickupActivity.setClickable(false);
+            destActivity.setClickable(false);
+            btnRequestRide.setClickable(false);
+
+            if (currRequest.getStatus() == Request.OPEN) {
+                mMap.clear();
+                addPickupMarker(currRequest.getStartLocation().getLatLng());
+                addDestMarker(currRequest.getEndLocation().getLatLng());
+
+                btnCancelRide.setVisibility(View.VISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
+
+            } else if (currRequest.getStatus() == Request.PICKED_UP) {
+                mMap.clear();
+                addDestMarker(currRequest.getEndLocation().getLatLng());
+
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.VISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                mMap.clear();
+                currRequest = null;
+                btnRequestRide.setVisibility(View.VISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                txtEndLocation.setText("");
+
+            } else if (currRequest.getStatus() == Request.AWAITING_PAYMENT){
+                btnMakePayment.setVisibility(View.VISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.ACCEPTED) {
+                mMap.clear();
+
+                btnDriverDetails.setVisibility(View.VISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
+                addDestMarker(currRequest.getEndLocation().getLatLng());
+            }
+        }
+    }
+
+    /**
+     * Called when the map resumes from its previous state
+     */
     @Override
     public void onResume() {
         super.onResume();
-
-        Log.d(TAG, "onResume()...");
-
-        if (currentRequest == null) {
-            btnRequestRide.setVisibility(View.VISIBLE);
-            btnCancelRide.setVisibility(View.INVISIBLE);
-        } else {
-            btnRequestRide.setVisibility(View.INVISIBLE);
-            btnCancelRide.setVisibility(View.VISIBLE);
+        if(mMap != null) {
+            refresh();
         }
     }
 
+    /**
+     * Check if the map activity is closed
+     */
+    @Override
+    public void onPause() {
+        Log.d(TAG, "map on pause");
+        super.onPause();
+        //active = false;
+    }
 
     /**
      * When the map is ready to use we set it up for our specifications
@@ -179,80 +389,16 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         }
 
 
-//        //Adding pickup location if map is reloaded
-//        if (pickup.getLat() != null){
-//            LatLng latLng = new LatLng(pickup.getLat(), pickup.getLon());
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.draggable(false);
-//            markerOptions.title("Pickup Location");
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//            startLocationText.setText(pickup.getAddress());
-//            pickupMarker = mMap.addMarker(markerOptions);
-//        }
-//
-//        //Adding destination location if the map is reloaded
-//        if(destination.getLat() != null) {
-//            LatLng latLng = new LatLng(destination.getLat(), destination.getLon());
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.draggable(false);
-//            markerOptions.title("Destination");
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//            endLocationText.setText(destination.getAddress());
-//            destMarker = mMap.addMarker(markerOptions);
-//        }
-
-        //Adding pickup location if map is reloaded
-        if (pickup.getLatLng() != null){
-            LatLng latLng = pickup.getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            txtStartLocation.setText(pickup.getAddress());
-            pickupMarker = mMap.addMarker(markerOptions);
-        }
-
-        //Adding destination location if the map is reloaded
-//        if(destination.getLat() != null) {
-//            LatLng latLng = new LatLng(destination.getLat(), destination.getLon());
-//            MarkerOptions markerOptions = new MarkerOptions();
-//            markerOptions.position(latLng);
-//            markerOptions.draggable(false);
-//            markerOptions.title("Destination");
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//            endLocationText.setText(destination.getAddress());
-//            destMarker = mMap.addMarker(markerOptions);
-//        }
-
-        //Adding destination location if the map is reloaded
-        if(destination.getLatLng() != null) {
-            LatLng latLng = destination.getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Destination");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            txtEndLocation.setText(destination.getAddress());
-            destMarker = mMap.addMarker(markerOptions);
-        }
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Log.d("map", "map was clicked");
-                View customView = getLayoutInflater().inflate(R.layout.pickup_dest_popup, null);
+                Log.d(TAG, "map was clicked");
 
-                PopupWindow popupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                popupWindow.showAtLocation(customView, Gravity.TOP, 0, 0);
-
-                Button pickupActivity = customView.findViewById(R.id.pickupButton);
-                Button destActivity = customView.findViewById(R.id.destButton);
-                Button back = customView.findViewById(R.id.back);
+                if (genericMarker != null) {
+                    genericMarker.remove();
+                }
+                addGenericMarker(latLng);
 
                 pickupActivity.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -260,23 +406,10 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         if (pickupMarker != null){
                             pickupMarker.remove();
                         }
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.draggable(false);
-                        markerOptions.title("Pickup Location");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                        pickupMarker = mMap.addMarker(markerOptions);
-                        popupWindow.dismiss();
-                        Address pickupAddress = getCurrentLocationAddress(pickupMarker);
+                        genericMarker.remove();
+                        addPickupMarker(latLng);
+                        /*popupWindow.dismiss();*/
 
-                        pickup.setName(pickupAddress.getFeatureName());
-                        pickup.setAddress(pickupAddress.getAddressLine(0));
-//                        pickup.setLat(pickupAddress.getLatitude());
-//                        pickup.setLon(pickupAddress.getLongitude());
-                        pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-                        txtStartLocation.setText(pickup.getAddress());
-
-                        marks.set(0, pickup);
                     }
                 });
 
@@ -286,30 +419,18 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         if (destMarker != null) {
                             destMarker.remove();
                         }
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.draggable(false);
-                        markerOptions.title("Destination");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                        destMarker = mMap.addMarker(markerOptions);
-                        popupWindow.dismiss();
-                        Address pickupAddress = getCurrentLocationAddress(destMarker);
-
-                        destination.setName(pickupAddress.getFeatureName());
-                        destination.setAddress(pickupAddress.getAddressLine(0));
-                        destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-                        txtEndLocation.setText(destination.getAddress());
-
-                        marks.add(1, destination);
+                        genericMarker.remove();
+                        addDestMarker(latLng);
+                        /*popupWindow.dismiss();*/
                     }
                 });
 
-                back.setOnClickListener(new View.OnClickListener() {
+                /*back.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         popupWindow.dismiss();
                     }
-                });
+                });*/
 
             }
         });
@@ -347,8 +468,12 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         btnRequestRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pickup != null && destination != null) {
-                    //TODO go to new intent to confirm RideRequest and get estimate cost and distance
+                // assert(!txtStartLocation.getText().toString().equals("") && !txtEndLocation.getText().toString().equals(""));
+
+                // Log.d(TAG, "btnRequestRide clicked");
+                // if (pickup != null && destination != null) {
+                if (pickupMarker != null && destMarker!= null) {
+                    Log.d(TAG, "btnRequestRide clicked");
                     //Creates new instance of the RideRequest fragment that we pass variables to
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -357,16 +482,43 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                     fragmentTransaction.add(0, fragment);
                     fragmentTransaction.commit();
                 }
+                else{
+                    Toast.makeText(RiderMapActivity.this,
+                            "Please select pickup and destination locations", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentRequest.setStatus(Request.STATUS_CANCELLED);
-                rm.updateRequest(currentRequest, (RequestCallbackListener) v.getContext());
+                currRequest.setStatus(Request.CANCELLED);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
             }
         });
+
+        btnDriverDetails.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDriverDetails(currRequest);
+            }
+        }));
+
+        btnMakePayment.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date date = new Date();
+                String payment = "I " + currRequest.getRider() +  "am making a payment of " + currRequest.getFare() +
+                        "to " + currRequest.getDriver() + "on " + date;
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                DialogFragment fragment = DisplayQRDialog.newInstance(payment);
+                fragmentTransaction.add(0, fragment);
+                fragmentTransaction.commit();
+            }
+        }));
 
         //This section of code will run when searchFragment sends over a place
         Intent intent = getIntent();
@@ -387,12 +539,18 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         int activityType = args.getInt("type");
         marks = (ArrayList<Place>) args.getSerializable("marks");
 
-        assert(selected != null);
+        if (selected == null){
+            if (marks.get(1) != null){
+                addDestMarker(marks.get(1).getLatLng());
+            }
+            if (marks.get(0) != null){
+                addPickupMarker(marks.get(0).getLatLng());
+            }
+
+            return;
+        }
 
         LatLng latLng = selected.getLatLng();
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.draggable(false);
 
         //If the search was for a destination
         if (activityType == 2) {
@@ -400,67 +558,95 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
             if (destMarker != null){
                 destMarker.remove();
             }
-            destination = selected;
-            marks.add(1, destination);
-
-            markerOptions.title("Destination");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            txtEndLocation.setText(selected.getAddress());
-            destMarker = mMap.addMarker(markerOptions);
+            addDestMarker(latLng);
 
             //Checks if we need to add a pickup marker that may have been erased when the map reloaded
-            addPickupMarker();
+            if(marks.get(0)!= null) {
+                addPickupMarker(marks.get(0).getLatLng());
+            }
 
         }
         //If the search was for a pickup
         else{
-            //Deletes the old pickup marker if necessary
             if (pickupMarker != null){
                 pickupMarker.remove();
             }
-            pickup = selected;
-            marks.set(0, pickup);
-
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            txtStartLocation.setText(selected.getAddress());
-            pickupMarker = mMap.addMarker(markerOptions);
-
-            //Checks if we need to add a destination marker that may have been erased when the map relaoded
-            addDestMarker();
-        }
-    }
-
-    /**
-     * Adds a pickup marker to the screen
-     */
-    public void addPickupMarker() {
-        if (marks.get(0) != null){
-            LatLng latLng = marks.get(0).getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            txtStartLocation.setText(marks.get(0).getAddress());
-            pickupMarker = mMap.addMarker(markerOptions);
+            addPickupMarker(latLng);
+            if(marks.get(1) != null) {
+                addDestMarker(marks.get(1).getLatLng());
+            }
         }
     }
 
 
     /**
-     * Adds a destination marker to the screen
+     * Adds a pickup marker to the map
+     * @param latLng : set of lat/lon coordinates
      */
-    public void addDestMarker(){
-        if (marks.size() > 1) {
-            LatLng latLng = marks.get(1).getLatLng();
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Destination");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            txtEndLocation.setText(marks.get(1).getAddress());
-            destMarker = mMap.addMarker(markerOptions);
+    public void addPickupMarker(LatLng latLng) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(false);
+        markerOptions.title("Pickup Location");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        pickupMarker = mMap.addMarker(markerOptions);
+
+        Address pickupAddress = getCurrentLocationAddress(pickupMarker);
+        pickup.setName(pickupAddress.getFeatureName());
+        pickup.setAddress(pickupAddress.getAddressLine(0));
+        pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+        txtStartLocation.setText(pickup.getAddress());
+
+        marks.set(0, pickup);
+
+        addLine();
+    }
+
+
+    /**
+     * adds a destination marker to the map
+     * @param latLng : set of lat/lon coordinates
+     */
+    public void addDestMarker(LatLng latLng){
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(false);
+        markerOptions.title("Destination");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        destMarker = mMap.addMarker(markerOptions);
+
+        Address pickupAddress = getCurrentLocationAddress(destMarker);
+        destination.setName(pickupAddress.getFeatureName());
+        destination.setAddress(pickupAddress.getAddressLine(0));
+        destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+        txtEndLocation.setText(destination.getAddress());
+
+        marks.add(1, destination);
+
+        addLine();
+    }
+
+    public void addGenericMarker(LatLng latLng) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(true);
+
+        markerOptions.title("Select pick up or destination");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+        genericMarker = mMap.addMarker(markerOptions);
+
+    }
+
+
+    public void addLine() {
+        if (marks.size() >= 2){
+            if (line != null ){
+                line.remove();
+            }
+            line = mMap.addPolyline(new PolylineOptions()
+                    .add(marks.get(0).getLatLng(), marks.get(1).getLatLng())
+                    .width(10)
+                    .color(Color.RED));
         }
     }
 
@@ -484,9 +670,8 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                 if (mMap != null) {
                     //Specifications for the current location marker
                     markerOptions.position(latLng);
-                    markerOptions.draggable(true);
                     markerOptions.title("Current Location");
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    markerOptions.visible(false);
 
                     //Checking if the users location has changed drastically
                     if (currentUserLocationMarker != null) {
@@ -509,15 +694,17 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
                         Address currentLocation = getCurrentLocationAddress(currentUserLocationMarker);
                         //If this is the first time the map is loaded set the default pickup
                         //location to be the current location
-                        if (marks.size() == 0){
+                        if (pickupMarker == null){
                             txtStartLocation.setText(currentLocation.getAddressLine(0));
 
                             current.setLatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                             current.setAddress(currentLocation.getAddressLine(0));
                             current.setName(currentLocation.getFeatureName());
 
+                            //pickupMarker = currentUserLocationMarker;
+
                             marks.add(0, current);
-                            addPickupMarker();
+                            addPickupMarker(latLng);
                         }
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
@@ -543,7 +730,7 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(addresses != null) {
+        if(addresses.size() != 0) {
             Log.i("add", addresses.get(0).getAddressLine(0));
             return addresses.get(0);
         }
@@ -579,19 +766,35 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     }
 
 
+    public void getDriverDetails(Request request) {
+        accountManager.getRequestDriverData(request.getDriver(), this);
+
+    }
+
+
+
+    /**
+     * Gets the results of the location permissions and acts accordingly
+     * @param requestCode : int of what request we are calling
+     * @param permissions : string of permissions granted
+     * @param grantResults : integer array of results
+     */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        switch(requestCode)
+        {
             case REQUEST_USER_LOCATION_CODE:
-                //If permission is accepted then create map with user location
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                    {
                         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                     }
                     mMap.setMyLocationEnabled(true);
                 }
-                //else show permission denied message
-                else {
+                else
+                {
                     Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
         }
@@ -610,36 +813,145 @@ public class RiderMapActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
-        currentRequest = req;
+
+        txtStatus.setText(Request.STATUS.get(req.getStatus()));
+
         Log.d(TAG, "Retrieved request: " + req.toString());
 
-        if(req.getStatus().equals(Request.STATUS_CANCELLED)) {
-            currentRequest = null;
-            Log.d(TAG, "Status = CANCELLED");
+        if(req.getStatus() == Request.CANCELLED) {
+            currRequest = null;
+//            refresh();
+        } else if(currRequest == null || !currRequest.equals(req)) {
+            currRequest = req;
+//            refresh();
         }
+        updateInfo();
 
-        onResume();
+
+
     }
 
     @Override
     public void onGetOpenSuccess(QuerySnapshot snapshot) {
         // Convert the snapshot to objects that can be used to display information
         List<Request> openRequests = snapshot.toObjects(Request.class);
-//        requestAdapter.clear();
-//        requestAdapter.addAll(openRequests);
-//        requestAdapter.notifyDataSetChanged();
         Log.d(TAG, "getOpen() : " + openRequests.toString());
+        Request req = openRequests.get(0);
+
+        currRequest = req;
+//        if (currRequest.getStatus() == Request.ACCEPTED) {
+//            getDriverDetails(currRequest);
+//        }
     }
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
-
+        List<Request> riderCurrRequests = snapshot.toObjects(Request.class);
+        Log.d(TAG, "onGetRiderRequestSuccess" + riderCurrRequests);
+        currRequest = riderCurrRequests.get(0);
     }
 
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
 
     }
+
+    @Override
+    public void onAccountSignIn(String userType) {
+
+    }
+
+    @Override
+    public void onSignInFailure(String e) {
+
+    }
+
+    @Override
+    public void onAccountCreated(String accountType) {
+
+    }
+
+    @Override
+    public void onAccountCreationFailure(String e) {
+
+    }
+
+    @Override
+    public void onRiderDataRetrieved(Rider rider) {
+        Log.d(TAG, "Getting rider data");
+        userName.setText(rider.getName());
+        userEmailAddress.setText(rider.getEmail());
+        myRiderObject = rider;
+        FirebaseUser user = auth.getCurrentUser();
+
+        //rm.getRiderRequests("usr-map-test", this);
+        rm.getRiderRequests(user.getUid(), this);
+    }
+
+    @Override
+    public void onDriverDataRetrieved(Driver driver) {
+//        String driverName = driver.getName();
+//        //String driverRating = driver.getRating();
+//        Car driverCar = driver.getCar();
+//        String vehicleDetails = driverCar.getYear() +  driverCar.getColor() +  driverCar.getMake() + driverCar.getModel();
+//        String licensePlate = driverCar.getPlate();
+//        String driverPhone = driver.getPhoneNumber();
+//        String driverEmail = driver.getEmail();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        DialogFragment fragment = DriverDetailsFragment.newInstance(driver);
+        fragmentTransaction.add(0, fragment);
+        fragmentTransaction.commit();
+
+
+
+    }
+
+    @Override
+    public void onDataRetrieveFail(String e) {
+        Toast.makeText(this, e, Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onAccountDeleted() {
+
+    }
+
+    @Override
+    public void onAccountDeleteFailure(String e) {
+
+    }
+
+    @Override
+    public void onImageUpload() {
+
+    }
+
+    @Override
+    public void onImageUploadFailure(String e) {
+
+    }
+
+    @Override
+    public void onPhotoReceived(Uri uri) {
+        Glide.with(this).load(uri).into(profilePhoto);
+        Log.d(TAG, "onPhotoReceived: " + uri.toString());
+    }
+
+    @Override
+    public void onPhotoReceiveFailure(String e) {
+        Toast.makeText(this, e,Toast.LENGTH_LONG);
+    }
+
+    @Override
+    public void onAccountUpdated() {
+
+    }
+
+    @Override
+    public void onAccountUpdateFailure(String e) {
+
+    }
 }
-
-
