@@ -614,7 +614,6 @@ public class AccountManager {
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "get data onFailure: " + e.toString());
                 listener.onDataRetrieveFail(e.toString());
-
             }
         });
     }

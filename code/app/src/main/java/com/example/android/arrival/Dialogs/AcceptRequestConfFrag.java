@@ -2,6 +2,7 @@ package com.example.android.arrival.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,15 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.android.arrival.Model.Driver;
+import com.example.android.arrival.Model.Notification;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
+import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,12 +37,15 @@ import java.util.Map;
 //Add open request information to fragment
 
 public class AcceptRequestConfFrag extends DialogFragment {
+    private String TAG  = "acceptRequest";
 
     private Request currRequest;
     private Marker marker;
 
     private FirebaseFirestore fb;
     private RequestManager rm;
+
+    private Context context;
 
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -47,6 +56,8 @@ public class AcceptRequestConfFrag extends DialogFragment {
 
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
+
+        context = getContext();
 
         TextView custName = view.findViewById(R.id.custNameValue);
         TextView custDestination = view.findViewById(R.id.custDestinationValue);
@@ -97,11 +108,44 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Log.d("AcceptRequestFrag", "OK clicked");
                         currRequest.setStatus(Request.ACCEPTED);
-                        //currRequest.setDriver(driverName);
                         currRequest.setDriver(driverName);
                         rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
+
+                        getRiderToken();
                     }}).create();
     }
+
+    public void getRiderToken() {
+        String uid = currRequest.getRider();
+        final String[] token = new String[1];
+
+        DocumentReference documentReference = fb.collection("riders").document(uid);
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Rider riderData = documentSnapshot.toObject(Rider.class);
+                token[0] = riderData.getTokenId();
+                Log.d(TAG, "Token in getRiderToken: " + token[0]);
+                notifyRider(token[0]);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "get data onFailure: " + e.toString());
+            }
+        });
+    }
+
+    public void notifyRider(String riderToken) {
+        Log.d("Notification", "Rider Token: " + riderToken);
+
+        if (riderToken != null) {
+            Notification notification = new Notification(context, riderToken,
+                    "Ride Request Status Update", "A driver has accepted your request");
+            notification.sendNotification();
+        }
+    }
+
 
     //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {

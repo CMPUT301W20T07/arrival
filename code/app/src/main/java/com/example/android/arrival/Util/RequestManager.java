@@ -110,8 +110,6 @@ public class RequestManager {
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG + "-update", "Successfully updated request " + req.getID() + "in FireStore.");
                         getRequest(req.getID(), listener);
-
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

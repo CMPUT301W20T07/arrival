@@ -101,13 +101,3 @@ public class Notification {
     }
 }
 
-
-
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        //TOKEN = "c1i0UmO9QL-Xt_ou61AIb_:APA91bEAx4HB07amyw1qMG2a5aak4ojw-ITJnqhYQV8HuWFxkiLYdpqlOT22SGhNfPJSALUU0cQrv0zYhC1UAvPxP6gAhXp8mhY3rqvmFDInl8XE6mCSUX53mTlN01SHGvBsWo8_kw0l";
-//        //queue = Volley.newRequestQueue(this);
-//        //TOKEN = "eYU7QB_OTyiu5fii2lC1aR:APA91bEZ8YAKFvsR0uUO5u5n-th81uUiblHO-_hojb0Ym7ZQg6-hHlhtxwoBNy-6vzHbqnW7Kx7amyzisITdXzZqxzDpsXYzNxGDYXVk869iKzJBE_Lb9jCcFuk5MuLGJr4e5K4608jk";
-//
-//        sendNotification();
-//    }

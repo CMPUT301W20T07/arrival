@@ -730,7 +730,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(addresses != null) {
+        if(addresses.size() != 0) {
             Log.i("add", addresses.get(0).getAddressLine(0));
             return addresses.get(0);
         }
