@@ -1,7 +1,6 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -10,12 +9,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.accounts.Account;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,23 +27,21 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
 import com.example.android.arrival.Dialogs.DisplayQRDialog;
-import com.example.android.arrival.Model.Car;
+import com.example.android.arrival.Dialogs.DriverDetailsFragment;
+import com.example.android.arrival.Dialogs.RideRequestConfFrag;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
@@ -71,9 +66,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
@@ -81,19 +73,14 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static java.sql.Types.NULL;
 
 
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
@@ -105,7 +92,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private FirebaseFirestore fb;
     private FirebaseAuth auth;
     private DrawerLayout drawer;
-
+    private Rider myRiderObject;
     //Declaring variables for use later
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -204,7 +191,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(RiderMapActivity.this, RiderProfileScreenActivity.class));
+                Intent intent = new Intent(RiderMapActivity.this, RiderProfileScreenActivity.class);
+                intent.putExtra("rider", myRiderObject);
+                startActivity(intent);
             }
         });
 
@@ -892,7 +881,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "Getting rider data");
         userName.setText(rider.getName());
         userEmailAddress.setText(rider.getEmail());
-
+        myRiderObject = rider;
         FirebaseUser user = auth.getCurrentUser();
 
         //rm.getRiderRequests("usr-map-test", this);

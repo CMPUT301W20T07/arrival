@@ -5,10 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_screen_photo"
-    android:backgroundTint="@color/blackTint"
-    android:backgroundTintMode="src_atop"
+    android:id="@+id/login_layout"
     >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_screen_photo"
+        android:cropToPadding="true"
+        android:tint="@color/blackTint"/>
 
     <ImageView
         android:id="@+id/arrival_logo"

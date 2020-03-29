@@ -1,6 +1,8 @@
 package com.example.android.arrival.Model;
 
-public class Rider extends User {
+import java.io.Serializable;
+
+public class Rider extends User implements Serializable {
 
     public Rider() {
         // Must have a constructor with no params to be pulled as Object from FireStore.
