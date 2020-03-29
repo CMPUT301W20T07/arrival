@@ -1,6 +1,7 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -44,6 +45,7 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
@@ -77,9 +79,12 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -96,6 +101,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private RequestManager rm;
     private AccountManager accountManager;
     private FirebaseFirestore fb;
+    private FirebaseAuth auth;
     private DrawerLayout drawer;
 
     //Declaring variables for use later
@@ -169,6 +175,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         rm = RequestManager.getInstance();
         fb = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         txtStartLocation = findViewById(R.id.riderStartLocation);
         txtEndLocation = findViewById(R.id.riderEndLocation);
@@ -301,6 +308,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 txtEndLocation.setText("");
+            } else if(currRequest.getStatus() == Request.ACCEPTED) {
+                getDriverDetails(currRequest);
             }
         }
     }
@@ -706,21 +715,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     public void getDriverDetails(Request request) {
-        String reqId = request.getID();
-        //DocumentReference reqObj = fb.collection("requests").document(reqId);
-        final String[] driverUID = new String[1];
+        accountManager.getRequestDriverData(request.getDriver(), this);
 
-
-        fb.collection("requests")
-                .document(reqId)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        driverUID[0] = documentSnapshot.get("driver").toString();
-                    }
-                });
-        Log.d(TAG, driverUID[0]);
     }
 
 
@@ -779,9 +775,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
         updateInfo();
 
-        if (req == currRequest && req.getStatus() == Request.ACCEPTED){
-            getDriverDetails(req);
-        }
+//        if (req == currRequest && req.getStatus() == Request.ACCEPTED){
+//            getDriverDetails(req);
+//        }
 
 
     }
@@ -791,11 +787,19 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         // Convert the snapshot to objects that can be used to display information
         List<Request> openRequests = snapshot.toObjects(Request.class);
         Log.d(TAG, "getOpen() : " + openRequests.toString());
+        Request req = openRequests.get(0);
+
+        currRequest = req;
+        if (currRequest.getStatus() == Request.ACCEPTED) {
+            getDriverDetails(currRequest);
+        }
     }
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
-        Log.d(TAG, "onGetRiderRequestSucces" + snapshot.toString());
+        List<Request> riderCurrRequests = snapshot.toObjects(Request.class);
+        Log.d(TAG, "onGetRiderRequestSuccess" + riderCurrRequests);
+        currRequest = riderCurrRequests.get(0);
     }
 
     @Override
@@ -829,12 +833,32 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         userName.setText(rider.getName());
         userEmailAddress.setText(rider.getEmail());
 
-        rm.getRiderRequests("usr-map-test", this);
-        //rm.getRiderRequests(rider.getName(), this);
+        FirebaseUser user = auth.getCurrentUser();
+
+
+        //rm.getRiderRequests("usr-map-test", this);
+        rm.getRiderRequests(user.getUid(), this);
     }
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
+//        String driverName = driver.getName();
+//        //String driverRating = driver.getRating();
+//        Car driverCar = driver.getCar();
+//        String vehicleDetails = driverCar.getYear() +  driverCar.getColor() +  driverCar.getMake() + driverCar.getModel();
+//        String licensePlate = driverCar.getPlate();
+//        String driverPhone = driver.getPhoneNumber();
+//        String driverEmail = driver.getEmail();
+
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        DialogFragment fragment = DriverDetailsFragment.newInstance(driver);
+        fragmentTransaction.add(0, fragment);
+        fragmentTransaction.commit();
+
+
 
     }
 
