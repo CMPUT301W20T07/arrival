@@ -24,6 +24,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
@@ -41,6 +42,7 @@ import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.Model.User;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
@@ -92,6 +94,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String driverName;
+    private String driverUID;
     private Driver mydriverObject;
     public boolean zoom = true;
     static boolean currentActivity = false;
@@ -102,6 +105,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     ArrayList<Request> requestsList = new ArrayList<>();
 
     private FirebaseFirestore fb;
+    private FirebaseAuth auth;
     private RequestManager rm;
     private AccountManager accountManager;
 
@@ -146,6 +150,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
+        auth = FirebaseAuth.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
         accountManager.getProfilePhoto(this);
 
@@ -193,6 +198,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         Window currentWindow = this.getWindow();
         currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        driverUID = auth.getCurrentUser().getUid();
 
 
 
@@ -411,7 +418,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 Bundle args = new Bundle();
                 args.putSerializable("currentRequest", currRequest);
                 args.putSerializable("markerLocation", markers);
-                args.putSerializable("driverName", driverName);
+                args.putSerializable("driverName", driverUID);
                 args.putSerializable("driverLat", currentLocation.getLatitude());
                 args.putSerializable("driverLon", currentLocation.getLongitude());
 
@@ -494,7 +501,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         driverInfo.put("lat", currentLocation.getLatitude());
         driverInfo.put("lon", currentLocation.getLongitude());
 
-        fb.collection("availableDrivers").document(driverName)
+
+
+        fb.collection("availableDrivers").document(driverUID)
                 .update(driverInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -695,12 +704,17 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             double distanceToPickUp = distance(currentLocation.getLatitude(), request.getStartLocation().getLat(),
                     currentLocation.getLongitude(), request.getStartLocation().getLon());
 
-            if(distanceToPickUp <= 2.0) {
-                MarkerOptions markerOptions = new MarkerOptions();
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(request.getStartLocation().getLatLng());
+            mMap.addMarker(markerOptions);
 
-                markerOptions.position(request.getStartLocation().getLatLng());
-                mMap.addMarker(markerOptions);
-            }
+            //TODO change this later just for testing on emulator
+//            if(distanceToPickUp <= 2.0) {
+//                MarkerOptions markerOptions = new MarkerOptions();
+//
+//                markerOptions.position(request.getStartLocation().getLatLng());
+//                mMap.addMarker(markerOptions);
+//            }
         }
     }
 
@@ -746,12 +760,10 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-        User user = driver;
-        driverName = user.getName();
 
-        String driversName = driver.getName();
+        driverName = driver.getName();
         String driverEmail = driver.getEmail();
-        userName.setText(driversName);
+        userName.setText(driverName);
         userEmailAddress.setText(driverEmail);
         mydriverObject = driver;
     }
