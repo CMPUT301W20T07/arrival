@@ -601,6 +601,9 @@ public class AccountManager {
     }
 
     public void getRequestDriverData(String uid, final AccountCallbackListener listener) {
+        if(uid == null) {
+            return;
+        }
 
         DocumentReference documentReference = driverRef.document(uid);
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
