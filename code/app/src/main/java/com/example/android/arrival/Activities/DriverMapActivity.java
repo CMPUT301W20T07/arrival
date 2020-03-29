@@ -1,16 +1,15 @@
 package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -19,14 +18,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
@@ -35,16 +32,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.AcceptRequestConfFrag;
 import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.Model.User;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
@@ -68,27 +64,26 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 //Drivers map, contains the driver's locations, markers of open requests
 //when marker is pressed info pops up about marker
+//can accept requests, pick up riders, drop them off, and receive payment
 
 public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "DriverMapActivity";
     private static final int CAMERA_REQUEST = 100;
-    private static final int REFRESH_INTERVAL = 1000 * 45; // 45 seconds in millis
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -97,9 +92,12 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String driverName;
+    private Driver mydriverObject;
     public boolean zoom = true;
     static boolean currentActivity = false;
     private int index;
+    private String currRequestID;
+    private int currRequestStatus;
 
     ArrayList<Request> requestsList = new ArrayList<>();
 
@@ -108,16 +106,13 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private AccountManager accountManager;
 
     private Handler handler;
-
     private Request currRequest;
-
     private EditText txtDriverLocation;
     private EditText txtRiderLocation;
     private Button btnCancelRide;
     private Button btnConfirmPickup;
     private Button btnCompleteRide;
     private Button btnScanQR;
-    private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
     private Toolbar toolbarDriver;
@@ -148,14 +143,12 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         setContentView(R.layout.driver_map_activity);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        driverName = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
         accountManager.getProfilePhoto(this);
 
-
-        handler = new Handler();
 
         // Get camera permissions
         checkPermissions(getApplicationContext());
@@ -203,18 +196,14 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
 
 
-        /*btnSignOut.setOnClickListener(new View.OnClickListener() {
+        headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "btnSignOut Clicked");
-                Log.d(TAG, "Attempting to sign out user... ");
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                Intent intent = new Intent(DriverMapActivity.this, DriverProfileScreenActivity.class);
+                intent.putExtra("driver", mydriverObject);
                 startActivity(intent);
-                finish();
             }
-        });*/
-
+        });
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -270,7 +259,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        updateInfo();
     }
 
     @Override
@@ -297,22 +285,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             // creating a new request, uncomment this line. Then you
             // can just manipulate it in FireBase and refresh with the
             // refresh button. Ex. changing status. Doc w/ ID = 1
-            // rm.getRequest("1", this);
-            rm.getOpenRequests(this);
+//             rm.getRequest("1", this);
         }
     }
-
-    private Runnable periodicUpdate = new Runnable() {
-        @Override
-        public void run() {
-            if(handler!= null) {
-                handler.postDelayed(periodicUpdate, REFRESH_INTERVAL);
-                refresh();
-            } else {
-                handler = new Handler();
-            }
-        }
-    };
 
     public void updateInfo() {
         if (currRequest == null) {
@@ -337,12 +312,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 MarkerOptions mop = new MarkerOptions();
                 mop.position(currRequest.getStartLocation().getLatLng());
                 mMap.addMarker(mop);
-
-                Log.d("notifications", currRequest.getRider());
-
-//                //Testing notification
-//                notif.sendNotification();
-//                String TOKEN = fb.collection("riders").document(currRequest.getRider()).get().;
 
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnConfirmPickup.setVisibility(View.VISIBLE);
@@ -426,7 +395,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             public boolean onMarkerClick(Marker marker) {
                 //Share marker and requests with the fragment
                 for (int i = 0; i < requestsList.size(); i++) {
-                    if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude && requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude) {
+                    if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
+                            requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude)
+                    {
                         index = i;
                         currRequest = requestsList.get(i);
                     }
@@ -473,31 +444,71 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 }
 
                 if (currentActivity) {
-
-//                   Youtube video by SimCoder https://firebase.google.com/docs/firestore/manage-data/add-data
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("lat", location.getLatitude());
-                    map.put("lon", location.getLongitude());
-
-                    fb.collection("availableDrivers").document(driverName)
-                            .set(map)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d("driverLocation", "updated");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w("driverLocation", "not updated", e);
-                                }
-                            });
+                    getCurrentRequest();
+                    if(currRequest == null)
+                    {
+                        updateInfo();
+                    }
+                    updateDriverPosition();
                 }
             }
         }
     };
 
+    public void getCurrentRequest(){
+        fb.collectionGroup("requests")
+                .whereEqualTo("driver", driverName)
+                .whereIn("status", Arrays.asList(1, 2, 3))
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (queryDocumentSnapshots.toObjects(Request.class) != null && queryDocumentSnapshots.size() != 0) {
+                    currRequest = (Request) queryDocumentSnapshots.toObjects(Request.class).get(0);
+                    if (currRequest.getStatus() == 1) {
+                        MarkerOptions markerOptions = new MarkerOptions();
+
+                        markerOptions.position(currRequest.getStartLocation().getLatLng());
+                        mMap.addMarker(markerOptions);
+                        updateInfo();
+                    }
+                    if (currRequest.getStatus() == 2 || currRequest.getStatus() == 3) {
+                        MarkerOptions markerOptions = new MarkerOptions();
+
+                        markerOptions.position(currRequest.getEndLocation().getLatLng());
+                        mMap.addMarker(markerOptions);
+                        updateInfo();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: Get Current Request");
+            }
+        });
+    }
+
+    public void updateDriverPosition(){
+        Map<String, Object> driverInfo = new HashMap<>();
+        driverInfo.put("lat", currentLocation.getLatitude());
+        driverInfo.put("lon", currentLocation.getLongitude());
+
+        fb.collection("availableDrivers").document(driverName)
+                .update(driverInfo)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("driverLocation", "null");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("driverLocation", "not null", e);
+                    }
+                });
+    }
 
     /**
      * When map is closed stop showing the driver's location making the driver unavailable
@@ -506,12 +517,12 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onStop() {
         super.onStop();
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("lat", null);
-        map.put("lon", null);
+        Map<String, Object> driverInfo = new HashMap<>();
+        driverInfo.put("lat", null);
+        driverInfo.put("lon", null);
 
         fb.collection("availableDrivers").document(driverName)
-                .set(map)
+                .update(driverInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -537,7 +548,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         currentActivity = true;
 
         refresh();
-        periodicUpdate.run();
     }
 
     /**
@@ -546,9 +556,26 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onPause() {
         super.onPause();
-        boolean active = false;
-        handler.removeCallbacks(periodicUpdate);
         currentActivity = false;
+
+        Map<String, Object> driverInfo = new HashMap<>();
+        driverInfo.put("lat", currentLocation.getLatitude());
+        driverInfo.put("lon", currentLocation.getLongitude());
+
+        fb.collection("availableDrivers").document(driverName)
+                .update(driverInfo)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("driverLocation", "null");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("driverLocation", "not null", e);
+                    }
+                });
     }
 
     /**
@@ -599,6 +626,31 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    public static double distance(double lat1, double lat2, double lon1, double lon2) {
+
+        // The math module contains a function named toRadians which converts from degrees to radians.
+        lon1 = Math.toRadians(lon1);
+        lon2 = Math.toRadians(lon2);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        // Haversine formula
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.pow(Math.sin(dlon / 2),2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        // Radius of earth in kilometers.
+        double r = 6371;
+
+        // calculate the result
+        return(c * r);
+    }
+
     @Override
     public void onCallbackStart() {
 
@@ -616,24 +668,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
 
         Log.d(TAG, "Retrieved request: " + req.toString());
-        //Log.d(TAG, "Retrieved request: " + req.getDriver());
-        Query query = fb.collection("drivers").whereEqualTo("name", req.getDriver());
-        Log.d(TAG, "Query:" + query.toString());
-
-        fb.collection("drivers").whereEqualTo("name","driver")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e!= null) {
-                            Log.d(TAG, "Listen failed" + e);
-                        }
-                        for (DocumentSnapshot doc: queryDocumentSnapshots) {
-                            Log.d(TAG, "In document snapshot");
-                            Log.d(TAG, "data: " + doc.getId() + "=>" + doc.getData());
-                        }
-                    }
-                });
-
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
@@ -657,12 +691,16 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.clear();
 
         for (int i = 0; i < requestsList.size(); i++) {
-            MarkerOptions markerOptions = new MarkerOptions();
-
             Request request = requestsList.get(i);
+            double distanceToPickUp = distance(currentLocation.getLatitude(), request.getStartLocation().getLat(),
+                    currentLocation.getLongitude(), request.getStartLocation().getLon());
 
-            markerOptions.position(request.getStartLocation().getLatLng());
-            mMap.addMarker(markerOptions);
+            if(distanceToPickUp <= 2.0) {
+                MarkerOptions markerOptions = new MarkerOptions();
+
+                markerOptions.position(request.getStartLocation().getLatLng());
+                mMap.addMarker(markerOptions);
+            }
         }
     }
 
@@ -709,10 +747,13 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onDriverDataRetrieved(Driver driver) {
         User user = driver;
-        String name = user.getName();
-        String driverEmail = user.getEmail();
-        userName.setText(name);
+        driverName = user.getName();
+
+        String driversName = driver.getName();
+        String driverEmail = driver.getEmail();
+        userName.setText(driversName);
         userEmailAddress.setText(driverEmail);
+        mydriverObject = driver;
     }
 
     @Override

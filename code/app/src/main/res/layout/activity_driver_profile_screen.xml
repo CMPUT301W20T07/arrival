@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.DriverProfileScreenActivity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_screen_photo"
+        android:cropToPadding="true"
+        android:tint="@color/blackTint"/>
+
+    <ImageView
+        android:id="@+id/arrival_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="285dp"
+        android:padding="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/arrival_logo"
+        tools:srcCompat="@drawable/arrival_logo" />
+
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/circularImageViewDriver"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_launcher"
+        app:civ_border_color="@color/colorPrimary"
+        app:civ_border_width="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/arrival_logo" />
+
+    <TextView
+        android:id="@+id/nameTVDriver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/circularImageViewDriver" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nameTVDriver"
+        android:layout_marginHorizontal="10dp"
+        android:text="Email"
+        android:textSize="18sp"
+        android:padding="8dp"
+        android:id="@+id/update_email_driver"
+        android:background="@drawable/edit_text_box"
+        android:textColor="@color/white"
+
+        />
+
+    <EditText
+        android:id="@+id/update_phone_driver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:autofillHints="XXX-XXX-XXXX"
+        android:background="@drawable/edit_text_box"
+        android:hint="Phone Number"
+        android:inputType="phone"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/update_car_info"
+        app:layout_constraintTop_toBottomOf="@id/update_email_driver"
+        tools:layout_editor_absoluteX="10dp" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:id="@+id/update_car_info"
+        app:layout_constraintBottom_toTopOf="@id/update_info_btn_driver"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/white"
+        android:background="@drawable/sign_in_button_background"
+        android:text="Change Car Info"
+        android:textSize="18sp"
+        android:textAllCaps="false"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="Update"
+        android:textSize="18sp"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/delete_account_button_driver"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/sign_in_button_background"
+        android:textColor="@color/white"
+        android:id="@+id/update_info_btn_driver"
+        />
+
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:text="Delete Account"
+        android:textSize="18sp"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/sign_in_button_background"
+        android:textColor="@color/white"
+        android:id="@+id/delete_account_button_driver"
+        />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

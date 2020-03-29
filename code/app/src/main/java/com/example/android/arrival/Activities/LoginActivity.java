@@ -1,10 +1,16 @@
 package com.example.android.arrival.Activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -49,16 +55,17 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements AccountCallbackListener {
 
-    Button signIn;
-    TextView signUp;
-    TextView forgot_password;
-    EditText email;
-    EditText password;
-    String TAG = "LoginActivity: ";
+    private Button signIn;
+    private TextView signUp;
+    private TextView forgot_password;
+    private EditText email;
+    private EditText password;
+    private String TAG = "LoginActivity: ";
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
-    AccountManager accountManager;
+    private AccountManager accountManager;
     private static final int STORAGE_REQUEST = 1;
+    private View view;
 
 
     @Override
@@ -67,9 +74,9 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
-
         accountManager = AccountManager.getInstance();
         requestStoragePermission();
+        view = findViewById(R.id.login_layout);
 
         // View binding
         email = findViewById(R.id.login_email_editText);
@@ -122,7 +129,6 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
             }
         }
     }
-
 
     /**
      * basic error checking for user input
