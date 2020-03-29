@@ -1,10 +1,16 @@
 package com.example.android.arrival.Activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -49,19 +55,17 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements AccountCallbackListener {
 
-    private int RC_SIGN_IN = 500;
-    Button signIn;
-    TextView signUp;
-    TextView forgot_password;
-    EditText email;
-    EditText password;
-    String TAG = "LoginActivity: ";
+    private Button signIn;
+    private TextView signUp;
+    private TextView forgot_password;
+    private EditText email;
+    private EditText password;
+    private String TAG = "LoginActivity: ";
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
-    AccountManager accountManager;
-    SignInButton signInGoogle;
+    private AccountManager accountManager;
     private static final int STORAGE_REQUEST = 1;
-    GoogleSignInClient googleSignInClient;
+    private View view;
 
 
     @Override
@@ -70,33 +74,17 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
-
         accountManager = AccountManager.getInstance();
         requestStoragePermission();
+        view = findViewById(R.id.login_layout);
 
         // View binding
         email = findViewById(R.id.login_email_editText);
         password = findViewById(R.id.login_passWord_editText);
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
-        //signInGoogle = findViewById(R.id.sign_in_google_button);
         forgot_password = findViewById(R.id.forgot_password);
 
-        /* Code that handles sign in with google
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("772065063254-c6bmasbskc5e4o386g8tvgao851tdn7k.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
-        signInGoogle.setSize(SignInButton.SIZE_ICON_ONLY);
-        signInGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = googleSignInClient.getSignInIntent();
-                startActivityForResult(intent, RC_SIGN_IN);
-            }
-        });*/
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,7 +129,6 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
             }
         }
     }
-
 
     /**
      * basic error checking for user input
@@ -309,47 +296,5 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
                 });
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-/* Code that handles sign in with google stuff
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> task) {
-        try {
-            GoogleSignInAccount account = task.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
-            updateUI(account);
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
-        }
-    }
-
-    private void updateUI(GoogleSignInAccount account) {
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-
-    }*/
 }
 

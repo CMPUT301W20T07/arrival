@@ -2,7 +2,6 @@ package com.example.android.arrival.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -41,6 +40,7 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
 
     private final static String TAG = "RiderProfileScreenAct";
     private AccountManager accountManager;
+    private Rider rider;
     private TextView  name;
     private EditText email, phoneNumber;
     private CircularImageView profilePhoto;
@@ -56,20 +56,21 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.getInstance();
-        accountManager.getUserData(this);
         accountManager.getProfilePhoto(this);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_rider_profile_screen);
-
-
+        rider = (Rider) getIntent().getSerializableExtra("rider");
 
         email = findViewById(R.id.update_email);
         name = findViewById(R.id.name_TV);
         phoneNumber = findViewById(R.id.update_phone);
-        profilePhoto = findViewById(R.id.circularImageView);
+        profilePhoto = findViewById(R.id.circularImageViewRider);
         deleteAccount = findViewById(R.id.delete_account_button);
         updateInfo = findViewById(R.id.update_info_btn);
 
+        email.setText(rider.getEmail());
+        name.setText(rider.getName());
+        phoneNumber.setText(rider.getPhoneNumber());
 
         deleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,9 +168,7 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
 
     @Override
     public void onRiderDataRetrieved(Rider rider) {
-        email.setText(rider.getEmail());
-        phoneNumber.setText(rider.getPhoneNumber());
-        name.setText(rider.getName());
+
     }
 
     @Override
@@ -217,6 +216,7 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     @Override
     public void onAccountUpdated() {
         Toast.makeText(this, "Info successfully updated!", Toast.LENGTH_SHORT).show();
+        this.finish();
     }
 
     @Override
@@ -246,7 +246,7 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
                                 Log.d(TAG, token[0]);
                             }
                         });
-                Rider rider = new Rider(email.getText().toString(), name.getText().toString(), phoneNumber.getText().toString(), token[0]);
+                rider = new Rider(email.getText().toString(), name.getText().toString(), phoneNumber.getText().toString(), token[0]);
                 accountManager.updateRiderAccount(rider, credentials[0], credentials[1], RiderProfileScreenActivity.this);
             }
         }

@@ -535,6 +535,71 @@ public class AccountManager {
 
     }
 
+    public void updateDriverAccount(Driver user, String email, String password, final AccountCallbackListener listener) {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        String uid = firebaseUser.getUid();
+
+        if (user.getEmail().equals(firebaseUser.getEmail())) {
+            driverRef.document(uid).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    listener.onAccountUpdated();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure: updateFailure: " + e.toString());
+                    listener.onAccountUpdateFailure(e.toString());
+                }
+            });
+        }
+        // if user wants to change email
+        else if (!user.getEmail().equals(firebaseUser.getEmail())) {
+
+            // reauthorize user
+            AuthCredential authCredential = EmailAuthProvider.getCredential(email, password);
+
+            firebaseUser.reauthenticate(authCredential).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                    // change email in firebaseAuth
+                    firebaseUser.updateEmail(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // update rider object
+                            driverRef.document(uid).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    listener.onAccountUpdated();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: " + e.toString());
+                                    listener.onAccountUpdateFailure(e.toString());
+                                }
+                            });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            listener.onAccountUpdateFailure(e.toString());
+                            Log.d(TAG, "onFailure: "+e.toString());
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    listener.onAccountUpdateFailure(e.toString());
+                    Log.d(TAG, "onFailure: update account: " + e.toString());
+                }
+            });
+        }
+    }
+
     public void getRequestDriverData(String uid, final AccountCallbackListener listener) {
 
         DocumentReference documentReference = driverRef.document(uid);

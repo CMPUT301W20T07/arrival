@@ -5,11 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_screen_photo"
-    android:backgroundTint="@color/blackTint"
-    android:backgroundTintMode="src_atop"
     >
-
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_screen_photo"
+        android:cropToPadding="true"
+        android:tint="@color/blackTint"/>
     <ImageView
         android:id="@+id/arrival_logo"
         android:layout_width="wrap_content"
@@ -103,34 +108,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/register_password_editText">
+        app:layout_constraintTop_toBottomOf="@+id/profile_image">
 
 
         <Button
             android:id="@+id/sign_up_driver"
             android:layout_width="140dp"
             android:layout_height="36dp"
+            android:layout_margin="5dp"
             android:background="@drawable/small_button"
             android:text="Driver"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:layout_margin="5dp"/>
+            android:textSize="20sp" />
 
         <Button
+            android:id="@+id/sign_up_rider"
             android:layout_width="140dp"
             android:layout_height="36dp"
-            android:id="@+id/sign_up_rider"
+            android:layout_margin="5dp"
             android:background="@drawable/small_button"
             android:text="Rider"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:layout_margin="5dp"
-            />
+            android:textSize="20sp" />
     </LinearLayout>
 
 

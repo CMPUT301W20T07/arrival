@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Activities.DriverMapActivity">
+
+    <include layout="@layout/driver_map_layout">
+
+    </include>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/driver_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        android:background="@drawable/rounded_bottom_sheet"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:fontFamily="@font/product_sans_regular"
+                android:text="Begin Accepting Ride Requests"
+                android:textAlignment="center"
+                android:textColor="@color/blackTint"
+                android:textSize="20sp" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <TextView
+                android:id="@+id/txtDriverStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="STATUS"
+                android:textAlignment="textEnd"
+                android:textColor="@color/black"
+                android:fontFamily="@font/product_sans_regular"
+                />
+
+        </LinearLayout>
+
+            <EditText
+                android:id="@+id/txtDriverLocation"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="8dp"
+                android:cursorVisible="false"
+                android:hint="Your Location"
+                android:textColorHint="@color/blackTint"
+                android:fontFamily="@font/product_sans_regular"
+                android:backgroundTint="@color/blackTint"
+                android:textColor="@color/black"
+                android:focusable="false"
+                android:inputType="none"
+                android:textSize="14sp"
+                />
+
+            <EditText
+                android:id="@+id/txtRiderLocation"
+                android:layout_width="350dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="8dp"
+                android:cursorVisible="false"
+                android:ems="10"
+                android:focusable="false"
+                android:inputType="none"
+                android:textColor="@color/black"
+                android:textColorHint="@color/blackTint"
+                android:fontFamily="@font/product_sans_regular"
+                android:backgroundTint="@color/blackTint"
+                android:hint="Rider Location"
+                android:textSize="14sp"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="80dp"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:paddingLeft="4dp">
+
+                    <Button
+                        android:id="@+id/driverConfirmPickup"
+                        android:layout_width="180dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/refresh_button"
+                        android:fontFamily="@font/product_sans_regular"
+                        android:text="Confirm Pickup"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/driverCancelRide"
+                        android:layout_width="180dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/pickup_button"
+                        android:fontFamily="@font/product_sans_regular"
+                        android:text="Cancel Ride"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:visibility="invisible" />
+
+                    <Button
+                        android:id="@+id/btnDriverScanQR"
+                        android:layout_width="180dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/destination_button"
+                        android:fontFamily="@font/product_sans_regular"
+                        android:gravity="center_horizontal"
+                        android:text="Scan QR Code"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:visibility="invisible" />
+
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/driverCompleteRide"
+                    android:layout_width="180dp"
+                    android:layout_height="60dp"
+                    android:background="@drawable/destination_button"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Complete Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:visibility="invisible" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
