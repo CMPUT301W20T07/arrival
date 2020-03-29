@@ -325,8 +325,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnDriverDetails.setVisibility(View.VISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
 
-
-
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                 mMap.clear();
                 currRequest = null;
@@ -348,9 +346,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
 
-
                 addDestMarker(currRequest.getEndLocation().getLatLng());
-                //getDriverDetails(currRequest);
             }
         }
     }
