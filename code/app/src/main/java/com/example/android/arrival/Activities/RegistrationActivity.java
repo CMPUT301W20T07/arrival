@@ -251,13 +251,16 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     @Override
     public void onAccountCreated(String accountType) {
+
+        accountManager.uploadProfilePhoto(filePath, this);
         if (accountType.equals(RIDER_TYPE_STRING)) {
-            accountManager.uploadProfilePhoto(filePath, this);
+
             Toast.makeText(this, "You have been registered as a rider", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(RegistrationActivity.this, RiderMapActivity.class));
             finish();
         }
         else if (accountType.equals(DRIVER_TYPE_STRING)){
+
             Toast.makeText(this, "You have been registered as a driver", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(RegistrationActivity.this, DriverMapActivity.class));
             finish();

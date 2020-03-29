@@ -3,9 +3,13 @@ package com.example.android.arrival.Activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -17,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -24,12 +29,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
@@ -54,7 +64,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -62,6 +74,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -71,7 +84,7 @@ import java.util.Map;
 //Drivers map, contains the driver's locations, markers of open requests
 //when marker is pressed info pops up about marker
 
-public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener {
+public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "DriverMapActivity";
     private static final int CAMERA_REQUEST = 100;
@@ -92,6 +105,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     private FirebaseFirestore fb;
     private RequestManager rm;
+    private AccountManager accountManager;
 
     private Handler handler;
 
@@ -106,11 +120,31 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private Button btnSignOut;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
+    private Toolbar toolbarDriver;
+    private DrawerLayout drawerDriver;
+    private TextView userName;
+    private TextView userEmailAddress;
+    private CircularImageView profilePhoto;
+    private BottomSheetBehavior bottomSheetBehavior;
+
+
+    @Override
+    public void onBackPressed() {
+        if(drawerDriver.isDrawerOpen(GravityCompat.START)){
+            drawerDriver.closeDrawer(GravityCompat.START);
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        accountManager = AccountManager.getInstance();
+        accountManager.getProfilePhoto(this);
+        accountManager.getUserData(this);
         setContentView(R.layout.driver_map_activity);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -118,6 +152,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         AccountManager.getInstance().getUserData(DriverMapActivity.this);
+        accountManager.getProfilePhoto(this);
+
 
         handler = new Handler();
 
@@ -131,11 +167,43 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
         btnCompleteRide = findViewById(R.id.driverCompleteRide);
         btnScanQR = findViewById(R.id.btnDriverScanQR);
-        btnSignOut = findViewById(R.id.btnDriverSignout);
         btnRefresh = findViewById(R.id.btnDriverRefresh);
         txtStatus = findViewById(R.id.txtDriverStatus);
+        toolbarDriver = findViewById(R.id.toolbar3);
+        drawerDriver = findViewById(R.id.driver_navigation_layout);
 
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
+        //Handling Navigation Drawer
+        NavigationView navigationView = findViewById(R.id.driver_navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        userName = headerView.findViewById(R.id.userNameDriver);
+        userEmailAddress = headerView.findViewById(R.id.userEmailAddressDriver);
+        profilePhoto = headerView.findViewById(R.id.user_profile_pic_driver);
+
+
+        //Setting up Persistent Bottom Sheet
+        View bottomSheet = findViewById(R.id.driver_bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setPeekHeight(140);
+        bottomSheetBehavior.setHideable(false);
+
+        //Setting Navigation View click listener
+        navigationView.setNavigationItemSelectedListener(this);
+
+        toolbarDriver.setBackgroundColor(Color.TRANSPARENT);
+        setSupportActionBar(toolbarDriver);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        ActionBarDrawerToggle newToggle = new ActionBarDrawerToggle(this, drawerDriver, toolbarDriver, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerDriver.addDrawerListener(newToggle);
+        newToggle.syncState();
+
+        Window currentWindow = this.getWindow();
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+
+
+        /*btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "btnSignOut Clicked");
@@ -145,7 +213,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 startActivity(intent);
                 finish();
             }
-        });
+        });*/
 
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,6 +271,21 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
 
         updateInfo();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sign_out_button_driver:
+                Log.d(TAG, "btnSignOut Clicked");
+                Log.d(TAG, "Attempting to sign out user... ");
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+        }
+        return true;
     }
 
     public void refresh() {
@@ -625,8 +708,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-
-
+        User user = driver;
+        driverName = user.getName();
+        String driverEmail = user.getEmail();
+        userName.setText(driverName);
+        userEmailAddress.setText(driverEmail);
     }
 
     @Override
@@ -656,12 +742,13 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPhotoReceived(Uri uri) {
-
+        Glide.with(this).load(uri).into(profilePhoto);
+        Log.d(TAG, "onPhotoReceived: " + uri.toString());
     }
 
     @Override
     public void onPhotoReceiveFailure(String e) {
-
+        Toast.makeText(this, e,Toast.LENGTH_LONG);
     }
 
     @Override

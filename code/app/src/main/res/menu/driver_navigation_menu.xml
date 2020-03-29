@@ -15,7 +15,7 @@
     <item android:title="Status">
         <menu>
             <item
-                android:id="@+id/sign_out_button"
+                android:id="@+id/sign_out_button_driver"
                 android:icon="@drawable/ic_sign_out"
                 android:title="Sign Out"
                 >
