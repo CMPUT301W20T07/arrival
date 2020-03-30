@@ -134,7 +134,7 @@
 
                 </RelativeLayout>
 
-                <Button
+              <!--  <Button
                     android:id="@+id/driverCompleteRide"
                     android:layout_width="180dp"
                     android:layout_height="60dp"
@@ -145,7 +145,7 @@
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:visibility="invisible" />
-
+-->
 
             </LinearLayout>
 
