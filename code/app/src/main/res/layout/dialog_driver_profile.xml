@@ -113,7 +113,6 @@
                 android:id="@+id/phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="True"
                 />
 
         </LinearLayout>
@@ -139,12 +138,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+            <Button
                 android:id="@+id/phone_driver"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CONTACT DRIVER"
-                android:onClick="True"/>
+                android:text="Phone Driver"/>
 
         </LinearLayout>
 
