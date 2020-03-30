@@ -51,8 +51,6 @@ public class RequestManager {
                 if(e != null) {
                     return;
                 }
-
-                // Notify all
             }
         });
     }

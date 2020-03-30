@@ -69,7 +69,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
         //Info passed from DriverMapActivity
         ArrayList<Marker> markers = (ArrayList<Marker>)getArguments().getSerializable("markerLocation");
         currRequest = (Request) getArguments().getSerializable("currentRequest");
-        String driverName = (String) getArguments().getSerializable("driverName");
+        String driverUID = (String) getArguments().getSerializable("driverUID");
         double driverLat = (double) getArguments().getSerializable("driverLat");
         double driverLon = (double) getArguments().getSerializable("driverLon");
 
@@ -108,7 +108,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Log.d("AcceptRequestFrag", "OK clicked");
                         currRequest.setStatus(Request.ACCEPTED);
-                        currRequest.setDriver(driverName);
+                        currRequest.setDriver(driverUID);
                         rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
 
                         getRiderToken();

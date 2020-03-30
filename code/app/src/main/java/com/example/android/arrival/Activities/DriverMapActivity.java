@@ -93,14 +93,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private static final int REQUEST_USER_LOCATION_CODE = 99;
     //Youtube video by SimCoder https://www.youtube.com/watch?v=u10ZEnARZag&t=857s
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private String driverName;
     private String driverUID;
     private Driver mydriverObject;
     public boolean zoom = true;
     static boolean currentActivity = false;
     private int index;
-    private String currRequestID;
-    private int currRequestStatus;
 
     ArrayList<Request> requestsList = new ArrayList<>();
 
@@ -151,7 +148,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
         auth = FirebaseAuth.getInstance();
-        AccountManager.getInstance().getUserData(DriverMapActivity.this);
         accountManager.getProfilePhoto(this);
 
 
@@ -418,7 +414,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 Bundle args = new Bundle();
                 args.putSerializable("currentRequest", currRequest);
                 args.putSerializable("markerLocation", markers);
-                args.putSerializable("driverName", driverUID);
+                args.putSerializable("driverUID", driverUID);
                 args.putSerializable("driverLat", currentLocation.getLatitude());
                 args.putSerializable("driverLon", currentLocation.getLongitude());
 
@@ -464,7 +460,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     public void getCurrentRequest(){
         fb.collectionGroup("requests")
-                .whereEqualTo("driver", driverName)
+                .whereEqualTo("driver", driverUID)
                 .whereIn("status", Arrays.asList(1, 2, 3))
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -530,7 +526,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         driverInfo.put("lat", null);
         driverInfo.put("lon", null);
 
-        fb.collection("availableDrivers").document(driverName)
+        fb.collection("availableDrivers").document(driverUID)
                 .update(driverInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -571,8 +567,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         driverInfo.put("lat", currentLocation.getLatitude());
         driverInfo.put("lon", currentLocation.getLongitude());
 
-        fb.collection("availableDrivers").document(driverName)
-                .update(driverInfo)
+        fb.collection("availableDrivers").document(driverUID)
+                .set(driverInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -761,11 +757,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onDriverDataRetrieved(Driver driver) {
 
-        driverName = driver.getName();
-        String driverEmail = driver.getEmail();
-        userName.setText(driverName);
-        userEmailAddress.setText(driverEmail);
-        mydriverObject = driver;
     }
 
     @Override
