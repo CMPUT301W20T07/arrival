@@ -265,7 +265,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             Log.d(TAG, currRequest.toString());
         } else {
             // For testing
-            rm.getRequest("388029042622444", this);
+            //rm.getRequest("388029042622444", this);
         }
     }
 

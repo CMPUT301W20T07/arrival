@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -29,13 +30,16 @@ import androidx.fragment.app.DialogFragment;
 
 import java.util.List;
 import java.util.Map;
-
+/**
+ * an alert dialog appears on the rider's screen when they click on Driver Details button
+ * the alert dialog shows all the information of their driver (name, phone number, car details, driver rating etc)
+ * the rider can contact the driver directly from the dialog view
+ */
 
 public class DriverDetailsFragment extends DialogFragment {
     private static final String TAG = "driver_fragment";
 
-    String phoneNum = "7801234567"; // Why do we have this??
-    TextView phoneDriver;
+    Button phoneDriver;
     String driverPhone;
 
     public static DriverDetailsFragment newInstance(Driver driver, String driverID) {
@@ -48,7 +52,6 @@ public class DriverDetailsFragment extends DialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @NonNull
     @Override
