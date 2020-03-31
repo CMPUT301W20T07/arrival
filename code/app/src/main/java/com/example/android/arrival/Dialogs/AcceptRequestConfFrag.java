@@ -76,7 +76,9 @@ public class AcceptRequestConfFrag extends DialogFragment {
         double driverLat = (double) getArguments().getSerializable("driverLat");
         double driverLon = (double) getArguments().getSerializable("driverLon");
 
-        assert currRequest != null;
+        if (currRequest == null) {
+            return null;
+        }
 
         marker = markers.get(0);
         if (currRequest.getStartLocation().getLat() == marker.getPosition().latitude && currRequest.getStartLocation().getLon() == marker.getPosition().longitude) {
@@ -114,7 +116,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                         currRequest.setDriver(driverUID);
                         rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
 
-                        getRiderToken();
+                        // getRiderToken();
                     }}).create();
     }
 
@@ -140,12 +142,16 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void notifyRider(String riderToken) {
-        Log.d("Notification", "Rider Token: " + riderToken);
+        try {
+            Log.d("Notification", "Rider Token: " + riderToken);
 
-        if (riderToken != null) {
-            Notification notification = new Notification(context, riderToken,
-                    "Ride Request Status Update", "A driver has accepted your request");
-            notification.sendNotification();
+            if (riderToken != null) {
+                Notification notification = new Notification(context, riderToken,
+                        "Ride Request Status Update", "A driver has accepted your request");
+                notification.sendNotification();
+            }
+        } catch (Exception e) {
+
         }
     }
 

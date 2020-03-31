@@ -35,8 +35,6 @@ public class Notification {
 
     final String TAG = "NOTIFICATION TAG";
 
-
-
     public Notification(Context ctx, String to, String subject, String message){
         context = ctx;
         token = to;
@@ -82,8 +80,7 @@ public class Notification {
                 public void onErrorResponse(VolleyError error) {
                     Log.e("TAG", "Error: " + error.toString());
                 }
-            }
-            ){
+            }){
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String, String> header = new HashMap<>();

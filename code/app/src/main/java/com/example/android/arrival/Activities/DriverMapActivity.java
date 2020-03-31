@@ -444,7 +444,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //Share marker and requests with the fragment
-                if(currRequest == null) {
                     for (int i = 0; i < requestsList.size(); i++) {
                         if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
                                 requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude) {
@@ -469,7 +468,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                     acceptRequestConfFrag.setArguments(args);
                     fragmentTransaction.add(0, acceptRequestConfFrag);
                     fragmentTransaction.commit();
-                }
+
                 return false;
             }
         });
@@ -751,7 +750,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
         Log.d(TAG, "Retrieved request: " + req.toString());
 
-        if(req.getStatus() == Request.CANCELLED) {
+        if(req.getStatus() == Request.CANCELLED || req.getStatus() == Request.COMPLETED) {
             currRequest = null;
         } else {
             currRequest = req;
