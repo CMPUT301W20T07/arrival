@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +54,8 @@ public class AcceptRequestConfFrag extends DialogFragment {
         DecimalFormat format = new DecimalFormat("0.00");
 
         super.onCreate(savedInstanceState);
+
+        Log.d("Request", "Creating accept dialog");
 
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
