@@ -269,6 +269,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             public void onClick(View v) {
                 Log.d(TAG, "Payment completed.");
                 currRequest.setStatus(Request.COMPLETED);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+                refresh();
             }
         });
 
@@ -442,31 +444,32 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //Share marker and requests with the fragment
-                for (int i = 0; i < requestsList.size(); i++) {
-                    if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
-                            requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude)
-                    {
-                        index = i;
-                        currRequest = requestsList.get(i);
+                if(currRequest == null) {
+                    for (int i = 0; i < requestsList.size(); i++) {
+                        if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
+                                requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude) {
+                            index = i;
+                            currRequest = requestsList.get(i);
+                        }
                     }
+
+                    ArrayList<Marker> markers = new ArrayList<>();
+                    markers.add(marker);
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                    Bundle args = new Bundle();
+                    args.putSerializable("currentRequest", currRequest);
+                    args.putSerializable("markerLocation", markers);
+                    args.putSerializable("driverUID", driverUID);
+                    args.putSerializable("driverLat", currentLocation.getLatitude());
+                    args.putSerializable("driverLon", currentLocation.getLongitude());
+
+                    AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
+                    acceptRequestConfFrag.setArguments(args);
+                    fragmentTransaction.add(0, acceptRequestConfFrag);
+                    fragmentTransaction.commit();
                 }
-
-                ArrayList<Marker> markers = new ArrayList<>();
-                markers.add(marker);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                Bundle args = new Bundle();
-                args.putSerializable("currentRequest", currRequest);
-                args.putSerializable("markerLocation", markers);
-                args.putSerializable("driverUID", driverUID);
-                args.putSerializable("driverLat", currentLocation.getLatitude());
-                args.putSerializable("driverLon", currentLocation.getLongitude());
-
-                AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
-                acceptRequestConfFrag.setArguments(args);
-                fragmentTransaction.add(0, acceptRequestConfFrag);
-                fragmentTransaction.commit();
                 return false;
             }
         });
@@ -746,12 +749,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         Request req = snapshot.toObject(Request.class);
 
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
-
         Log.d(TAG, "Retrieved request: " + req.toString());
 
         if(req.getStatus() == Request.CANCELLED) {
             currRequest = null;
-        } else if(currRequest == null || !currRequest.equals(req)) {
+        } else {
             currRequest = req;
         }
 

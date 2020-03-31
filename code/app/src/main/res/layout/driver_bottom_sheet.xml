@@ -149,7 +149,6 @@
                         android:layout_marginTop="1dp"
                         android:background="@drawable/destination_button"
                         android:fontFamily="@font/product_sans_regular"
-                        android:gravity="center_horizontal"
                         android:text="Scan QR Code"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
