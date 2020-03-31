@@ -103,21 +103,33 @@ public class AcceptRequestConfFrag extends DialogFragment {
             custPaymentOffer.setText(format.format(fare));
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        return builder
-                .setView(view)
-                .setTitle("Accept Ride Request")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Log.d("AcceptRequestFrag", "OK clicked");
-                        currRequest.setStatus(Request.ACCEPTED);
-                        currRequest.setDriver(driverUID);
-                        rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
+        if (currRequest.getStatus() == 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            return builder
+                    .setView(view)
+                    .setTitle("Accept Ride Request")
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Log.d("AcceptRequestFrag", "OK clicked");
+                            currRequest.setStatus(Request.ACCEPTED);
+                            currRequest.setDriver(driverUID);
+                            rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
 
-                        // getRiderToken();
-                    }}).create();
+                            getRiderToken();
+                        }
+                    }).create();
+        }
+        else
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            return builder
+                    .setView(view)
+                    .setTitle("Current Request")
+                    .setNegativeButton("Close", null)
+                    .create();
+        }
     }
 
     public void getRiderToken() {
