@@ -167,7 +167,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
 
     @Override
-    public void onAccountSignIn(String accountType) {
+    public void onAccountTypeRetrieved(String accountType) {
         Log.d("TOKEN", "calling to check for token");
         checkForToken(accountType);
         Log.d(TAG, "onAccountSignIn: " + accountType);
@@ -189,7 +189,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
         Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show();
     }
 

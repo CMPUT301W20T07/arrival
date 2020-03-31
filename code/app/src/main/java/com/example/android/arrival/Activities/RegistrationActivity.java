@@ -241,12 +241,12 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     }
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 

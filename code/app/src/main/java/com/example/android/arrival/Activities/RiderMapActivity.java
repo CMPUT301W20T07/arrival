@@ -90,7 +90,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private RequestManager rm;
     private AccountManager accountManager;
     private FirebaseFirestore fb;
-    private FirebaseAuth auth;
+    private String uid;
     private DrawerLayout drawer;
     private Rider myRiderObject;
     //Declaring variables for use later
@@ -130,6 +130,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView userName;
     private TextView userEmailAddress;
     private ImageView profilePhoto;
+    private MenuItem rideHistory;
 
     @Override
     public void onBackPressed() {
@@ -151,7 +152,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.getInstance();
-        accountManager.getProfilePhoto(this);
+        uid = accountManager.getUID();
+        accountManager.getProfilePhoto(this, uid);
         accountManager.getUserData(this);
         setContentView(R.layout.rider_map_activity);
 
@@ -166,7 +168,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         rm = RequestManager.getInstance();
         fb = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+
 
         txtStartLocation = findViewById(R.id.riderStartLocation);
         txtEndLocation = findViewById(R.id.riderEndLocation);
@@ -200,6 +202,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         //Setting Navigation View click listener
         navigationView.setNavigationItemSelectedListener(this);
 
+
         //Set transparent toolbar
         toolbar2.setBackgroundColor(Color.TRANSPARENT);
         setSupportActionBar(toolbar2);
@@ -221,6 +224,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         //Don't show keyboard when EditTexts are clicked.
         txtStartLocation.setInputType(InputType.TYPE_NULL);
         txtEndLocation.setInputType(InputType.TYPE_NULL);
+
 
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
@@ -246,6 +250,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
+            case R.id.ride_history:
+                startActivity(new Intent(RiderMapActivity.this, RideHistoryActivity.class));
+                break;
             case R.id.sign_out_button:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
@@ -262,6 +269,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "refreshing...");
         if(currRequest != null) {
             rm.getRequest(currRequest.getID(), this);
+            accountManager.getProfilePhoto(this, uid);
+            accountManager.getUserData(this);
             Log.d(TAG, currRequest.toString());
         } else {
             // For testing
@@ -879,12 +888,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 
@@ -904,10 +913,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         userName.setText(rider.getName());
         userEmailAddress.setText(rider.getEmail());
         myRiderObject = rider;
-        FirebaseUser user = auth.getCurrentUser();
 
         //rm.getRiderRequests("usr-map-test", this);
-        rm.getRiderRequests(user.getUid(), this);
+        rm.getRiderRequests(uid, this);
     }
 
     @Override

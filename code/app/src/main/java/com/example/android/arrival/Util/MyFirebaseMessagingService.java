@@ -129,7 +129,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     }
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
         if (userType != null) {
             updateToken(userType);
@@ -138,7 +138,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 
