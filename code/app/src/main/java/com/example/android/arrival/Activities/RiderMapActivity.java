@@ -946,8 +946,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onDriverDataRetrieved(Driver driver) {
         if(currRequest.getStatus() == Request.COMPLETED) {
-            displayRateDriverDialog(driver);
             currRequest = null;
+            Log.d(TAG, "onDriverDataRetrieved: " + currRequest.getStatus());
+            displayRateDriverDialog(driver);
         } else {
             displayDriverDetailsDialog(driver);
         }

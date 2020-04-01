@@ -295,6 +295,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.ride_history_driver:
+                startActivity(new Intent(DriverMapActivity.this, RideHistoryActivity.class));
+                break;
             case R.id.sign_out_button_driver:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");

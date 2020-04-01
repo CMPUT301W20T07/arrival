@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.arrival.Model.Driver;
@@ -33,6 +34,7 @@ public class RideHistoryActivity extends AppCompatActivity implements RequestCal
     private AccountManager accountManager;
     private static final String RIDER_TYPE_STRING = "rider";
     private static final String DRIVER_TYPE_STRING = "driver";
+    private static final String TAG = "RideHistoryActivity";
     private RecyclerView recyclerView;
     private RequestAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -163,22 +165,30 @@ public class RideHistoryActivity extends AppCompatActivity implements RequestCal
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
         // put requests into list that can be passed to the adapter
-        for (QueryDocumentSnapshot document : snapshot) {
-            Request request = document.toObject(Request.class);
-            requests.add(request);
+
+        if (snapshot != null) {
+            for (QueryDocumentSnapshot document : snapshot) {
+                Request request = document.toObject(Request.class);
+                Log.d(TAG, "onGetRiderRequestsSuccess: " + request.getStatus());
+                requests.add(request);
+            }
+            adapter = new RequestAdapter(this, requests, type);
+            recyclerView.setAdapter(adapter);
         }
-        adapter = new RequestAdapter(this, requests, type);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
         // put requests into list that can be passed to the adapter
-        for (QueryDocumentSnapshot document : snapshot) {
-            Request request = document.toObject(Request.class);
-            requests.add(request);
+
+        if (snapshot != null) {
+            for (QueryDocumentSnapshot document : snapshot) {
+                Request request = document.toObject(Request.class);
+
+                requests.add(request);
+            }
+            adapter = new RequestAdapter(this, requests, type);
+            recyclerView.setAdapter(adapter);
         }
-        adapter = new RequestAdapter(this, requests, type);
-        recyclerView.setAdapter(adapter);
     }
 }
