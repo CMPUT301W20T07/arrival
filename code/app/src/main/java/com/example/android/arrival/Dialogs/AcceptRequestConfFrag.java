@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +55,8 @@ public class AcceptRequestConfFrag extends DialogFragment {
 
         super.onCreate(savedInstanceState);
 
+        Log.d("Request", "Creating accept dialog");
+
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
 
@@ -73,7 +76,9 @@ public class AcceptRequestConfFrag extends DialogFragment {
         double driverLat = (double) getArguments().getSerializable("driverLat");
         double driverLon = (double) getArguments().getSerializable("driverLon");
 
-        assert currRequest != null;
+        if (currRequest == null) {
+            return null;
+        }
 
         marker = markers.get(0);
         if (currRequest.getStartLocation().getLat() == marker.getPosition().latitude && currRequest.getStartLocation().getLon() == marker.getPosition().longitude) {
@@ -149,12 +154,16 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void notifyRider(String riderToken) {
-        Log.d("Notification", "Rider Token: " + riderToken);
+        try {
+            Log.d("Notification", "Rider Token: " + riderToken);
 
-        if (riderToken != null) {
-            Notification notification = new Notification(context, riderToken,
-                    "Ride Request Status Update", "A driver has accepted your request");
-            notification.sendNotification();
+            if (riderToken != null) {
+                Notification notification = new Notification(context, riderToken,
+                        "Ride Request Status Update", "A driver has accepted your request");
+                notification.sendNotification();
+            }
+        } catch (Exception e) {
+
         }
     }
 

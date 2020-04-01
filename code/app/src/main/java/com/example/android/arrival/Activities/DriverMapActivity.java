@@ -80,6 +80,7 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +92,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     private static final String TAG = "DriverMapActivity";
     private static final int CAMERA_REQUEST = 100;
+    private static final int REFRESH_INTERVAL = 10; // How often the application should auto refresh in seconds
 
     private GoogleMap mMap;
     private LocationRequest locationRequest;
@@ -122,6 +124,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private Button btnCompleteRide;
     private Button btnScanQR;
     private Button btnRemoveMarker;
+    private Button btnConfirmPayment;
     private FloatingActionButton btnRefresh;
     private TextView txtStatus;
     private Toolbar toolbarDriver;
@@ -158,7 +161,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         auth = FirebaseAuth.getInstance();
         accountManager.getProfilePhoto(this);
 
-
         // Get camera permissions
         checkPermissions(getApplicationContext());
 
@@ -174,6 +176,10 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         toolbarDriver = findViewById(R.id.toolbar3);
         drawerDriver = findViewById(R.id.driver_navigation_layout);
         btnRemoveMarker = findViewById(R.id.removeMarker);
+        btnConfirmPayment = findViewById(R.id.driverConfirmPayment);
+
+        // Runtime Handler
+        handler = new Handler();
 
         //Handling Navigation Drawer
         NavigationView navigationView = findViewById(R.id.driver_navigation_view);
@@ -181,7 +187,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         userName = headerView.findViewById(R.id.userNameDriver);
         userEmailAddress = headerView.findViewById(R.id.userEmailAddressDriver);
         profilePhoto = headerView.findViewById(R.id.user_profile_pic_driver);
-
 
         //Setting up Persistent Bottom Sheet
         View bottomSheet = findViewById(R.id.driver_bottom_sheet);
@@ -206,8 +211,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         driverUID = auth.getCurrentUser().getUid();
 
-
-
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,6 +219,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 startActivity(intent);
             }
         });
+
         btnCancelRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -260,6 +264,16 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
 
+        btnConfirmPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Payment completed.");
+                currRequest.setStatus(Request.COMPLETED);
+                rm.updateRequest(currRequest, (RequestCallbackListener) v.getContext());
+                refresh();
+            }
+        });
+
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -271,8 +285,15 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
     }
+
+    Runnable runner =  new Runnable() {
+        @Override
+        public void run() {
+            refresh();
+            handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
+        }
+    };
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -303,6 +324,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     public void updateInfo() {
+        Log.d(TAG, "Updating info...");
         if (currRequest == null) {
             rm.getOpenRequests(this);
 
@@ -310,18 +332,22 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             btnConfirmPickup.setVisibility(View.INVISIBLE);
             btnCompleteRide.setVisibility(View.INVISIBLE);
             btnScanQR.setVisibility(View.INVISIBLE);
+            btnConfirmPayment.setVisibility(View.INVISIBLE);
             btnRemoveMarker.setVisibility(View.INVISIBLE);
             txtRiderLocation.setText("");
             txtStatus.setText("");
         } else {
             Log.d(TAG, "currRequest is " + currRequest.toString());
+
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
             requestsList.clear();
             txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
 
-            if (currRequest.getStatus() == Request.ACCEPTED) {
-                // Clear open requests from map, except currRequest
+            if(currRequest.getStatus() == Request.OPEN) {
+                currRequest = null;
+            } else if (currRequest.getStatus() == Request.ACCEPTED) {
+                //Clear open requests from map, except currRequest
                 mMap.clear();
                 MarkerOptions mop = new MarkerOptions();
                 mop.position(currRequest.getStartLocation().getLatLng());
@@ -331,6 +357,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 btnConfirmPickup.setVisibility(View.VISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
                 btnScanQR.setVisibility(View.INVISIBLE);
+                btnConfirmPayment.setVisibility(View.INVISIBLE);
                 btnRemoveMarker.setVisibility(View.INVISIBLE);
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 // Clear open requests from map, except currRequest destination
@@ -343,6 +370,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.VISIBLE);
                 btnScanQR.setVisibility(View.INVISIBLE);
+                btnConfirmPayment.setVisibility(View.INVISIBLE);
                 btnRemoveMarker.setVisibility(View.INVISIBLE);
 
             } else if(currRequest.getStatus() == Request.AWAITING_PAYMENT) {
@@ -356,6 +384,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
                 btnScanQR.setVisibility(View.VISIBLE);
+                btnConfirmPayment.setVisibility(View.VISIBLE);
                 btnRemoveMarker.setVisibility(View.INVISIBLE);
 
             } else if (currRequest.getStatus() == Request.COMPLETED) {
@@ -365,6 +394,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
                 btnScanQR.setVisibility(View.INVISIBLE);
+                btnConfirmPayment.setVisibility(View.INVISIBLE);
                 btnRemoveMarker.setVisibility(View.INVISIBLE);
                 txtRiderLocation.setText("");
             }
@@ -414,31 +444,31 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //Share marker and requests with the fragment
-                for (int i = 0; i < requestsList.size(); i++) {
-                    if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
-                            requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude)
-                    {
-                        index = i;
-                        currRequest = requestsList.get(i);
+                    for (int i = 0; i < requestsList.size(); i++) {
+                        if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
+                                requestsList.get(i).getStartLocation().getLon() == marker.getPosition().longitude) {
+                            index = i;
+                            currRequest = requestsList.get(i);
+                        }
                     }
-                }
 
-                ArrayList<Marker> markers = new ArrayList<>();
-                markers.add(marker);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    ArrayList<Marker> markers = new ArrayList<>();
+                    markers.add(marker);
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                Bundle args = new Bundle();
-                args.putSerializable("currentRequest", currRequest);
-                args.putSerializable("markerLocation", markers);
-                args.putSerializable("driverUID", driverUID);
-                args.putSerializable("driverLat", currentLocation.getLatitude());
-                args.putSerializable("driverLon", currentLocation.getLongitude());
+                    Bundle args = new Bundle();
+                    args.putSerializable("currentRequest", currRequest);
+                    args.putSerializable("markerLocation", markers);
+                    args.putSerializable("driverUID", driverUID);
+                    args.putSerializable("driverLat", currentLocation.getLatitude());
+                    args.putSerializable("driverLon", currentLocation.getLongitude());
 
-                AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
-                acceptRequestConfFrag.setArguments(args);
-                fragmentTransaction.add(0, acceptRequestConfFrag);
-                fragmentTransaction.commit();
+                    AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
+                    acceptRequestConfFrag.setArguments(args);
+                    fragmentTransaction.add(0, acceptRequestConfFrag);
+                    fragmentTransaction.commit();
+
                 return false;
             }
         });
@@ -597,7 +627,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         super.onResume();
         currentActivity = true;
 
-        refresh();
+        runner.run();
     }
 
     /**
@@ -607,6 +637,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     public void onPause() {
         super.onPause();
         currentActivity = false;
+
+        handler.removeCallbacks(runner);
 
         Map<String, Object> driverInfo = new HashMap<>();
         driverInfo.put("lat", currentLocation.getLatitude());
@@ -716,12 +748,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         Request req = snapshot.toObject(Request.class);
 
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
-
         Log.d(TAG, "Retrieved request: " + req.toString());
 
-        if(req.getStatus() == Request.CANCELLED) {
+        if(req.getStatus() == Request.CANCELLED || req.getStatus() == Request.COMPLETED) {
             currRequest = null;
-        } else if(currRequest == null || !currRequest.equals(req)) {
+        } else {
             currRequest = req;
         }
 

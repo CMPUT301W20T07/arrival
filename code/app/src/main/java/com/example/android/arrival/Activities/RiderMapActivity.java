@@ -24,6 +24,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
@@ -86,6 +87,7 @@ import java.util.List;
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
+    private static final int REFRESH_INTERVAL = 10; // How often the application should auto refresh in seconds
 
     private RequestManager rm;
     private AccountManager accountManager;
@@ -113,6 +115,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     //ArrayList that holds the markers so we can add them again when the map reloads
     private ArrayList<Place> marks = new ArrayList<>();
 
+    private Handler handler;
     private Request currRequest;
 
     private EditText txtStartLocation;
@@ -168,6 +171,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         fb = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        // Bind components
         txtStartLocation = findViewById(R.id.riderStartLocation);
         txtEndLocation = findViewById(R.id.riderEndLocation);
         btnRequestRide = findViewById(R.id.rideRequest);
@@ -181,6 +185,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         pickupActivity = findViewById(R.id.pickupButtonRed);
         destActivity = findViewById(R.id.destinationButton);
 
+        // Runtime Handler
+        handler = new Handler();
 
         NavigationView navigationView = findViewById(R.id.rider_navigation_view);
         View headerView = navigationView.getHeaderView(0);
@@ -242,6 +248,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
+    Runnable runner =  new Runnable() {
+        @Override
+        public void run() {
+            if (currRequest != null) {
+                refresh();
+            }
+            handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
+        }
+    };
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -265,7 +280,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             Log.d(TAG, currRequest.toString());
         } else {
             // For testing
-            //rm.getRequest("388029042622444", this);
+//            rm.getRequest("427939185967584", this);
         }
     }
 
@@ -304,7 +319,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnDriverDetails.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
 
-
             } else if(currRequest.getStatus() == Request.ACCEPTED) {
                 mMap.clear();
 
@@ -333,14 +347,17 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                 mMap.clear();
+//                addPickupMarker(pickup.getLatLng());
+//                addDestMarker(destination.getLatLng());
 
                 getDriverDetails(currRequest);
 
 //                currRequest = null;
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
                 txtEndLocation.setText("");
-
             }
         }
     }
@@ -351,6 +368,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onResume() {
         super.onResume();
+        runner.run();
         if(mMap != null) {
             refresh();
         }
@@ -364,6 +382,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "map on pause");
         super.onPause();
         //active = false;
+        handler.removeCallbacks(runner); // stop refreshing
     }
 
     /**
@@ -618,14 +637,16 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         destMarker = mMap.addMarker(markerOptions);
 
         Address pickupAddress = getCurrentLocationAddress(destMarker);
-        destination.setName(pickupAddress.getFeatureName());
-        destination.setAddress(pickupAddress.getAddressLine(0));
-        destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-        txtEndLocation.setText(destination.getAddress());
+        if(pickupAddress != null) {
+            destination.setName(pickupAddress.getFeatureName());
+            destination.setAddress(pickupAddress.getAddressLine(0));
+            destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+            txtEndLocation.setText(destination.getAddress());
 
-        marks.add(1, destination);
+            marks.add(1, destination);
 
-        addLine();
+            addLine();
+        }
     }
 
     public void addGenericMarker(LatLng latLng) {
@@ -779,8 +800,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         //Creates new instance of the search fragment that we pass variables to
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        DialogFragment fragment = RateDriverFrag.newInstance(driver, currRequest.getDriver());
+        DialogFragment fragment;
+        if(driver.getID() != null && driver.getID() != "") {
+            fragment = RateDriverFrag.newInstance(driver, driver.getID());
+        } else {
+            fragment = RateDriverFrag.newInstance(driver, currRequest.getDriver());
+        }
         fragmentTransaction.add(0, fragment);
         fragmentTransaction.commit();
     }
@@ -914,6 +939,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     public void onDriverDataRetrieved(Driver driver) {
         if(currRequest.getStatus() == Request.COMPLETED) {
             displayRateDriverDialog(driver);
+            currRequest = null;
         } else {
             displayDriverDetailsDialog(driver);
         }
