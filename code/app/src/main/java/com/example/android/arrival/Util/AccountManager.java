@@ -140,7 +140,6 @@ public class AccountManager {
      */
     public void createDriverAccount(Driver driver, String password, final AccountCallbackListener listener) {
 
-
         firebaseAuth.createUserWithEmailAndPassword(driver.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -164,6 +163,8 @@ public class AccountManager {
                             listener.onAccountCreationFailure(e.toString());
                         }
                     });
+
+                    driver.setID(userId);
 
                     // add user data to driver table
                     DocumentReference driverDocumentReference = driverRef.document(userId);
@@ -221,7 +222,9 @@ public class AccountManager {
                         }
                     });
 
-                    // add user data to driver table
+                    rider.setID(userId);
+
+                    // add user data to rider table
                     DocumentReference riderDocumentReference = riderRef.document(userId);
                     riderDocumentReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
