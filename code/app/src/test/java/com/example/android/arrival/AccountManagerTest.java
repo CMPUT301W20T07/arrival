@@ -11,11 +11,13 @@ import com.example.android.arrival.Util.AccountManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 
 class AccountManagerTest {
 
@@ -31,7 +33,7 @@ class AccountManagerTest {
     static void setUp() {
         mockAccountManager = mock(AccountManager.class);
         setMock(mockAccountManager);
-        mockAccountCallbackListener = mock(TestAccountCallbackListener.class);
+        mockAccountCallbackListener = new TestAccountCallbackListener();
 
     }
 
@@ -79,7 +81,7 @@ class TestAccountCallbackListener implements AccountCallbackListener {
 
     @Override
     public void onAccountCreated(String accountType) {
-
+        assertEquals("rider", accountType);
     }
 
     @Override
