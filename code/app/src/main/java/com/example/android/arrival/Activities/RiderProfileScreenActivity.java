@@ -56,7 +56,7 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.getInstance();
-        accountManager.getProfilePhoto(this);
+        accountManager.getProfilePhoto(this, accountManager.getUID());
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_rider_profile_screen);
         rider = (Rider) getIntent().getSerializableExtra("rider");
@@ -147,12 +147,12 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     }
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 

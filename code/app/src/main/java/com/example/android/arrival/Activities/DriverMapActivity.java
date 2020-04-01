@@ -111,7 +111,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     ArrayList<Request> requestsList = new ArrayList<>();
 
     private FirebaseFirestore fb;
-    private FirebaseAuth auth;
     private RequestManager rm;
     private AccountManager accountManager;
 
@@ -133,7 +132,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private TextView userEmailAddress;
     private CircularImageView profilePhoto;
     private BottomSheetBehavior bottomSheetBehavior;
-
+    private MenuItem rideHistory;
 
     @Override
     public void onBackPressed() {
@@ -150,7 +149,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.getInstance();
-        accountManager.getProfilePhoto(this);
+        driverUID = accountManager.getUID();
+        accountManager.getProfilePhoto(this, driverUID);
         accountManager.getUserData(this);
         setContentView(R.layout.driver_map_activity);
 
@@ -158,8 +158,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
-        auth = FirebaseAuth.getInstance();
-        accountManager.getProfilePhoto(this);
 
         // Get camera permissions
         checkPermissions(getApplicationContext());
@@ -209,7 +207,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         currentWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         currentWindow.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-        driverUID = auth.getCurrentUser().getUid();
 
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -298,6 +295,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.ride_history_driver:
+                startActivity(new Intent(DriverMapActivity.this, RideHistoryActivity.class));
+                break;
             case R.id.sign_out_button_driver:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
@@ -305,7 +305,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 Intent intent = new Intent(DriverMapActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
-                break;
         }
         return true;
     }
@@ -821,12 +820,12 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 
@@ -847,7 +846,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-
+        mydriverObject = driver;
+        userName.setText(driver.getName());
+        userEmailAddress.setText(driver.getEmail());
     }
 
     @Override

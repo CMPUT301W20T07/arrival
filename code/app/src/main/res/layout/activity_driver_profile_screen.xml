@@ -73,6 +73,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="5dp
+"
         android:autofillHints="XXX-XXX-XXXX"
         android:background="@drawable/edit_text_box"
         android:hint="Phone Number"
@@ -81,55 +83,52 @@
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/update_car_info"
         app:layout_constraintTop_toBottomOf="@id/update_email_driver"
-        tools:layout_editor_absoluteX="10dp" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:id="@+id/update_car_info"
-        app:layout_constraintBottom_toTopOf="@id/update_info_btn_driver"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:textColor="@color/white"
-        android:background="@drawable/sign_in_button_background"
-        android:text="Change Car Info"
-        android:textSize="18sp"
-        android:textAllCaps="false"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:text="Update"
-        android:textSize="18sp"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@id/delete_account_button_driver"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:background="@drawable/sign_in_button_background"
-        android:textColor="@color/white"
-        android:id="@+id/update_info_btn_driver"
         />
 
-
-
     <Button
+        android:id="@+id/update_car_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:text="Delete Account"
-        android:textSize="18sp"
+        android:background="@drawable/sign_in_button_background"
+        android:text="Change Car Info"
         android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/update_phone_driver" />
+
+    <Button
+        android:id="@+id/update_info_btn_driver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/sign_in_button_background"
+        android:text="Update"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/update_car_info" />
+
+
+    <Button
+        android:id="@+id/delete_account_button_driver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/sign_in_button_background"
+        android:text="Delete Account"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:background="@drawable/sign_in_button_background"
-        android:textColor="@color/white"
-        android:id="@+id/delete_account_button_driver"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/update_info_btn_driver" />
 
 
 

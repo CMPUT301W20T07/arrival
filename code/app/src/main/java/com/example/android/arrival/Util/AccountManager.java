@@ -5,11 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.android.arrival.Activities.RiderProfileScreenActivity;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.Model.User;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -65,6 +62,10 @@ public class AccountManager {
             instance = new AccountManager();
         }
         return instance;
+    }
+
+    public String getUID() {
+        return firebaseAuth.getCurrentUser().getUid();
     }
 
     /**
@@ -261,7 +262,7 @@ public class AccountManager {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 String docData = documentSnapshot.get("type").toString();
                 accountType[0] = docData;
-                listener.onAccountSignIn(accountType[0]);
+                listener.onAccountTypeRetrieved(accountType[0]);
                 Log.d(TAG, "onSuccess: " + docData);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -294,7 +295,7 @@ public class AccountManager {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "onFailure: " + e.toString());
-                listener.onSignInFailure(e.toString());
+                listener.onAccountTypeRetrieveFailure(e.toString());
 
             }
         });
@@ -324,61 +325,48 @@ public class AccountManager {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        // delete user profile picture
-                        storage.getReference("images/"+uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        // find user type
+                        userRef.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                String type = documentSnapshot.get("type").toString();
 
-                                // find user type
-                                userRef.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                // delete user in Users look up table
+                                userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
-                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                        String type = documentSnapshot.get("type").toString();
+                                    public void onSuccess(Void aVoid) {
 
-                                        // delete user in Users look up table
-                                        userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-
-                                                // delete driver
-                                                if (type.equals(DRIVER_TYPE_STRING)) {
-                                                    driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            listener.onAccountDeleted();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.d(TAG, "onFailure: " + e.toString());
-                                                            listener.onAccountDeleteFailure(e.toString());
-                                                        }
-                                                    });
+                                        // delete driver
+                                        if (type.equals(DRIVER_TYPE_STRING)) {
+                                            driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    listener.onAccountDeleted();
                                                 }
-
-                                                // delete rider
-                                                else if (type.equals(RIDER_TYPE_STRING)) {
-                                                    riderRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            listener.onAccountDeleted();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.d(TAG, "onFailure: " + e.toString());
-                                                            listener.onAccountDeleteFailure(e.toString());
-                                                        }
-                                                    });
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "onFailure: " + e.toString());
+                                                    listener.onAccountDeleteFailure(e.toString());
                                                 }
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.d(TAG, "onFailure: " + e.toString());
-                                                listener.onAccountDeleteFailure(e.toString());
-                                            }
-                                        });
+                                            });
+                                        }
+
+                                        // delete rider
+                                        else if (type.equals(RIDER_TYPE_STRING)) {
+                                            riderRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    listener.onAccountDeleted();
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "onFailure: " + e.toString());
+                                                    listener.onAccountDeleteFailure(e.toString());
+                                                }
+                                            });
+                                        }
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -445,8 +433,8 @@ public class AccountManager {
      * gets download link of profile photo to set in in imageview
      * @param listener listener to send photo to
      */
-    public void getProfilePhoto(final AccountCallbackListener listener) {
-        String uid = firebaseAuth.getCurrentUser().getUid();
+    public void getProfilePhoto(final AccountCallbackListener listener, String uid) {
+
         StorageReference reference = storage.getReference().child("images/" + uid);
         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -611,6 +599,27 @@ public class AccountManager {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Driver driverData = documentSnapshot.toObject(Driver.class);
                 listener.onDriverDataRetrieved(driverData);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "get data onFailure: " + e.toString());
+                listener.onDataRetrieveFail(e.toString());
+            }
+        });
+    }
+
+    public void getRequestRider(String uid, final AccountCallbackListener listener) {
+        if(uid == null) {
+            return;
+        }
+
+        DocumentReference documentReference = riderRef.document(uid);
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Rider riderData = documentSnapshot.toObject(Rider.class);
+                listener.onRiderDataRetrieved(riderData);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
