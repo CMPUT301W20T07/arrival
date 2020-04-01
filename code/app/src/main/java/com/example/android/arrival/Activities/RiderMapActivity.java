@@ -1,17 +1,5 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -38,6 +26,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.android.arrival.Dialogs.DisplayQRDialog;
@@ -47,16 +46,14 @@ import com.example.android.arrival.Dialogs.RideRequestConfFrag;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.google.android.gms.location.LocationCallback;
-//import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -68,13 +65,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -83,6 +79,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+//import com.google.android.gms.common.api.GoogleApiClient;
 
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
@@ -134,6 +132,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView userEmailAddress;
     private ImageView profilePhoto;
     private MenuItem rideHistory;
+
+    private boolean shouldDisplayRatingDialog = false;
 
     @Override
     public void onBackPressed() {
@@ -356,10 +356,10 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
             } else if(currRequest.getStatus() == Request.COMPLETED) {
                 mMap.clear();
-//                addPickupMarker(pickup.getLatLng());
-//                addDestMarker(destination.getLatLng());
 
+                shouldDisplayRatingDialog = true;
                 getDriverDetails(currRequest);
+                currRequest = null;
 
 //                currRequest = null;
                 btnRequestRide.setVisibility(View.VISIBLE);
@@ -813,7 +813,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         if(driver.getID() != null && driver.getID() != "") {
             fragment = RateDriverFrag.newInstance(driver, driver.getID());
         } else {
-            fragment = RateDriverFrag.newInstance(driver, currRequest.getDriver());
+            return;
         }
         fragmentTransaction.add(0, fragment);
         fragmentTransaction.commit();
@@ -872,6 +872,10 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
+
+        if(req == null) {
+            return;
+        }
 
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
 
@@ -940,14 +944,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         myRiderObject = rider;
 
         //rm.getRiderRequests("usr-map-test", this);
-        rm.getRiderRequests(uid, this);
+//        rm.getRiderRequests(uid, this);
     }
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-        if(currRequest.getStatus() == Request.COMPLETED) {
+        Log.d(TAG, "onDriverDataRetrieved");
+        if(shouldDisplayRatingDialog) {
             currRequest = null;
-            Log.d(TAG, "onDriverDataRetrieved: " + currRequest.getStatus());
+            shouldDisplayRatingDialog = false;
             displayRateDriverDialog(driver);
         } else {
             displayDriverDetailsDialog(driver);
