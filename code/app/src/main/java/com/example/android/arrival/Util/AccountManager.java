@@ -322,61 +322,48 @@ public class AccountManager {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        // delete user profile picture
-                        storage.getReference("images/"+uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        // find user type
+                        userRef.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                String type = documentSnapshot.get("type").toString();
 
-                                // find user type
-                                userRef.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                // delete user in Users look up table
+                                userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
-                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                        String type = documentSnapshot.get("type").toString();
+                                    public void onSuccess(Void aVoid) {
 
-                                        // delete user in Users look up table
-                                        userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-
-                                                // delete driver
-                                                if (type.equals(DRIVER_TYPE_STRING)) {
-                                                    driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            listener.onAccountDeleted();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.d(TAG, "onFailure: " + e.toString());
-                                                            listener.onAccountDeleteFailure(e.toString());
-                                                        }
-                                                    });
+                                        // delete driver
+                                        if (type.equals(DRIVER_TYPE_STRING)) {
+                                            driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    listener.onAccountDeleted();
                                                 }
-
-                                                // delete rider
-                                                else if (type.equals(RIDER_TYPE_STRING)) {
-                                                    riderRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            listener.onAccountDeleted();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.d(TAG, "onFailure: " + e.toString());
-                                                            listener.onAccountDeleteFailure(e.toString());
-                                                        }
-                                                    });
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "onFailure: " + e.toString());
+                                                    listener.onAccountDeleteFailure(e.toString());
                                                 }
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.d(TAG, "onFailure: " + e.toString());
-                                                listener.onAccountDeleteFailure(e.toString());
-                                            }
-                                        });
+                                            });
+                                        }
+
+                                        // delete rider
+                                        else if (type.equals(RIDER_TYPE_STRING)) {
+                                            riderRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    listener.onAccountDeleted();
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "onFailure: " + e.toString());
+                                                    listener.onAccountDeleteFailure(e.toString());
+                                                }
+                                            });
+                                        }
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
