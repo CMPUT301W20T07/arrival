@@ -365,6 +365,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
             } else if (currRequest.getStatus() == Request.PICKED_UP) {
                 mMap.clear();
+                addPickupMarker(currRequest.getStartLocation().getLatLng());
                 addDestMarker(currRequest.getEndLocation().getLatLng());
 
                 btnDriverDetails.setVisibility(View.VISIBLE);
@@ -387,7 +388,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 shouldDisplayRatingDialog = true;
                 getDriverDetails(currRequest.getDriver());
                 currRequest = null;
-                updateInfo();
 
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);

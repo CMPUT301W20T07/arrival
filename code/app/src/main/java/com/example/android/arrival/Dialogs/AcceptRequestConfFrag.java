@@ -39,7 +39,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-//Add open request information to fragment
+//Show current request info, this is different for riders and drivers. Rider side contains
+//driver name, while driver side contains distance from driver to rider.
 
 public class AcceptRequestConfFrag extends DialogFragment {
     private String TAG  = "acceptRequest";
@@ -47,7 +48,6 @@ public class AcceptRequestConfFrag extends DialogFragment {
     private Request currRequest;
     private Marker marker;
     private String driverUID;
-//    private String riderName;
 
     private FirebaseFirestore fb;
     private RequestManager rm;
