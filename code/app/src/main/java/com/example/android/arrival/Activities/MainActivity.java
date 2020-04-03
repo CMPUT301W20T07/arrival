@@ -154,12 +154,12 @@ public class MainActivity extends AppCompatActivity implements AccountCallbackLi
 
 
     @Override
-    public void onAccountTypeRetrieved(String userType) {
+    public void onAccountSignIn(String userType) {
 
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
 
     }
 

@@ -47,14 +47,6 @@ public interface RequestCallbackListener {
 
     /**
      * Define what should happen when data is successfully retrieved
-     * using the RequestManger.getRiderOpenRequests() methods from the
-     * database and how it should update.
-     * @param snapshot
-     */
-    void onGetRiderOpenRequestsSuccess(QuerySnapshot snapshot);
-
-    /**
-     * Define what should happen when data is successfully retrieved
      * using the RequestManger.getDriverRequests() methods from the
      * database and how it should update.
      * @param snapshot

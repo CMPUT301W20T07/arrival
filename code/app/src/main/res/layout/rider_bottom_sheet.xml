@@ -14,7 +14,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="280dp"
         android:background="@drawable/rounded_bottom_sheet"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="false"
@@ -36,25 +36,6 @@
                 android:textAlignment="center"
                 android:textColor="@color/blackTint"
                 android:textSize="20sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true">
-
-                <TextView
-                    android:id="@+id/txtRiderStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="STATUS"
-                    android:textAlignment="textEnd"
-                    android:textColor="@color/black"
-                    android:fontFamily="@font/product_sans_regular"
-                    />
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -134,20 +115,11 @@
                     android:text="Request Ride"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="20sp"
-                    android:visibility="invisible"
-                    android:layout_centerHorizontal="true"/>
-
+                    android:textSize="20sp" />
                 <Button
                     android:id="@+id/cancelRideRequest"
                     android:layout_width="300dp"
                     android:layout_height="60dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginStart="56dp"
-                    android:layout_marginEnd="55dp"
-                    android:layout_marginBottom="0dp"
                     android:background="@drawable/arrival_button_blue_long"
                     android:fontFamily="@font/product_sans_regular"
                     android:text="Cancel Ride"
@@ -157,12 +129,8 @@
 
                 <Button
                     android:id="@+id/seeDriverDetails"
-                    android:layout_width="190dp"
+                    android:layout_width="300dp"
                     android:layout_height="60dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginEnd="0dp"
-                    android:layout_marginBottom="0dp"
                     android:background="@drawable/arrival_button_blue_long"
                     android:fontFamily="@font/product_sans_regular"
                     android:text="Driver Details"
@@ -171,31 +139,15 @@
                     android:textSize="20sp" />
 
                 <Button
-                    android:id="@+id/seeRequestDetails"
-                    android:layout_width="190dp"
-                    android:layout_height="60dp"
-                    android:layout_alignParentStart="true"
-                    android:background="@drawable/arrival_button_blue_long"
-                    android:fontFamily="@font/product_sans_regular"
-                    android:text="Request Details"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"/>
-
-                <Button
                     android:id="@+id/makePayment"
                     android:layout_width="300dp"
                     android:layout_height="60dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginBottom="0dp"
                     android:background="@drawable/arrival_button_blue_long"
                     android:fontFamily="@font/product_sans_regular"
                     android:text="Make Payment"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:visibility="invisible"
-                    android:textSize="20sp"
-                    android:layout_centerHorizontal="true"/>
+                    android:textSize="20sp" />
 
             </RelativeLayout>
 
@@ -203,6 +155,7 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

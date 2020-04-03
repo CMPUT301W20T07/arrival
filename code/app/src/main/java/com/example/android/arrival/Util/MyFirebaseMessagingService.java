@@ -70,11 +70,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
         db = FirebaseFirestore.getInstance();
 
         FirebaseUser user = fb.getCurrentUser();
-        if (user != null) {
-            userID = user.getUid();
-            am.getAccountType(userID, this);
-        }
-
+        userID = user.getUid();
+        am.getAccountType(userID, this);
+        
     }
 
     public void updateToken(String type) {
@@ -131,7 +129,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     }
 
     @Override
-    public void onAccountTypeRetrieved(String userType) {
+    public void onAccountSignIn(String userType) {
 
         if (userType != null) {
             updateToken(userType);
@@ -140,7 +138,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
 
     }
 

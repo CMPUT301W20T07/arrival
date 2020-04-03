@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,33 +20,27 @@ import com.example.android.arrival.Model.Notification;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.Model.User;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-//Show current request info, this is different for riders and drivers. Rider side contains
-//driver name, while driver side contains distance from driver to rider.
+//Add open request information to fragment
 
 public class AcceptRequestConfFrag extends DialogFragment {
     private String TAG  = "acceptRequest";
 
     private Request currRequest;
     private Marker marker;
-    private String driverUID;
 
     private FirebaseFirestore fb;
     private RequestManager rm;
@@ -61,8 +54,6 @@ public class AcceptRequestConfFrag extends DialogFragment {
 
         super.onCreate(savedInstanceState);
 
-        Log.d("Request", "Creating accept dialog");
-
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
 
@@ -70,105 +61,58 @@ public class AcceptRequestConfFrag extends DialogFragment {
 
         TextView custName = view.findViewById(R.id.custNameValue);
         TextView custDestination = view.findViewById(R.id.custDestinationValue);
-        TextView distanceToCust = view.findViewById(R.id.distanceToCust);
-        TextView distanceToCustVal = view.findViewById(R.id.distanceToCustValue);
+        TextView distanceToCust = view.findViewById(R.id.distanceToCustValue);
         TextView custDistanceToDestination = view.findViewById(R.id.custDistanceToDestinationValue);
         TextView estTime = view.findViewById(R.id.estTimeValue);
         TextView custPaymentOffer = view.findViewById(R.id.custPaymentOfferValue);
-        TextView driverName = view.findViewById(R.id.driverName);
-        TextView driverNameVal = view.findViewById(R.id.driverNameValue);
 
-
-        String userType = (String) getArguments().getSerializable("userType");
+        //Info passed from DriverMapActivity
+        ArrayList<Marker> markers = (ArrayList<Marker>)getArguments().getSerializable("markerLocation");
         currRequest = (Request) getArguments().getSerializable("currentRequest");
+        String driverName = (String) getArguments().getSerializable("driverName");
+        double driverLat = (double) getArguments().getSerializable("driverLat");
+        double driverLon = (double) getArguments().getSerializable("driverLon");
 
-        if (userType.equals("driver")) {
-            //Info passed from DriverMapActivity
-            ArrayList<Marker> markers = (ArrayList<Marker>) getArguments().getSerializable("markerLocation");
-            driverUID = (String) getArguments().getSerializable("driverUID");
-            double driverLat = (double) getArguments().getSerializable("driverLat");
-            double driverLon = (double) getArguments().getSerializable("driverLon");
-            marker = markers.get(0);
-            double distanceFromDriverToLocation = distance(currRequest.getStartLocation().getLat(), driverLat, currRequest.getStartLocation().getLon(), driverLon);
-            distanceToCustVal.setText(format.format((int) distanceFromDriverToLocation));
-            distanceToCust.setVisibility(View.VISIBLE);
-            distanceToCustVal.setVisibility(View.VISIBLE);
-            driverName.setVisibility(View.INVISIBLE);
-            driverNameVal.setVisibility(View.INVISIBLE);
+        assert currRequest != null;
+
+        marker = markers.get(0);
+        if (currRequest.getStartLocation().getLat() == marker.getPosition().latitude && currRequest.getStartLocation().getLon() == marker.getPosition().longitude) {
+
+            String riderName = currRequest.getRider();
+            Place startLocation = currRequest.getStartLocation();
+            Place endLocation = currRequest.getEndLocation();
+            Float fare = currRequest.getFare();
+
+
+            custName.setText(riderName);
+            custDestination.setText(endLocation.getAddress());
+
+            double distanceFromDriverToLocation = distance(startLocation.getLat(), driverLat, startLocation.getLon(), driverLon);
+            distanceToCust.setText(format.format((int) distanceFromDriverToLocation));
+
+            double distanceFromRiderStartToEnd = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
+            custDistanceToDestination.setText(format.format((int) distanceFromRiderStartToEnd));
+
+            estTime.setText(format.format((int) (distanceFromRiderStartToEnd / 180)));
+
+            custPaymentOffer.setText(format.format(fare));
         }
 
-        if (userType.equals("rider"))
-        {
-            driverName.setVisibility(View.VISIBLE);
-            driverNameVal.setVisibility(View.VISIBLE);
-            distanceToCust.setVisibility(View.INVISIBLE);
-            distanceToCustVal.setVisibility(View.INVISIBLE);
-            DocumentReference documentReference = fb.collection("drivers")
-                    .document(currRequest.getDriver());
-            documentReference.get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            driverNameVal.setText((String) documentSnapshot.get("name"));
-                        }
-                    });
-        }
-
-        if (currRequest == null) {
-            return null;
-        }
-        else {
-                Place startLocation = currRequest.getStartLocation();
-                Place endLocation = currRequest.getEndLocation();
-                Float fare = currRequest.getFare();
-
-                DocumentReference documentReference = fb.collection("riders").document(currRequest.getRider());
-                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        return builder
+                .setView(view)
+                .setTitle("Accept Ride Request")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        custName.setText((String) documentSnapshot.get("name"));
-                    }
-                });
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("AcceptRequestFrag", "OK clicked");
+                        currRequest.setStatus(Request.ACCEPTED);
+                        currRequest.setDriver(driverName);
+                        rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
 
-                custDestination.setText(endLocation.getAddress());
-
-                double distanceFromRiderStartToEnd = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
-                custDistanceToDestination.setText(format.format((int) distanceFromRiderStartToEnd));
-
-                estTime.setText(format.format((int) (distanceFromRiderStartToEnd / 180)));
-
-                custPaymentOffer.setText(format.format(fare));
-
-        }
-
-        if (currRequest.getStatus() == 0 && userType.equals("driver")) {
-            distanceToCust.setVisibility(View.VISIBLE);
-            distanceToCustVal.setVisibility(View.VISIBLE);
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            return builder
-                    .setView(view)
-                    .setTitle("Accept Ride Request")
-                    .setNegativeButton("Cancel", null)
-                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Log.d("AcceptRequestFrag", "OK clicked");
-                            currRequest.setStatus(Request.ACCEPTED);
-                            currRequest.setDriver(driverUID);
-                            rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
-
-                            getRiderToken();
-                        }
-                    }).create();
-        }
-        else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            return builder
-                    .setView(view)
-                    .setTitle("Current Request")
-                    .setNegativeButton("Close", null)
-                    .create();
-        }
+                        getRiderToken();
+                    }}).create();
     }
 
     public void getRiderToken() {
@@ -193,23 +137,17 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void notifyRider(String riderToken) {
-        try {
-            Log.d("Notification", "Rider Token: " + riderToken);
+        Log.d("Notification", "Rider Token: " + riderToken);
 
-            if (riderToken != null) {
-                Notification notification = new Notification(context, riderToken,
-                        "Ride Request Status Update", "A driver has accepted your request");
-                notification.sendNotification();
-            }
-        } catch (Exception e) {
-
+        if (riderToken != null) {
+            Notification notification = new Notification(context, riderToken,
+                    "Ride Request Status Update", "A driver has accepted your request");
+            notification.sendNotification();
         }
     }
 
 
-    //GeeksforGeeks by Twinkl Bajaj (https://auth.geeksforgeeks.org/user/Twinkl%20Bajaj/articles)
-    // "Program for distance between two points on earth"
-    // https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
         // The math module contains a function named toRadians which converts from degrees to radians.
