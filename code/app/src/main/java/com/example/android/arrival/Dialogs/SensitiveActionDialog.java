@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -15,12 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.android.arrival.Activities.RiderProfileScreenActivity;
-import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.R;
 
 /**
- * this dialog pops up for any action that requires reauthentication of user
+ * DialogFragment displayed for any action that requires re-authentication of user
  */
 public class SensitiveActionDialog extends DialogFragment {
 

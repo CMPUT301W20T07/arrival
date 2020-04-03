@@ -14,6 +14,9 @@ import com.example.android.arrival.R;
 
 import java.util.ArrayList;
 
+/**
+ * ArrayAdapter for the search suggestion dialog
+ */
 public class CustomSuggestionList extends ArrayAdapter<Place> {
 
     private ArrayList<Place> loc;
@@ -24,8 +27,6 @@ public class CustomSuggestionList extends ArrayAdapter<Place> {
         this.loc = loc;
         this.context = context;
     }
-
-
 
     @NonNull
     @Override

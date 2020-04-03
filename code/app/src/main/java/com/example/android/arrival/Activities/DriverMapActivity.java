@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +45,6 @@ import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
-import com.example.android.arrival.Util.RequestAdapter;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -78,10 +76,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-//Drivers map, contains the driver's locations, markers of open requests
-//when marker is pressed info pops up about marker
-//can accept requests, pick up riders, drop them off, and receive payment
-
+/**
+ * Android Activity that displays the Driver's Map. Allows Drivers
+ * to accept requests, pick up riders, drop them off, and receive payment
+ */
 public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "DriverMapActivity";
@@ -272,6 +270,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * Refreshes the app the every REFRESH_INTERVAL seconds
+     */
     Runnable runner =  new Runnable() {
         @Override
         public void run() {
@@ -311,22 +312,19 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         return true;
     }
 
+    /**
+     * Fetches information relative to the current user and current request
+     */
     public void refresh() {
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
-        } else {
-            // FOR TESTING: If you want to test and spare the time of
-            // creating a new request, uncomment this line. Then you
-            // can just manipulate it in FireBase and refresh with the
-            // refresh button. Ex. changing status. Doc w/ ID = 1
-//             rm.getRequest("1", this);
         }
     }
 
 
     /**
-     * Check the ride status and update the activity to match the status
+     * Updates the UI relative the current request's status
      */
     public void updateInfo() {
         Log.d(TAG, "Updating info...");

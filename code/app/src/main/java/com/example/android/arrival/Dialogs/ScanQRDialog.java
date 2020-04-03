@@ -5,12 +5,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -31,10 +27,13 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
-import java.util.Objects;
 
+/**
+ * DialogFragment displayed when scanning a QR for payment.
+ * Opens the scanner for a Driver to scan the Rider's QR code
+ * and receive payment.
+ */
 public class ScanQRDialog extends DialogFragment {
-
 
     private SurfaceView cameraView;
     private BarcodeDetector barcode;
@@ -43,8 +42,6 @@ public class ScanQRDialog extends DialogFragment {
     private TextView showQRTV;
     private OnFragmentInteractionListener listener;
     private String result;
-
-
 
     @NonNull
     @Override

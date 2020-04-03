@@ -84,6 +84,10 @@ import java.util.List;
 
 //import com.google.android.gms.common.api.GoogleApiClient;
 
+/**
+ * Android Activity that displays the Rider's Map. Allows Riders to make requests,
+ * view their request's status, cancel requests, make payments, and rate drivers
+ */
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
@@ -260,6 +264,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         rm.getRiderOpenRequests(uid, this);
     }
 
+    /**
+     * Refreshes the app the every REFRESH_INTERVAL seconds
+     */
     Runnable runner =  new Runnable() {
         @Override
         public void run() {
@@ -297,6 +304,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         return true;
     }
 
+    /**
+     * Fetches information relative to the current user and current request
+     */
     public void refresh() {
         Log.d(TAG, "refreshing...");
         if(currRequest != null) {
@@ -305,13 +315,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             accountManager.getUserData(this);
             Log.d(TAG, currRequest.toString());
         } else {
-            // For testing
-//            rm.getRequest("427939185967584", this);
             rm.getRiderOpenRequests(uid, this);
             updateInfo();
         }
     }
 
+    /**
+     * Updates the UI relative the current request's status
+     */
     public void updateInfo() {
         if (currRequest == null) {
             txtStatus.setText("");

@@ -24,6 +24,10 @@ import com.google.zxing.common.BitMatrix;
     Link: https://www.android-examples.com/generate-qr-code-in-android-using-zxing-library-in-android-studio/
  */
 
+/**
+ * DialogFragment displayed when generating a QR for payment.
+ * Generates and displays a QR to be scanned by a Driver.
+ */
 public class DisplayQRDialog extends DialogFragment {
 
 

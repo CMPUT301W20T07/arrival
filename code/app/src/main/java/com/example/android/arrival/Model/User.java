@@ -1,9 +1,10 @@
 package com.example.android.arrival.Model;
 
-import android.graphics.Bitmap;
-
 import java.io.Serializable;
 
+/**
+ * Data Object superclass that represents all Users
+ */
 public class User implements Serializable {
 
     private String id;
