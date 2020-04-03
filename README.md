@@ -5,7 +5,7 @@
 Arrival is a simple, user-friendly Edmonton-based ride sharing platform for Android that allows users to request rides within the city.
 It is a mobile application that allows riders to make ride requests and drivers to see and accept requests in their area. Users can sign up as drivers or riders. Requests are automatically updated every few seconds.
 
-<br><br><br><br><br><br><br><br><br>
+<br><br><br><br>
 
 ## Features
 
