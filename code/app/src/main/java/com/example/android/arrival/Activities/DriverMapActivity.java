@@ -544,7 +544,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if (queryDocumentSnapshots.toObjects(Request.class) != null && queryDocumentSnapshots.size() != 0) {
+                queryDocumentSnapshots.toObjects(Request.class);
+                if (queryDocumentSnapshots.size() != 0) {
                     currRequest = (Request) queryDocumentSnapshots.toObjects(Request.class).get(0);
                     if (currRequest.getStatus() == 1) {
                         MarkerOptions markerOptions = new MarkerOptions();
