@@ -207,7 +207,9 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
 
-    //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    //GeeksforGeeks by Twinkl Bajaj (https://auth.geeksforgeeks.org/user/Twinkl%20Bajaj/articles)
+    // "Program for distance between two points on earth"
+    // https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
         // The math module contains a function named toRadians which converts from degrees to radians.

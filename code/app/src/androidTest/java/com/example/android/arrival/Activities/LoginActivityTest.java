@@ -18,6 +18,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static junit.framework.TestCase.assertNotNull;
 
+// Youtube video by Learn Share Anything Anyone (https://www.youtube.com/channel/UClq3QxwbzVVoTdyccHla0-g)
+// "Android app development for beginners - 26 - Android - Unit test for Activity - Activity Test Rule"
+// https://www.youtube.com/watch?v=_TR6QcRozAg
 public class LoginActivityTest {
     @Rule
     public ActivityTestRule<LoginActivity> lActivityTestRule = new ActivityTestRule<>(LoginActivity.class, true, true);

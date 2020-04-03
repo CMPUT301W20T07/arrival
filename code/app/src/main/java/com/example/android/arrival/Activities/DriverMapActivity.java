@@ -316,11 +316,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
         } else {
-            // FOR TESTING: If you want to test and spare the time of
-            // creating a new request, uncomment this line. Then you
-            // can just manipulate it in FireBase and refresh with the
-            // refresh button. Ex. changing status. Doc w/ ID = 1
-//             rm.getRequest("1", this);
         }
     }
 
@@ -590,24 +585,26 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     public void updateDriverPosition(){
-        Map<String, Object> driverInfo = new HashMap<>();
-        driverInfo.put("lat", currentLocation.getLatitude());
-        driverInfo.put("lon", currentLocation.getLongitude());
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Map<String, Object> driverInfo = new HashMap<>();
+            driverInfo.put("lat", currentLocation.getLatitude());
+            driverInfo.put("lon", currentLocation.getLongitude());
 
-        fb.collection("availableDrivers").document(driverUID)
-                .update(driverInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("driverLocation", "null");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("driverLocation", "not null", e);
-                    }
-                });
+            fb.collection("availableDrivers").document(driverUID)
+                    .update(driverInfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("driverLocation", "null");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("driverLocation", "not null", e);
+                        }
+                    });
+        }
     }
 
     /**
@@ -617,31 +614,34 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onStop() {
         super.onStop();
 
-        Map<String, Object> driverInfo = new HashMap<>();
-        driverInfo.put("lat", null);
-        driverInfo.put("lon", null);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Map<String, Object> driverInfo = new HashMap<>();
+            driverInfo.put("lat", null);
+            driverInfo.put("lon", null);
 
-        fb.collection("availableDrivers").document(driverUID)
-                .update(driverInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("driverLocation", "null");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("driverLocation", "not null", e);
-                    }
-                });
+            fb.collection("availableDrivers").document(driverUID)
+                    .update(driverInfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("driverLocation", "null");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("driverLocation", "not null", e);
+                        }
+                    });
+        }
     }
 
     /**
      * Check if the map activity is open
      */
-//    Stackoverflow post by virsir https://stackoverflow.com/users/238061/virsir
-//    Answer https://stackoverflow.com/questions/3262157/how-to-check-if-my-activity-is-the-current-activity-running-in-the-screen
+    //Stackoverflow post by virsir https://stackoverflow.com/users/238061/virsir
+    // "How to check if my activity is the current activity running in the screen"
+    // Answer https://stackoverflow.com/questions/3262157/how-to-check-if-my-activity-is-the-current-activity-running-in-the-screen
     @Override
     public void onResume() {
         super.onResume();
@@ -660,7 +660,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         handler.removeCallbacks(runner);
 
-        updateDriverPosition();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            updateDriverPosition();
+        }
     }
 
     /**
@@ -719,7 +721,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
      * @param lon2
      * @return
      */
-    //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    // GeeksforGeeks by Twinkl Bajaj (https://auth.geeksforgeeks.org/user/Twinkl%20Bajaj/articles)
+    // "Program for distance between two points on earth"
+    // https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
         // The math module contains a function named toRadians which converts from degrees to radians.
@@ -789,7 +793,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 double distanceToPickUp = distance(currentLocation.getLatitude(), request.getStartLocation().getLat(),
                         currentLocation.getLongitude(), request.getStartLocation().getLon());
 
-                //TODO change this later just for testing on emulator
             if(distanceToPickUp <= 2.0)
             {
                 MarkerOptions markerOptions = new MarkerOptions();
