@@ -22,9 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.DriverReviewActivity"></activity>
-        <activity android:name=".Activities.RideHistoryActivity" />
-        <activity android:name=".Activities.DriverProfileScreenActivity" />
+        <activity android:name=".Activities.DriverProfileScreenActivity"></activity>
         <activity android:name=".Activities.RiderProfileScreenActivity" />
         <activity android:name=".Activities.RequestTestActivity" />
         <activity android:name=".Activities.RegistrationActivity" />

@@ -76,7 +76,7 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
     }
 
     @Override
-    public void onAccountTypeRetrieved(String userType) {
+    public void onAccountSignIn(String userType) {
         if (userType.equals(DRIVER_TYPE_STRING)) {
             Intent intent = new Intent(SplashActivity.this, DriverMapActivity.class);
             startActivity(intent);
@@ -93,7 +93,7 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
         Log.d(TAG, "onFailure: could not get document: " + e);
         Toast.makeText(SplashActivity.this, "There was an error", Toast.LENGTH_SHORT).show();
     }

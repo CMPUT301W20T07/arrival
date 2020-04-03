@@ -34,12 +34,11 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:hint="Name"
-        android:maxLines="1"
         android:background="@drawable/edit_text_box"
         android:padding="8dp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:inputType="textCapWords"
+        android:inputType="textPersonName"
         android:id="@+id/user_name_editText"
         />
 
