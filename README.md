@@ -28,8 +28,7 @@ Arrival requires the following permissions:
 | :---: | :---: | :---: | :---: | :---: | :---: |
 | Reilly Keele | Jessica Brownell| Jason Branch-Allen| Sirak Radaa| Nana Andoh | Keshinee Moonian|
 
-## License
+## License and Citations
 This application is licensed under the [Apache License, Version 2.0](https://github.com/CMPUT301W20T07/arrival/wiki/Glossary#license)
-
-## Citations
-https://github.com/CMPUT301W20T07/arrival/wiki/Citations
+<br><br>
+Refrences and citations for the project can be found [here](https://github.com/CMPUT301W20T07/arrival/wiki/Citations).
