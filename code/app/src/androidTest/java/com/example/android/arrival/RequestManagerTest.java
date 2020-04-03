@@ -1,5 +1,5 @@
 package com.example.android.arrival;
-/*
+
 import android.app.Activity;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -22,7 +22,7 @@ import static junit.framework.TestCase.assertTrue;
  * Provides testing of the RequestManager to verify correct
  * additions, deletions, updates and callbacks from the
  * Firebase FireStore Cloud Database.
- *//*
+ */
 public class RequestManagerTest {
 
     private Solo solo;
@@ -47,50 +47,49 @@ public class RequestManagerTest {
     public void start() throws Exception {
         Activity activity = rule.getActivity();
     }
-*/
+
     /**
      * Test opening a Request, updating a list of current requests,
      * deleting a request.
-     *//*
-    @Test
-    public void testOpenRequest() {
-        solo.assertCurrentActivity("Wrong Activity", RequestTestActivity.class);
-
-        RequestManager rm = RequestManager.getInstance();
-
-        // Open request
-        Request req = mockRequest();
-        rm.openRequest(req, (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(solo.waitForText("rm-test-user", 1, 5000)); // Wait for entry
-
-        // Delete request
-        rm.deleteRequest(req.getID(), (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(!solo.waitForText("rm-test-user", 1, 2000)); // Wait for entry
-    }*/
+     */
+//    @Test
+//    public void testOpenRequest() {
+//        solo.assertCurrentActivity("Wrong Activity", RequestTestActivity.class);
+//
+//        RequestManager rm = RequestManager.getInstance();
+//
+//        // Open request
+//        Request req = mockRequest();
+//        rm.openRequest(req, (RequestCallbackListener) solo.getCurrentActivity());
+//        assertTrue(solo.waitForText("rm-test-user", 1, 5000)); // Wait for entry
+//
+//        // Delete request
+//        rm.deleteRequest(req.getID(), (RequestCallbackListener) solo.getCurrentActivity());
+//        assertTrue(!solo.waitForText("rm-test-user", 1, 2000)); // Wait for entry
+//    }
 
     /**
      * Test opening a Request, updating a list of currently open requests
      * updating the request, and the deleting the request.
-     *//*
-    @Test
-    public void testUpdateRequest() {
-        solo.assertCurrentActivity("Wrong Activity", RequestTestActivity.class);
-
-        RequestManager rm = RequestManager.getInstance();
-
-        // Open request
-        Request req = mockRequest();
-        rm.openRequest(req, (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(solo.waitForText("rm-test-user", 1, 5000)); // Wait for entry
-
-        // Update request
-        req.setFare(17.38f);
-        rm.updateRequest(req, (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(solo.waitForText("" + 17.38f, 1, 2000)); // Wait for entry
-
-        // Delete request
-        rm.deleteRequest(req.getID(), (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(!solo.waitForText("rm-test-user", 1, 2000)); // Wait for entry
-    }
+     */
+//    @Test
+//    public void testUpdateRequest() {
+//        solo.assertCurrentActivity("Wrong Activity", RequestTestActivity.class);
+//
+//        RequestManager rm = RequestManager.getInstance();
+//
+//        // Open request
+//        Request req = mockRequest();
+//        rm.openRequest(req, (RequestCallbackListener) solo.getCurrentActivity());
+//        assertTrue(solo.waitForText("rm-test-user", 1, 5000)); // Wait for entry
+//
+//        // Update request
+//        req.setFare(17.38f);
+//        rm.updateRequest(req, (RequestCallbackListener) solo.getCurrentActivity());
+//        assertTrue(solo.waitForText("" + 17.38f, 1, 2000)); // Wait for entry
+//
+//        // Delete request
+//        rm.deleteRequest(req.getID(), (RequestCallbackListener) solo.getCurrentActivity());
+//        assertTrue(!solo.waitForText("rm-test-user", 1, 2000)); // Wait for entry
+//    }
 }
-*/
