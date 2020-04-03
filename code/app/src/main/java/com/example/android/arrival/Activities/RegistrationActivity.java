@@ -156,7 +156,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (requestCode == GALLERY_RC &&data != null) {
             try {
                 filePath = data.getData();
-                Bitmap bitmap = null;
+                Bitmap bitmap;
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filePath);
                 profileImage.setImageBitmap(bitmap);
             } catch (IOException e) {
@@ -195,7 +195,8 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (filePath == null) {
             Snackbar.make(profileImage, "Please input a photo", Snackbar.LENGTH_SHORT).show();
         }
-        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty() && filePath == null)) {
+        if (!em.isEmpty() && !pwd.isEmpty() && !uName.isEmpty() && !uPhoneNumber.isEmpty() && filePath != null) {
+            Log.d(TAG, "riderSignUp: " + filePath);
             Rider rider = new Rider(em, uName, uPhoneNumber, uTokenId);
             accountManager.createRiderAccount(rider, pwd, this);
         } else {
@@ -224,7 +225,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (uPhoneNumber.isEmpty()) {
             txtPhoneNumber.setError("Please input your phoneNumber");
         }
-        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+        if (!em.isEmpty() && !pwd.isEmpty() && !uName.isEmpty() && !uPhoneNumber.isEmpty() && filePath != null){
             Driver driver = new Driver(em, uName, uPhoneNumber, uTokenId, driverCar);
             accountManager.createDriverAccount(driver, pwd, this);
         }

@@ -1,52 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:padding="16dp"
+    xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <LinearLayout
+
+    <EditText
+        android:id="@+id/edit_make"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:hint="Make"
+        android:inputType="textCapWords" />
 
-        <EditText
-            android:id="@+id/edit_make"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Make"
-            android:inputType="textCapWords" />
+    <EditText
+        android:id="@+id/edit_model"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Model"
+        android:inputType="textCapWords" />
 
-        <EditText
-            android:id="@+id/edit_model"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Model"
-            android:inputType="textCapWords" />
+    <EditText
+        android:id="@+id/edit_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Year"
+        android:inputType="number"/>
 
-        <EditText
-            android:id="@+id/edit_year"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Year"
-            android:inputType="textCapWords" />
+    <EditText
+        android:id="@+id/edit_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Color"
+        android:inputType="textCapWords" />
 
-        <EditText
-            android:id="@+id/edit_color"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Color"
-            android:inputType="textCapWords" />
+    <EditText
+        android:id="@+id/edit_plate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="License Plate Number"
+        android:inputType="textCapCharacters" />
 
-        <EditText
-            android:id="@+id/edit_plate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="License Plate Number"
-            android:inputType="textCapCharacters" />
-
-    </LinearLayout>
-
-
-</RelativeLayout>
+</LinearLayout>
