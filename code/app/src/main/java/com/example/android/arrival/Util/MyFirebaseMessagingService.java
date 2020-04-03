@@ -70,9 +70,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
         db = FirebaseFirestore.getInstance();
 
         FirebaseUser user = fb.getCurrentUser();
-        userID = user.getUid();
-        am.getAccountType(userID, this);
-        
+        if (user != null) {
+            userID = user.getUid();
+            am.getAccountType(userID, this);
+        }
+
     }
 
     public void updateToken(String type) {
