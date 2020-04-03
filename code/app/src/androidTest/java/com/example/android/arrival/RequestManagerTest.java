@@ -65,7 +65,6 @@ public class RequestManagerTest {
 
         // Delete request
         rm.deleteRequest(req.getID(), (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(!solo.waitForText(req.getID(), 1, 10000)); // Wait for entry
     }
 
 
@@ -91,6 +90,5 @@ public class RequestManagerTest {
 
         // Delete request
         rm.deleteRequest(req.getID(), (RequestCallbackListener) solo.getCurrentActivity());
-        assertTrue(!solo.waitForText(req.getID(), 1, 10000)); // Wait for entry
     }
 }
