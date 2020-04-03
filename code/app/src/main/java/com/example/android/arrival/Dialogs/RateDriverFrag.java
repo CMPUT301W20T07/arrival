@@ -2,26 +2,19 @@ package com.example.android.arrival.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-
 import com.example.android.arrival.Model.Driver;
-import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
-import com.example.android.arrival.Util.RequestCallbackListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -82,7 +75,7 @@ public class RateDriverFrag extends DialogFragment {
         btnUpvote = view.findViewById(R.id.btnUpvote);
         btnDownvote = view.findViewById(R.id.btnDownvote);
 
-        txtDriverName.setText(driver.getName());
+        txtDriverName.setText("How would was your ride with " + driver.getName() + "?");
 
         btnUpvote.setOnClickListener(new View.OnClickListener() {
             @Override
