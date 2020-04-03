@@ -152,9 +152,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         fb = FirebaseFirestore.getInstance();
         rm = RequestManager.getInstance();
 
-        // Get camera permissions
-//        checkPermissions(getApplicationContext());
-
         // Bind components
         btnCancelRide = findViewById(R.id.driverCancelRide);
         btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
@@ -327,6 +324,10 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+
+    /**
+     * Check the ride status and update the activity to match the status
+     */
     public void updateInfo() {
         Log.d(TAG, "Updating info...");
         if (currRequest == null) {
@@ -401,6 +402,10 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    /**
+     * Check for camera permissions to scan QR code
+     * @param context
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void checkPermissions(Context context){
         if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -408,6 +413,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    /**
+     * Open the qr scanner
+     */
     public void openScanner() {
         FragmentTransaction fm = getSupportFragmentManager().beginTransaction();
         ScanQRDialog scanQRDialog = new ScanQRDialog();
@@ -477,6 +485,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
+    /**
+     * finding requests by pressing an area on the map to see all available requests within 2km
+     */
     public void findRequestsByLocation() {
         if (currRequest == null) {
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -538,6 +549,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         }
     };
 
+    /**
+     * Check for current requests when the app is opened to make sure the driver
+     * does not have more than one current request or to retrieve the request
+     * if a crash happens
+     */
     public void getCurrentRequest(){
         fb.collectionGroup("requests")
                 .whereEqualTo("driver", driverUID)
@@ -644,26 +660,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         handler.removeCallbacks(runner);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Map<String, Object> driverInfo = new HashMap<>();
-            driverInfo.put("lat", currentLocation.getLatitude());
-            driverInfo.put("lon", currentLocation.getLongitude());
-
-            fb.collection("availableDrivers").document(driverUID)
-                    .set(driverInfo)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("driverLocation", "null");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("driverLocation", "not null", e);
-                        }
-                    });
-        }
+        updateDriverPosition();
     }
 
     /**
@@ -714,6 +711,14 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    /**
+     * Get the distance between 2 points
+     * @param lat1
+     * @param lat2
+     * @param lon1
+     * @param lon2
+     * @return
+     */
     //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
@@ -778,22 +783,20 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.clear();
 
         if (placedMarkerLocation == null) {
-            for (int i = 0; i < requestsList.size(); i++) {
+            for (int i = 0; i < requestsList.size(); i++)
+            {
                 Request request = requestsList.get(i);
                 double distanceToPickUp = distance(currentLocation.getLatitude(), request.getStartLocation().getLat(),
                         currentLocation.getLongitude(), request.getStartLocation().getLon());
 
+                //TODO change this later just for testing on emulator
+            if(distanceToPickUp <= 2.0)
+            {
                 MarkerOptions markerOptions = new MarkerOptions();
+
                 markerOptions.position(request.getStartLocation().getLatLng());
                 mMap.addMarker(markerOptions);
-
-                //TODO change this later just for testing on emulator
-//            if(distanceToPickUp <= 2.0) {
-//                MarkerOptions markerOptions = new MarkerOptions();
-//
-//                markerOptions.position(request.getStartLocation().getLatLng());
-//                mMap.addMarker(markerOptions);
-//            }
+            }
             }
         } else {
             for (int i = 0; i < requestsList.size(); i++) {
