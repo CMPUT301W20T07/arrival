@@ -395,6 +395,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnRequestDetails.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
                 txtEndLocation.setText("");
+                pickupMarker.remove();
+                destMarker.remove();
+                line.remove();
             }
         }
     }
@@ -682,6 +685,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 marks.set(0, pickup);
             }
 
+
+        if(marks.size() < 1) {
+            marks.add(pickup);
+        } else {
+            marks.set(0, pickup);
+        }
 
             addLine();
         }
