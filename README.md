@@ -1,3 +1,5 @@
+<img src="https://github.com/CMPUT301W20T07/arrival/blob/photos/doc/Photos/ArrivalLogoBanner-01.png">
+
 # Arrival
 
 <img src="https://raw.githubusercontent.com/CMPUT301W20T07/arrival/master/code/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" align="left" width="200" hspace="10" vspace="10">
