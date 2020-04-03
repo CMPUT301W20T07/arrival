@@ -70,10 +70,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
         db = FirebaseFirestore.getInstance();
 
         FirebaseUser user = fb.getCurrentUser();
-        if (user != null) {
-            userID = user.getUid();
-            am.getAccountType(userID, this);
-        }
+        userID = user.getUid();
+        am.getAccountType(userID, this);
+
 
     }
 

@@ -167,6 +167,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void getRiderToken() {
+        Log.d("Notifications", "In getRiderToken");
         String uid = currRequest.getRider();
         final String[] token = new String[1];
 
@@ -176,13 +177,13 @@ public class AcceptRequestConfFrag extends DialogFragment {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Rider riderData = documentSnapshot.toObject(Rider.class);
                 token[0] = riderData.getTokenId();
-                Log.d(TAG, "Token in getRiderToken: " + token[0]);
+                Log.d("Notifications", "Token in getRiderToken: " + token[0]);
                 notifyRider(token[0]);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "get data onFailure: " + e.toString());
+                Log.d("Notifications", "get data onFailure: " + e.toString());
             }
         });
     }
