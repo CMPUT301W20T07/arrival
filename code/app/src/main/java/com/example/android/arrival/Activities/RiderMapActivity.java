@@ -149,7 +149,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-
     /**
      * When activity is initially called we set up some basic location items needed later
      *
@@ -661,22 +660,29 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
      * @param latLng : set of lat/lon coordinates
      */
     public void addPickupMarker(LatLng latLng) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.draggable(false);
-        markerOptions.title("Pickup Location");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        pickupMarker = mMap.addMarker(markerOptions);
+        if(mMap != null) {
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.draggable(false);
+            markerOptions.title("Pickup Location");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            pickupMarker = mMap.addMarker(markerOptions);
 
-        Address pickupAddress = getCurrentLocationAddress(pickupMarker);
-        pickup.setName(pickupAddress.getFeatureName());
-        pickup.setAddress(pickupAddress.getAddressLine(0));
-        pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-        txtStartLocation.setText(pickup.getAddress());
+            Address pickupAddress = getCurrentLocationAddress(pickupMarker);
+            pickup.setName(pickupAddress.getFeatureName());
+            pickup.setAddress(pickupAddress.getAddressLine(0));
+            pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+            txtStartLocation.setText(pickup.getAddress());
 
-        marks.set(0, pickup);
+            if(marks.size() < 1) {
+                marks.add(pickup);
+            } else {
+                marks.set(0, pickup);
+            }
 
-        addLine();
+
+            addLine();
+        }
     }
 
 
