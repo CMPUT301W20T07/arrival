@@ -21,18 +21,22 @@ import com.example.android.arrival.Model.Notification;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
+import com.example.android.arrival.Model.User;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 //Add open request information to fragment
@@ -43,6 +47,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
     private Request currRequest;
     private Marker marker;
     private String driverUID;
+//    private String riderName;
 
     private FirebaseFirestore fb;
     private RequestManager rm;
@@ -77,9 +82,6 @@ public class AcceptRequestConfFrag extends DialogFragment {
         String userType = (String) getArguments().getSerializable("userType");
         currRequest = (Request) getArguments().getSerializable("currentRequest");
 
-        System.out.println(userType);
-        System.out.println("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST");
-
         if (userType.equals("driver")) {
             //Info passed from DriverMapActivity
             ArrayList<Marker> markers = (ArrayList<Marker>) getArguments().getSerializable("markerLocation");
@@ -101,20 +103,33 @@ public class AcceptRequestConfFrag extends DialogFragment {
             driverNameVal.setVisibility(View.VISIBLE);
             distanceToCust.setVisibility(View.INVISIBLE);
             distanceToCustVal.setVisibility(View.INVISIBLE);
-            driverNameVal.setText(currRequest.getDriver());
+            DocumentReference documentReference = fb.collection("drivers")
+                    .document(currRequest.getDriver());
+            documentReference.get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            driverNameVal.setText((String) documentSnapshot.get("name"));
+                        }
+                    });
         }
 
         if (currRequest == null) {
             return null;
         }
         else {
-
-                String riderName = currRequest.getRider();
                 Place startLocation = currRequest.getStartLocation();
                 Place endLocation = currRequest.getEndLocation();
                 Float fare = currRequest.getFare();
 
-                custName.setText(riderName);
+                DocumentReference documentReference = fb.collection("riders").document(currRequest.getRider());
+                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        custName.setText((String) documentSnapshot.get("name"));
+                    }
+                });
+
                 custDestination.setText(endLocation.getAddress());
 
                 double distanceFromRiderStartToEnd = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
@@ -154,50 +169,6 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     .setNegativeButton("Close", null)
                     .create();
         }
-
-//        if (currRequest.getStatus() == 0 && userType == "driver") {
-//            distanceToCust.setVisibility(View.VISIBLE);
-//            distanceToCustVal.setVisibility(View.VISIBLE);
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//            return builder
-//                    .setView(view)
-//                    .setTitle("Accept Ride Request")
-//                    .setNegativeButton("Cancel", null)
-//                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            Log.d("AcceptRequestFrag", "OK clicked");
-//                            currRequest.setStatus(Request.ACCEPTED);
-//                            currRequest.setDriver(driverUID);
-//                            rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
-//
-//                            getRiderToken();
-//                            }
-//                    }).create();
-//        }
-//        else
-//        {
-//            if(userType == "driver") {
-//                distanceToCust.setVisibility(View.VISIBLE);
-//                distanceToCustVal.setVisibility(View.VISIBLE);
-//                driverName.setVisibility(View.INVISIBLE);
-//                driverNameVal.setVisibility(View.INVISIBLE);
-//            }
-//            if (userType == "rider")
-//            {
-//                driverName.setVisibility(View.VISIBLE);
-//                driverNameVal.setVisibility(View.VISIBLE);
-//                distanceToCust.setVisibility(View.INVISIBLE);
-//                distanceToCustVal.setVisibility(View.INVISIBLE);
-//                driverNameVal.setText(currRequest.getDriver());
-//            }
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//            return builder
-//                    .setView(view)
-//                    .setTitle("Current Request")
-//                    .setNegativeButton("Close", null)
-//                    .create();
-//        }
     }
 
     public void getRiderToken() {

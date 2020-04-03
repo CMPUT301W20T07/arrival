@@ -111,8 +111,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     private Handler handler;
     private Request currRequest;
-    private EditText txtDriverLocation;
-    private EditText txtRiderLocation;
     private Button btnCancelRide;
     private Button btnConfirmPickup;
     private Button btnCompleteRide;
@@ -158,8 +156,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         checkPermissions(getApplicationContext());
 
         // Bind components
-        txtDriverLocation = findViewById(R.id.txtDriverLocation);
-        txtRiderLocation = findViewById(R.id.txtRiderLocation);
         btnCancelRide = findViewById(R.id.driverCancelRide);
         btnConfirmPickup = findViewById(R.id.driverConfirmPickup);
         btnCompleteRide = findViewById(R.id.driverCompleteRide);
@@ -341,7 +337,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             btnCompleteRide.setVisibility(View.INVISIBLE);
             btnScanQR.setVisibility(View.INVISIBLE);
             btnConfirmPayment.setVisibility(View.INVISIBLE);
-            txtRiderLocation.setText("");
             txtStatus.setText("");
         } else {
             Log.d(TAG, "currRequest is " + currRequest.toString());
@@ -349,7 +344,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
             requestsList.clear();
-            txtRiderLocation.setText(currRequest.getStartLocation().getAddress());
+
 
             if(currRequest.getStatus() == Request.OPEN) {
                 currRequest = null;
@@ -402,7 +397,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 btnScanQR.setVisibility(View.INVISIBLE);
                 btnConfirmPayment.setVisibility(View.INVISIBLE);
                 btnRemoveMarker.setVisibility(View.INVISIBLE);
-                txtRiderLocation.setText("");
             }
         }
     }
@@ -647,24 +641,26 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
         handler.removeCallbacks(runner);
 
-        Map<String, Object> driverInfo = new HashMap<>();
-        driverInfo.put("lat", currentLocation.getLatitude());
-        driverInfo.put("lon", currentLocation.getLongitude());
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Map<String, Object> driverInfo = new HashMap<>();
+            driverInfo.put("lat", currentLocation.getLatitude());
+            driverInfo.put("lon", currentLocation.getLongitude());
 
-        fb.collection("availableDrivers").document(driverUID)
-                .set(driverInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("driverLocation", "null");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("driverLocation", "not null", e);
-                    }
-                });
+            fb.collection("availableDrivers").document(driverUID)
+                    .set(driverInfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("driverLocation", "null");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("driverLocation", "not null", e);
+                        }
+                    });
+        }
     }
 
     /**
@@ -847,7 +843,9 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onDonePressed(String s) {
-        // TODO: I have no idea what this is supposed to do - Reilly
+        currRequest.setStatus(Request.COMPLETED);
+        rm.updateRequest(currRequest, (RequestCallbackListener) DriverMapActivity.this);
+        refresh();
     }
 
     @Override
