@@ -43,29 +43,29 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
         accountManager = AccountManager.getInstance();
 
         // Makes sure the account is still valid
-        if(user != null) {
-            user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        // User still exits
-                        Log.d(TAG, "User = " + user.getEmail());
-                        accountManager.getAccountType(user.getUid(), SplashActivity.this);
-                    } else {
-                        // User no longer exists, send to login screen
-                        Log.d(TAG, "User is null.");
-                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-            });
-        } else {
+//        if(user != null) {
+//            user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//                    if (task.isSuccessful()) {
+//                        // User still exits
+//                        Log.d(TAG, "User = " + user.getEmail());
+//                        accountManager.getAccountType(user.getUid(), SplashActivity.this);
+//                    } else {
+//                        // User no longer exists, send to login screen
+//                        Log.d(TAG, "User is null.");
+//                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }
+//                }
+//            });
+//        } else {
             Log.d(TAG, "User is null.");
             Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        }
+//        }
     }
 
     @Override
