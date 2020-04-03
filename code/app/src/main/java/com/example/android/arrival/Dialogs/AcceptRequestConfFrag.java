@@ -42,6 +42,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
 
     private Request currRequest;
     private Marker marker;
+    private String driverUID;
 
     private FirebaseFirestore fb;
     private RequestManager rm;
@@ -64,46 +65,70 @@ public class AcceptRequestConfFrag extends DialogFragment {
 
         TextView custName = view.findViewById(R.id.custNameValue);
         TextView custDestination = view.findViewById(R.id.custDestinationValue);
-        TextView distanceToCust = view.findViewById(R.id.distanceToCustValue);
+        TextView distanceToCust = view.findViewById(R.id.distanceToCust);
+        TextView distanceToCustVal = view.findViewById(R.id.distanceToCustValue);
         TextView custDistanceToDestination = view.findViewById(R.id.custDistanceToDestinationValue);
         TextView estTime = view.findViewById(R.id.estTimeValue);
         TextView custPaymentOffer = view.findViewById(R.id.custPaymentOfferValue);
+        TextView driverName = view.findViewById(R.id.driverName);
+        TextView driverNameVal = view.findViewById(R.id.driverNameValue);
 
-        //Info passed from DriverMapActivity
-        ArrayList<Marker> markers = (ArrayList<Marker>)getArguments().getSerializable("markerLocation");
+
+        String userType = (String) getArguments().getSerializable("userType");
         currRequest = (Request) getArguments().getSerializable("currentRequest");
-        String driverUID = (String) getArguments().getSerializable("driverUID");
-        double driverLat = (double) getArguments().getSerializable("driverLat");
-        double driverLon = (double) getArguments().getSerializable("driverLon");
+
+        System.out.println(userType);
+        System.out.println("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST");
+
+        if (userType.equals("driver")) {
+            //Info passed from DriverMapActivity
+            ArrayList<Marker> markers = (ArrayList<Marker>) getArguments().getSerializable("markerLocation");
+            driverUID = (String) getArguments().getSerializable("driverUID");
+            double driverLat = (double) getArguments().getSerializable("driverLat");
+            double driverLon = (double) getArguments().getSerializable("driverLon");
+            marker = markers.get(0);
+            double distanceFromDriverToLocation = distance(currRequest.getStartLocation().getLat(), driverLat, currRequest.getStartLocation().getLon(), driverLon);
+            distanceToCustVal.setText(format.format((int) distanceFromDriverToLocation));
+            distanceToCust.setVisibility(View.VISIBLE);
+            distanceToCustVal.setVisibility(View.VISIBLE);
+            driverName.setVisibility(View.INVISIBLE);
+            driverNameVal.setVisibility(View.INVISIBLE);
+        }
+
+        if (userType.equals("rider"))
+        {
+            driverName.setVisibility(View.VISIBLE);
+            driverNameVal.setVisibility(View.VISIBLE);
+            distanceToCust.setVisibility(View.INVISIBLE);
+            distanceToCustVal.setVisibility(View.INVISIBLE);
+            driverNameVal.setText(currRequest.getDriver());
+        }
 
         if (currRequest == null) {
             return null;
         }
+        else {
 
-        marker = markers.get(0);
-        if (currRequest.getStartLocation().getLat() == marker.getPosition().latitude && currRequest.getStartLocation().getLon() == marker.getPosition().longitude) {
+                String riderName = currRequest.getRider();
+                Place startLocation = currRequest.getStartLocation();
+                Place endLocation = currRequest.getEndLocation();
+                Float fare = currRequest.getFare();
 
-            String riderName = currRequest.getRider();
-            Place startLocation = currRequest.getStartLocation();
-            Place endLocation = currRequest.getEndLocation();
-            Float fare = currRequest.getFare();
+                custName.setText(riderName);
+                custDestination.setText(endLocation.getAddress());
 
+                double distanceFromRiderStartToEnd = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
+                custDistanceToDestination.setText(format.format((int) distanceFromRiderStartToEnd));
 
-            custName.setText(riderName);
-            custDestination.setText(endLocation.getAddress());
+                estTime.setText(format.format((int) (distanceFromRiderStartToEnd / 180)));
 
-            double distanceFromDriverToLocation = distance(startLocation.getLat(), driverLat, startLocation.getLon(), driverLon);
-            distanceToCust.setText(format.format((int) distanceFromDriverToLocation));
+                custPaymentOffer.setText(format.format(fare));
 
-            double distanceFromRiderStartToEnd = distance(startLocation.getLat(), endLocation.getLat(), startLocation.getLon(), endLocation.getLon());
-            custDistanceToDestination.setText(format.format((int) distanceFromRiderStartToEnd));
-
-            estTime.setText(format.format((int) (distanceFromRiderStartToEnd / 180)));
-
-            custPaymentOffer.setText(format.format(fare));
         }
 
-        if (currRequest.getStatus() == 0) {
+        if (currRequest.getStatus() == 0 && userType.equals("driver")) {
+            distanceToCust.setVisibility(View.VISIBLE);
+            distanceToCustVal.setVisibility(View.VISIBLE);
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             return builder
                     .setView(view)
@@ -121,8 +146,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
                         }
                     }).create();
         }
-        else
-        {
+        else {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             return builder
                     .setView(view)
@@ -130,6 +154,50 @@ public class AcceptRequestConfFrag extends DialogFragment {
                     .setNegativeButton("Close", null)
                     .create();
         }
+
+//        if (currRequest.getStatus() == 0 && userType == "driver") {
+//            distanceToCust.setVisibility(View.VISIBLE);
+//            distanceToCustVal.setVisibility(View.VISIBLE);
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//            return builder
+//                    .setView(view)
+//                    .setTitle("Accept Ride Request")
+//                    .setNegativeButton("Cancel", null)
+//                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            Log.d("AcceptRequestFrag", "OK clicked");
+//                            currRequest.setStatus(Request.ACCEPTED);
+//                            currRequest.setDriver(driverUID);
+//                            rm.updateRequest(currRequest, (RequestCallbackListener) getContext());
+//
+//                            getRiderToken();
+//                            }
+//                    }).create();
+//        }
+//        else
+//        {
+//            if(userType == "driver") {
+//                distanceToCust.setVisibility(View.VISIBLE);
+//                distanceToCustVal.setVisibility(View.VISIBLE);
+//                driverName.setVisibility(View.INVISIBLE);
+//                driverNameVal.setVisibility(View.INVISIBLE);
+//            }
+//            if (userType == "rider")
+//            {
+//                driverName.setVisibility(View.VISIBLE);
+//                driverNameVal.setVisibility(View.VISIBLE);
+//                distanceToCust.setVisibility(View.INVISIBLE);
+//                distanceToCustVal.setVisibility(View.INVISIBLE);
+//                driverNameVal.setText(currRequest.getDriver());
+//            }
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//            return builder
+//                    .setView(view)
+//                    .setTitle("Current Request")
+//                    .setNegativeButton("Close", null)
+//                    .create();
+//        }
     }
 
     public void getRiderToken() {

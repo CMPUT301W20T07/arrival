@@ -104,6 +104,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private LatLng placedMarkerLocation;
 
     private String driverUID;
+    private String accountType;
     private Driver mydriverObject;
     static boolean currentActivity = false;
     private int index;
@@ -152,6 +153,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         driverUID = accountManager.getUID();
         accountManager.getProfilePhoto(this, driverUID);
         accountManager.getUserData(this);
+        accountManager.getAccountType(driverUID, DriverMapActivity.this);
         setContentView(R.layout.driver_map_activity);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -332,7 +334,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
             btnCompleteRide.setVisibility(View.INVISIBLE);
             btnScanQR.setVisibility(View.INVISIBLE);
             btnConfirmPayment.setVisibility(View.INVISIBLE);
-            btnRemoveMarker.setVisibility(View.INVISIBLE);
             txtRiderLocation.setText("");
             txtStatus.setText("");
         } else {
@@ -462,6 +463,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                     args.putSerializable("driverUID", driverUID);
                     args.putSerializable("driverLat", currentLocation.getLatitude());
                     args.putSerializable("driverLon", currentLocation.getLongitude());
+                    args.putSerializable("userType", accountType);
 
                     AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
                     acceptRequestConfFrag.setArguments(args);
@@ -821,6 +823,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onAccountTypeRetrieved(String userType) {
+        accountType = userType;
 
     }
 

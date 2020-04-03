@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/accept_request_fragment"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/accept_request_fragment">
+    android:orientation="vertical">
 
 
     <TextView
-        android:id="@+id/custPaymentOfferValue"
+        android:id="@+id/driverNameValue"
         android:layout_width="285dp"
         android:layout_height="60dp"
         android:ems="10"
         android:gravity="center_vertical"
         android:inputType="numberDecimal"
-        app:layout_constraintStart_toEndOf="@+id/custPaymentOffer"
-        app:layout_constraintTop_toBottomOf="@+id/estTimeValue" />
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/driverName"
+        app:layout_constraintTop_toBottomOf="@+id/custNameValue" />
 
     <TextView
-        android:id="@+id/custPaymentOffer"
+        android:id="@+id/custPaymentOffer2"
         android:layout_width="88dp"
         android:layout_height="60dp"
         android:gravity="center_vertical"
@@ -30,15 +31,35 @@
         app:layout_constraintTop_toBottomOf="@+id/estTime" />
 
     <TextView
+        android:id="@+id/custPaymentOfferValue"
+        android:layout_width="285dp"
+        android:layout_height="60dp"
+        android:ems="10"
+        android:gravity="center_vertical"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toEndOf="@+id/custPaymentOffer2"
+        app:layout_constraintTop_toBottomOf="@+id/estTimeValue" />
+
+    <TextView
+        android:id="@+id/driverName"
+        android:layout_width="88dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:text="Driver Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/custName" />
+
+    <TextView
         android:id="@+id/custDistanceToDestinationValue"
         android:layout_width="221dp"
         android:layout_height="60dp"
         android:gravity="center_vertical"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:text=""
         app:layout_constraintStart_toEndOf="@+id/custDistanceToDestination"
-        app:layout_constraintTop_toBottomOf="@+id/distanceToCustValue" />
+        app:layout_constraintTop_toBottomOf="@+id/custDestinationValue" />
 
     <TextView
         android:id="@+id/custName"
@@ -60,7 +81,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/custName" />
+        app:layout_constraintTop_toBottomOf="@+id/distanceToCust" />
 
     <TextView
         android:id="@+id/distanceToCust"
@@ -70,8 +91,9 @@
         android:text="Distance to Customer (km)"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/custDestination" />
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/driver_name"
+        app:layout_constraintTop_toBottomOf="@+id/custName" />
 
     <TextView
         android:id="@+id/custDistanceToDestination"
@@ -82,7 +104,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/distanceToCust" />
+        app:layout_constraintTop_toBottomOf="@+id/custDestination" />
 
     <TextView
         android:id="@+id/estTime"
@@ -100,7 +122,7 @@
         android:layout_width="192dp"
         android:layout_height="81dp"
         android:gravity="center_vertical"
-        android:text="TextView"
+        android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/custName"
@@ -111,22 +133,19 @@
         android:layout_width="232dp"
         android:layout_height="80dp"
         android:gravity="center_vertical"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:text=""
         app:layout_constraintStart_toEndOf="@+id/custDestination"
-        app:layout_constraintTop_toBottomOf="@+id/custNameValue" />
+        app:layout_constraintTop_toBottomOf="@+id/distanceToCustValue" />
 
     <TextView
         android:id="@+id/distanceToCustValue"
         android:layout_width="288dp"
         android:layout_height="60dp"
         android:gravity="center_vertical"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:text=""
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/distanceToCust"
-        app:layout_constraintTop_toBottomOf="@+id/custDestinationValue" />
+        app:layout_constraintTop_toTopOf="@+id/driverNameValue" />
 
     <TextView
         android:id="@+id/estTimeValue"
@@ -135,8 +154,6 @@
         android:ems="10"
         android:gravity="center_vertical"
         android:inputType="numberDecimal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/estTime"
         app:layout_constraintTop_toBottomOf="@+id/custDistanceToDestinationValue" />
 </androidx.constraintlayout.widget.ConstraintLayout>
