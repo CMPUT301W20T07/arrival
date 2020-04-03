@@ -71,7 +71,6 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 
-
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
@@ -91,4 +90,5 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
     testImplementation "org.mockito:mockito-core:3.3.3"
 
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {exclude group: 'com.android.support', module:'support-annotations'})
 }

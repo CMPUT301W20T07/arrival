@@ -590,6 +590,7 @@ public class AccountManager {
 
     public void getRequestDriverData(String uid, final AccountCallbackListener listener) {
         if(uid == null) {
+            Log.d(TAG, "UID is null");
             return;
         }
 

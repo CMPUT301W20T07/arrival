@@ -142,7 +142,6 @@ public class RequestManager {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");
 
-
                 listener.onGetOpenSuccess(queryDocumentSnapshots);
             }
         });
@@ -172,7 +171,8 @@ public class RequestManager {
      *
      */
     public void getRiderOpenRequests(String rider, final RequestCallbackListener listener) {
-        requestRef.whereEqualTo("rider", rider).whereEqualTo("status", Request.OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        Log.d(TAG, "Getting open rider requests....");
+        requestRef.whereEqualTo("rider", rider).whereLessThanOrEqualTo("status", Request.AWAITING_PAYMENT).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getRider", "Successfully retrieved rider " + rider + "'s OPEN requests from DB. ");
@@ -180,10 +180,15 @@ public class RequestManager {
                 if(userRequests.size() > 0) {
                     Log.d(TAG + "-getRider", userRequests.toString());
 
-                    listener.onGetRiderRequestsSuccess(queryDocumentSnapshots);
+                    listener.onGetRiderOpenRequestsSuccess(queryDocumentSnapshots);
                 } else {
                     Log.d(TAG + "-getRider", "The user provided has no open requests!");
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, e.toString());
             }
         });
     }
