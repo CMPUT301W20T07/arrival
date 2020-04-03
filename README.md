@@ -30,3 +30,6 @@ Arrival requires the following permissions:
 
 ## License
 This application is licensed under the [Apache License, Version 2.0](https://github.com/CMPUT301W20T07/arrival/wiki/Glossary#license)
+
+## Citations
+https://github.com/CMPUT301W20T07/arrival/wiki/Citations
