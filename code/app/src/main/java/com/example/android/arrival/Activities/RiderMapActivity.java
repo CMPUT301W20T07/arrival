@@ -265,7 +265,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         @Override
         public void run() {
             refresh();
-            handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
+            if(currRequest == null) {
+                handler.postDelayed(runner, REFRESH_INTERVAL * 3 * 1000);
+            } else {
+                handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
+            }
         }
     };
 
