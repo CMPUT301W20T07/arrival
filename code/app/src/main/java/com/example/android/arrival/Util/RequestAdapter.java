@@ -78,26 +78,32 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         holder.endLoc.setText(end);
         holder.fare.setText(fare);
 
-
         if (type.equals(AccountManager.RIDER_TYPE_STRING)) {
-            String uid = request.getDriver();
-            getPhoto(uid, holder, position);
-            // get name
-            DocumentReference reference = db.collection("drivers").document(uid);
-            reference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    String nameStr = documentSnapshot.toObject(Driver.class).getName();
-                    holder.name.setText(nameStr);
+            if(request.getDriver() == null) {
+                if(request.getStatus() == Request.CANCELLED) {
+                    holder.name.setText("Cancelled request");
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(context, "Could not fetch name for ride " + position, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onFailure: -Get name " + e.toString());
-                }
-            });
-
+            } else {
+                String uid = request.getDriver();
+                getPhoto(uid, holder, position);
+                // get name
+                DocumentReference reference = db.collection("drivers").document(uid);
+                reference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot != null) {
+                            String nameStr = documentSnapshot.toObject(Driver.class).getName();
+                            holder.name.setText(nameStr);
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(context, "Could not fetch name for ride " + position, Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onFailure: -Get name " + e.toString());
+                    }
+                });
+            }
         }
         else if (type.equals(AccountManager.DRIVER_TYPE_STRING)) {
             String uid = request.getRider();
