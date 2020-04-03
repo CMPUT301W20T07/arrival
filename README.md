@@ -9,14 +9,14 @@
 <br>
 
 ## Features
-- Geolocation : identifies user's current location <br>
-- Notifications: the rider gets notified when a driver accepts their request <br>
+- Geolocation : Identifies user's current location <br>
+- Notifications: The rider gets notified when a driver accepts their request <br>
 - Update personal details: Users can update their personal information and profile picture <br>
-- In-app payment: riders can pay with QR bucks by having the driver scan the QR code <br>
+- In-app payment: Riders can pay with QR bucks by having the driver scan the QR code <br>
 - Offline: Users can see the current request while offline <br>
-- Cancel: riders can cancel a request before they are picked up <br>
-- Rating: riders can anonymously rate the driver at the end of the ride <br>
-- Ride history : the user can view their ride history from the handy navigation menu <br>
+- Cancel: Riders can cancel a request before they are picked up <br>
+- Rating: Riders can anonymously rate the driver at the end of the ride <br>
+- Ride history : The user can view their ride history from the handy navigation menu <br>
 
 ## Permissions
 Arrival requires the following permissions: 
