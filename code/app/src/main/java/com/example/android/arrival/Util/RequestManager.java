@@ -142,7 +142,6 @@ public class RequestManager {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");
 
-
                 listener.onGetOpenSuccess(queryDocumentSnapshots);
             }
         });
@@ -181,7 +180,7 @@ public class RequestManager {
                 if(userRequests.size() > 0) {
                     Log.d(TAG + "-getRider", userRequests.toString());
 
-                    listener.onGetRiderRequestsSuccess(queryDocumentSnapshots);
+                    listener.onGetRiderOpenRequestsSuccess(queryDocumentSnapshots);
                 } else {
                     Log.d(TAG + "-getRider", "The user provided has no open requests!");
                 }

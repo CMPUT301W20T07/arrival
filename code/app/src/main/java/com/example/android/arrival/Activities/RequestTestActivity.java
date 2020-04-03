@@ -103,13 +103,14 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
 
     @Override
     public void update() {
-        rm.getOpenRequests(this);
+
     }
 
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
         Log.d(TAG + "-getReq", req.toString());
+        rm.getOpenRequests(this);
     }
 
     @Override
