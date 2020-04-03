@@ -1,19 +1,5 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,10 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,20 +23,34 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.bumptech.glide.Glide;
 import com.example.android.arrival.Dialogs.AcceptRequestConfFrag;
+import com.example.android.arrival.Dialogs.DriverReviewFragment;
 import com.example.android.arrival.Dialogs.ScanQRDialog;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.Model.User;
+import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
+import com.example.android.arrival.Util.RequestAdapter;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.example.android.arrival.R;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -71,16 +67,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -132,7 +126,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     private TextView userEmailAddress;
     private CircularImageView profilePhoto;
     private BottomSheetBehavior bottomSheetBehavior;
-    private MenuItem rideHistory;
 
     @Override
     public void onBackPressed() {
@@ -295,9 +288,23 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.ride_history_driver:
-                startActivity(new Intent(DriverMapActivity.this, RideHistoryActivity.class));
+            case R.id.reviews:
+                Log.d(TAG, "starting review list frag...");
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                DialogFragment fragment = DriverReviewFragment.newInstance();
+                fragmentTransaction.add(0, fragment);
+                fragmentTransaction.commit();
                 break;
+            case R.id.ride_history_driver:
+                if (currRequest != null) {
+                    Toast.makeText(this, "Cannot view past rides while driving", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                else {
+                    rm.getDriverRequests(driverUID, this);
+                    break;
+                }
             case R.id.sign_out_button_driver:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
@@ -388,7 +395,6 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
             } else if (currRequest.getStatus() == Request.COMPLETED) {
                 rm.getOpenRequests(this);
-
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnConfirmPickup.setVisibility(View.INVISIBLE);
                 btnCompleteRide.setVisibility(View.INVISIBLE);
@@ -817,6 +823,24 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
 
+        ArrayList<Request> requests= new ArrayList<>();
+
+        for (QueryDocumentSnapshot document : snapshot) {
+            Request request = document.toObject(Request.class);
+            Log.d(TAG, "onGetDriverRequestsSuccess: " + request.getDriver());
+            requests.add(request);
+        }
+        if (!requests.isEmpty()) {
+            Intent intent = new Intent(DriverMapActivity.this, RideHistoryActivity.class);
+            intent.putExtra("list", requests);
+            intent.putExtra("accountType", AccountManager.DRIVER_TYPE_STRING);
+            startActivity(intent);
+        }
+        else {
+            Log.d(TAG, "onGetDriverRequestsSuccess: no requests found");
+            Toast.makeText(this, "You have no requests", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     @Override
@@ -889,7 +913,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPhotoReceiveFailure(String e) {
-        Toast.makeText(this, e,Toast.LENGTH_LONG);
+        Toast.makeText(this, e,Toast.LENGTH_LONG).show();
     }
 
     @Override

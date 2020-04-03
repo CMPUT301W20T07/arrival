@@ -8,42 +8,43 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <EditText
             android:id="@+id/edit_make"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="Make"/>
+            android:hint="Make"
+            android:inputType="textCapWords" />
 
         <EditText
             android:id="@+id/edit_model"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="Model"/>
+            android:hint="Model"
+            android:inputType="textCapWords" />
 
         <EditText
             android:id="@+id/edit_year"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="Year"/>
+            android:hint="Year"
+            android:inputType="textCapWords" />
 
         <EditText
             android:id="@+id/edit_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="Color"/>
+            android:hint="Color"
+            android:inputType="textCapWords" />
 
         <EditText
             android:id="@+id/edit_plate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapCharacters"
-            android:hint="License Plate Number"/>
+            android:hint="License Plate Number"
+            android:inputType="textCapCharacters" />
 
     </LinearLayout>
 
