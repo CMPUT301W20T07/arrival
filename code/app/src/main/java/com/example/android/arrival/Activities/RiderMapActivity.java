@@ -264,9 +264,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     Runnable runner =  new Runnable() {
         @Override
         public void run() {
-            if (currRequest != null) {
-                refresh();
-            }
+            refresh();
             handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
         }
     };
@@ -306,6 +304,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         } else {
             // For testing
 //            rm.getRequest("427939185967584", this);
+            rm.getRiderOpenRequests(uid, this);
             updateInfo();
         }
     }
@@ -314,9 +313,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (currRequest == null) {
             txtStatus.setText("");
 
-            mMap.clear();
-            addPickupMarker(pickup.getLatLng());
-            addDestMarker(destination.getLatLng());
+            if(mMap!=null) {
+                mMap.clear();
+                addPickupMarker(pickup.getLatLng());
+                addDestMarker(destination.getLatLng());
+            }
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
@@ -377,10 +378,11 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnRequestRide.setVisibility(View.INVISIBLE);
 
             } else if(currRequest.getStatus() == Request.COMPLETED) {
+                Log.d(TAG, "Request is completed");
                 mMap.clear();
 
                 shouldDisplayRatingDialog = true;
-                getDriverDetails(currRequest);
+                getDriverDetails(currRequest.getDriver());
                 currRequest = null;
                 updateInfo();
 
@@ -553,7 +555,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         btnDriverDetails.setOnClickListener((new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getDriverDetails(currRequest);
+                getDriverDetails(currRequest.getDriver());
             }
         }));
 
@@ -838,8 +840,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-    public void getDriverDetails(Request request) {
-        accountManager.getRequestDriverData(request.getDriver(), this);
+    public void getDriverDetails(String driverID) {
+        Log.d(TAG, "Getting driver details...");
+        accountManager.getRequestDriverData(driverID, this);
     }
 
     /**
@@ -1015,9 +1018,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     public void onDriverDataRetrieved(Driver driver) {
         Log.d(TAG, "onDriverDataRetrieved");
         if(shouldDisplayRatingDialog) {
-            currRequest = null;
-            shouldDisplayRatingDialog = false;
             displayRateDriverDialog(driver);
+            shouldDisplayRatingDialog = false;
         } else {
             displayDriverDetailsDialog(driver);
         }
