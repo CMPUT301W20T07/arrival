@@ -56,7 +56,7 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.getInstance();
-        accountManager.getProfilePhoto(this);
+        accountManager.getProfilePhoto(this, accountManager.getUID());
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_rider_profile_screen);
         rider = (Rider) getIntent().getSerializableExtra("rider");
@@ -100,6 +100,8 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
 
     }
 
+    // demonuts article by EDITORIAL TEAM (https://demonuts.com/author/editorial-team/)
+    // "Pick Image From Gallery Or Camera In Android Studio Programmatically"
     // https://demonuts.com/pick-image-gallery-camera-android/
     private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
@@ -147,12 +149,12 @@ public class RiderProfileScreenActivity extends AppCompatActivity implements Acc
     }
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 

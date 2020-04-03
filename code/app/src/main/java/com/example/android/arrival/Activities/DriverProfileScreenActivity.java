@@ -45,7 +45,7 @@ public class DriverProfileScreenActivity extends AppCompatActivity implements Ac
     private TextView name;
     private EditText emailET, phoneET;
     private Button updateInfoButton, deleteAccountButton, editCarButton;
-    AccountManager accountManager;
+    private AccountManager accountManager;
     private CircularImageView profilePhoto;
     private Uri filePath = null;
     private final static int GALLERY_RC = 100;
@@ -63,7 +63,7 @@ public class DriverProfileScreenActivity extends AppCompatActivity implements Ac
         driver = (Driver) getIntent().getSerializableExtra("driver");
         car = driver.getCar();
         accountManager = AccountManager.getInstance();
-        accountManager.getProfilePhoto(this);
+        accountManager.getProfilePhoto(this, accountManager.getUID());
 
         name = findViewById(R.id.nameTVDriver);
         emailET = findViewById(R.id.update_email_driver);
@@ -113,6 +113,8 @@ public class DriverProfileScreenActivity extends AppCompatActivity implements Ac
 
     }
 
+    // demonuts article by EDITORIAL TEAM (https://demonuts.com/author/editorial-team/)
+    // "Pick Image From Gallery Or Camera In Android Studio Programmatically"
     // https://demonuts.com/pick-image-gallery-camera-android/
     private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
@@ -161,12 +163,12 @@ public class DriverProfileScreenActivity extends AppCompatActivity implements Ac
 
 
     @Override
-    public void onAccountSignIn(String userType) {
+    public void onAccountTypeRetrieved(String userType) {
 
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
 
     }
 

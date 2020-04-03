@@ -53,6 +53,10 @@ import com.google.firebase.iid.InstanceIdResult;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class for creating the login page
+ * Users who already an account can login from here
+ */
 public class LoginActivity extends AppCompatActivity implements AccountCallbackListener {
 
     private Button signIn;
@@ -84,6 +88,8 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         signUp = findViewById(R.id.sign_up_button);
         signIn = findViewById(R.id.sign_in_button);
         forgot_password = findViewById(R.id.forgot_password);
+
+        // set as onclick listeners
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +167,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
 
     @Override
-    public void onAccountSignIn(String accountType) {
+    public void onAccountTypeRetrieved(String accountType) {
         Log.d("TOKEN", "calling to check for token");
         checkForToken(accountType);
         Log.d(TAG, "onAccountSignIn: " + accountType);
@@ -183,7 +189,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     }
 
     @Override
-    public void onSignInFailure(String e) {
+    public void onAccountTypeRetrieveFailure(String e) {
         Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show();
     }
 

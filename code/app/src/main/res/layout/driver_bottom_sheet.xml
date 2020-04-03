@@ -13,131 +13,122 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/driver_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
+        android:layout_height="154dp"
         android:background="@drawable/rounded_bottom_sheet"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:behavior_hideable="true">
+        app:behavior_hideable="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
                 android:fontFamily="@font/product_sans_regular"
+                android:padding="16dp"
                 android:text="Begin Accepting Ride Requests"
                 android:textAlignment="center"
                 android:textColor="@color/blackTint"
                 android:textSize="20sp" />
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
-
-            <TextView
-                android:id="@+id/txtDriverStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="STATUS"
-                android:textAlignment="textEnd"
-                android:textColor="@color/black"
-                android:fontFamily="@font/product_sans_regular"
-                />
-
-        </LinearLayout>
-
-            <EditText
-                android:id="@+id/txtDriverLocation"
-                android:layout_width="350dp"
-                android:layout_height="50dp"
-                android:layout_marginEnd="8dp"
-                android:cursorVisible="false"
-                android:hint="Your Location"
-                android:textColorHint="@color/blackTint"
-                android:fontFamily="@font/product_sans_regular"
-                android:backgroundTint="@color/blackTint"
-                android:textColor="@color/black"
-                android:focusable="false"
-                android:inputType="none"
-                android:textSize="14sp"
-                />
-
-            <EditText
-                android:id="@+id/txtRiderLocation"
-                android:layout_width="350dp"
-                android:layout_height="50dp"
-                android:layout_marginEnd="8dp"
-                android:cursorVisible="false"
-                android:ems="10"
-                android:focusable="false"
-                android:inputType="none"
-                android:textColor="@color/black"
-                android:textColorHint="@color/blackTint"
-                android:fontFamily="@font/product_sans_regular"
-                android:backgroundTint="@color/blackTint"
-                android:hint="Rider Location"
-                android:textSize="14sp"
-                />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="80dp"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/txtDriverStatus"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:paddingLeft="4dp">
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text=""
+                    android:textAlignment="textEnd"
+                    android:textColor="@color/black" />
 
-                    <Button
-                        android:id="@+id/driverConfirmPickup"
-                        android:layout_width="180dp"
-                        android:layout_height="60dp"
-                        android:background="@drawable/refresh_button"
-                        android:fontFamily="@font/product_sans_regular"
-                        android:text="Confirm Pickup"
-                        android:textAllCaps="false"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
+            </LinearLayout>
 
-                    <Button
-                        android:id="@+id/driverCancelRide"
-                        android:layout_width="180dp"
-                        android:layout_height="60dp"
-                        android:background="@drawable/pickup_button"
-                        android:fontFamily="@font/product_sans_regular"
-                        android:text="Cancel Ride"
-                        android:textAllCaps="false"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:visibility="invisible" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:paddingLeft="4dp">
 
-                    <Button
-                        android:id="@+id/btnDriverScanQR"
-                        android:layout_width="180dp"
-                        android:layout_height="60dp"
-                        android:background="@drawable/destination_button"
-                        android:fontFamily="@font/product_sans_regular"
-                        android:gravity="center_horizontal"
-                        android:text="Scan QR Code"
-                        android:textAllCaps="false"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:visibility="invisible" />
+                <Button
+                    android:id="@+id/driverConfirmPickup"
+                    android:layout_width="180dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginEnd="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:background="@drawable/refresh_button"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Confirm Pickup"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
 
-                </RelativeLayout>
+                <Button
+                    android:id="@+id/driverCancelRide"
+                    android:layout_width="180dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="-1dp"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/pickup_button"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Cancel Ride"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:visibility="invisible" />
+
+                <Button
+                    android:id="@+id/removeMarker"
+                    android:layout_width="180dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="-1dp"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/pickup_button"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Remove Marker"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:visibility="invisible" />
+
+                <Button
+                    android:id="@+id/btnDriverScanQR"
+                    android:layout_width="180dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="-1dp"
+                    android:layout_marginTop="1dp"
+                    android:background="@drawable/destination_button"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Scan QR Code"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:visibility="invisible" />
 
                 <Button
                     android:id="@+id/driverCompleteRide"
                     android:layout_width="180dp"
                     android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="2dp"
                     android:background="@drawable/destination_button"
                     android:fontFamily="@font/product_sans_regular"
                     android:text="Complete Ride"
@@ -146,8 +137,23 @@
                     android:textSize="20sp"
                     android:visibility="invisible" />
 
+                <Button
+                    android:id="@+id/driverConfirmPayment"
+                    android:layout_width="180dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="2dp"
+                    android:background="@drawable/destination_button"
+                    android:fontFamily="@font/product_sans_regular"
+                    android:text="Confirm Payment"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:visibility="invisible" />
 
-            </LinearLayout>
+            </RelativeLayout>
 
 
         </LinearLayout>

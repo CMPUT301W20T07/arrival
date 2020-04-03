@@ -126,7 +126,8 @@ public class Request implements Serializable {
     }
 
     public String toString() {
-        return "{STATUS: " + getStatus() +
+        return "{ID: " + getID() +
+                ", STATUS: " + getStatus() +
                 ", RIDER: " + getRider() +
                 ", DRIVER: " + getDriver() +
                 ", START: " + getStartLocation().toString() +

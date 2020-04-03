@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,10 +23,6 @@ import androidx.fragment.app.DialogFragment;
 import com.example.android.arrival.Model.CustomSuggestionList;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.R;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +31,7 @@ import java.util.List;
 public class SearchFragment extends DialogFragment {
     private ListView list;
     private ArrayList<Place> arrayList = new ArrayList<>();
-    private Place selected;
+    private Place selected = null;
     private View oldView;
 
     /**
@@ -100,6 +97,8 @@ public class SearchFragment extends DialogFragment {
                 }
                 view.setBackgroundColor(Color.LTGRAY);
 
+                Log.d("test", "Selected: " + selected.toString());
+
                 oldView = view;
 
             }
@@ -125,16 +124,16 @@ public class SearchFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Bundle args = new Bundle();
-                        args.putInt("type", finalActivityType);
-                        args.putSerializable("place", selected);
-                        args.putSerializable("marks", finalMarks);
+                        Bundle returnArgs = new Bundle();
+                        returnArgs.putInt("type", finalActivityType);
+                        returnArgs.putSerializable("place", selected);
+                        returnArgs.putSerializable("marks", finalMarks);
 
                         //TODO ensure that a place is being passed back if not throw an error
 
                         //Sends this measurements details to the viewMeasurement activity
                         Intent intent = new Intent(SearchFragment.this.getActivity(), RiderMapActivity.class);
-                        intent.putExtra("selected", args);
+                        intent.putExtra("selected", returnArgs);
                         startActivity(intent);
 
                     }}).create();
