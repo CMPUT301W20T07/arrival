@@ -1,7 +1,6 @@
 package com.example.android.arrival;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
@@ -11,7 +10,6 @@ import com.example.android.arrival.Util.AccountManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
 
@@ -19,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-class AccountManagerTest {
+public class AccountManagerTest {
 
     private static final String TAG = "AccountManagerTest";
     private static AccountManager mockAccountManager;
