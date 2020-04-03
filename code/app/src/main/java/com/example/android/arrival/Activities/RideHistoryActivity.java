@@ -1,14 +1,13 @@
 package com.example.android.arrival.Activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Request;
@@ -19,14 +18,11 @@ import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestAdapter;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-
-import io.opencensus.stats.Measurement;
 
 public class RideHistoryActivity extends AppCompatActivity implements RequestCallbackListener, AccountCallbackListener {
 
@@ -175,6 +171,11 @@ public class RideHistoryActivity extends AppCompatActivity implements RequestCal
             adapter = new RequestAdapter(this, requests, type);
             recyclerView.setAdapter(adapter);
         }
+    }
+
+    @Override
+    public void onGetRiderOpenRequestsSuccess(QuerySnapshot snapshot) {
+
     }
 
     @Override

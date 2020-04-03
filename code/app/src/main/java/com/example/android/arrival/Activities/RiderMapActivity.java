@@ -250,6 +250,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             btnCancelRide.setVisibility(View.VISIBLE);
             Log.d(TAG, "CurrRequest: " + currRequest.toString());
         }
+
+        rm.getRiderOpenRequests(uid, this);
     }
 
     Runnable runner =  new Runnable() {
@@ -290,6 +292,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         } else {
             // For testing
 //            rm.getRequest("427939185967584", this);
+            updateInfo();
         }
     }
 
@@ -912,6 +915,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
+    public void onGetRiderOpenRequestsSuccess(QuerySnapshot snapshot) {
+        List<Request> riderCurrRequests = snapshot.toObjects(Request.class);
+        Log.d(TAG, "onGetRiderRequestSuccess" + riderCurrRequests);
+        currRequest = riderCurrRequests.get(0);
+        updateInfo();
+    }
+
+    @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
 
     }
@@ -943,8 +954,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         userEmailAddress.setText(rider.getEmail());
         myRiderObject = rider;
 
-        //rm.getRiderRequests("usr-map-test", this);
-//        rm.getRiderRequests(uid, this);
+        rm.getRiderOpenRequests(uid, this);
     }
 
     @Override

@@ -169,6 +169,26 @@ public class RequestManager {
     }
 
     /**
+     *
+     */
+    public void getRiderOpenRequests(String rider, final RequestCallbackListener listener) {
+        requestRef.whereEqualTo("rider", rider).whereEqualTo("status", Request.OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d(TAG + "-getRider", "Successfully retrieved rider " + rider + "'s OPEN requests from DB. ");
+                List<Request> userRequests = queryDocumentSnapshots.toObjects(Request.class);
+                if(userRequests.size() > 0) {
+                    Log.d(TAG + "-getRider", userRequests.toString());
+
+                    listener.onGetRiderRequestsSuccess(queryDocumentSnapshots);
+                } else {
+                    Log.d(TAG + "-getRider", "The user provided has no open requests!");
+                }
+            }
+        });
+    }
+
+    /**
      * Retrieves all the requests accepted by the given driver from the FireStore Cloud Database.
      */
     public void getDriverRequests(String driver, final RequestCallbackListener listener) {

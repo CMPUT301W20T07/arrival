@@ -810,6 +810,11 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     @Override
+    public void onGetRiderOpenRequestsSuccess(QuerySnapshot snapshot) {
+
+    }
+
+    @Override
     public void onGetDriverRequestsSuccess(QuerySnapshot snapshot) {
 
     }
