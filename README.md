@@ -11,9 +11,9 @@ Arrival is an Edmonton-based peer-to-peer rideshare service for Android.
 
 ## Permissions
 Arrival requires the following permissions: 
-- Internet
 - Camera access
 - Location services
+- Storage
 - Notifications (optional) 
 
 ## Credits
