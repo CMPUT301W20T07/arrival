@@ -16,15 +16,15 @@ Requests are automatically updated every few seconds.
 
 ## Features
 
-Geolocation : identifies user's current location
-Notifications: the rider gets notified when a driver accepts their request
-In-app call option: rider can phone the driver directly when viewing the driver profile
-Update personal details: Users can update their personal information and profile picture
-In-app payment: riders can pay with QR bucks by having the driver scan the QR code.
-Offline: Users can see the current request while offline
-Cancel: riders can cancel a request before they are picked up
-Rating: a rider can anonymously rate the driver at the end of the ride
-Ride history : the user can view their ride history from the handy navigation menu
+Geolocation : identifies user's current location<br>
+Notifications: the rider gets notified when a driver accepts their request<br>
+In-app call option: rider can phone the driver directly when viewing the driver profile<br>
+Update personal details: Users can update their personal information and profile picture<br>
+In-app payment: riders can pay with QR bucks by having the driver scan the QR code.<br>
+Offline: Users can see the current request while offline<br>
+Cancel: riders can cancel a request before they are picked up<br>
+Rating: a rider can anonymously rate the driver at the end of the ride<br>
+Ride history : the user can view their ride history from the handy navigation menu<br>
 
 
 ## Permissions
