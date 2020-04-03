@@ -4,7 +4,7 @@
 
 <br>Arrival is an Edmonton-based ride sharing platform for Android. Users can sign up as a Rider, or Driver, depending on their needs. Riders are able to request rides between two locations within Edmonton city limits, while Drivers can view Rider's open requests in their area, and are able to accept the requests they wish to complete. More information about the app's features and development can be found on the project's [Wiki](https://github.com/CMPUT301W20T07/arrival/wiki).
 
-<br><br>
+<br>
 
 ## Features
 - Geolocation : identifies user's current location <br>
