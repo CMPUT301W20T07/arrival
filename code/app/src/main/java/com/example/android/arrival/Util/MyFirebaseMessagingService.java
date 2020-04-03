@@ -74,7 +74,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
             userID = user.getUid();
             am.getAccountType(userID, this);
         }
-
     }
 
     public void updateToken(String type) {
@@ -132,11 +131,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
 
     @Override
     public void onAccountTypeRetrieved(String userType) {
-
         if (userType != null) {
             updateToken(userType);
         }
-
     }
 
     @Override

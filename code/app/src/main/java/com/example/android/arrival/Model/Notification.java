@@ -67,6 +67,7 @@ public class Notification {
         try {
             object.put("to", token);
             JSONObject notificationObj = new JSONObject();
+            notificationObj.put("to", token);
             notificationObj.put("title", title);
             notificationObj.put("body", body);
             object.put("notification", notificationObj);
@@ -75,12 +76,12 @@ public class Notification {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.d("TAG", "Response: " + response);
+                            Log.d("Notifications", "Response: " + response);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e("TAG", "Error: " + error.toString());
+                    Log.e("Notifications", "Error: " + error.toString());
                 }
             }){
                 @Override

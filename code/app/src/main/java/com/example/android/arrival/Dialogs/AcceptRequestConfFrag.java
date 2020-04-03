@@ -167,6 +167,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void getRiderToken() {
+        Log.d("Notifications", "In getRiderToken");
         String uid = currRequest.getRider();
         final String[] token = new String[1];
 
@@ -175,29 +176,26 @@ public class AcceptRequestConfFrag extends DialogFragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Rider riderData = documentSnapshot.toObject(Rider.class);
+                Log.d("Notifications", "Rider: " + riderData.getName());
                 token[0] = riderData.getTokenId();
-                Log.d(TAG, "Token in getRiderToken: " + token[0]);
+                Log.d("Notifications", "Token in getRiderToken: " + token[0]);
                 notifyRider(token[0]);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "get data onFailure: " + e.toString());
+                Log.d("Notifications", "get data onFailure: " + e.toString());
             }
         });
     }
 
     public void notifyRider(String riderToken) {
-        try {
-            Log.d("Notification", "Rider Token: " + riderToken);
+        Log.d("Notification", "Rider Token: " + riderToken);
 
-            if (riderToken != null) {
-                Notification notification = new Notification(context, riderToken,
-                        "Ride Request Status Update", "A driver has accepted your request");
-                notification.sendNotification();
-            }
-        } catch (Exception e) {
-
+        if (riderToken != null) {
+            Notification notification = new Notification(context, riderToken,
+                    "Ride Request Status Update", "A driver has accepted your request");
+            notification.sendNotification();
         }
     }
 
