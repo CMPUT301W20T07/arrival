@@ -4,12 +4,13 @@ import android.net.Uri;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.auth.User;
 
-
+/**
+ * Interface to be implemented by Activities that want to access
+ * account information from Firebase through the AccountManager. Methods
+ * determine how to receive the data pulled from the database.
+ */
 public interface AccountCallbackListener {
-
 
     /**
      * called when a user has been successfully signed in

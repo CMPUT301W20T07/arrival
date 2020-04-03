@@ -1,10 +1,5 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,6 +14,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.android.arrival.Dialogs.SensitiveActionDialog;
@@ -35,8 +35,11 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.IOException;
 
+/**
+ * Android Activity that displays the Rider's profile screen.
+ * Allows Rider to update account information and delete their account.
+ */
 public class RiderProfileScreenActivity extends AppCompatActivity implements AccountCallbackListener, SensitiveActionDialog.OnFragmentInteractionListener {
-
 
     private final static String TAG = "RiderProfileScreenAct";
     private AccountManager accountManager;

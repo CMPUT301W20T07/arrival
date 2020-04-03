@@ -15,8 +15,15 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.android.arrival.Model.Car;
 import com.example.android.arrival.R;
+<<<<<<< HEAD
+/**
+ * DialogFragment displayed when a user signs up as a driver
+ * that prompts the user to input their car details
+ */
+=======
 import com.google.firebase.auth.FirebaseAuth;
 
+>>>>>>> master
 public class CarDetailsDialog extends DialogFragment {
 
     private EditText make;

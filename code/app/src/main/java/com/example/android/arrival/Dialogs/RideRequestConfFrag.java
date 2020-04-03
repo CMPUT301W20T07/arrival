@@ -25,6 +25,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+/**
+ * DialogFragment displayed when a Rider is making a new Request.
+ * Displays the ride details and allows the user to increase the
+ * fare from the estimated cost.
+ */
 public class RideRequestConfFrag extends DialogFragment {
 
     private static final String TAG = "RideRequestFrag";

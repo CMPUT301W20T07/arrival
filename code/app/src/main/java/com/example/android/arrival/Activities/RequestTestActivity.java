@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Temporary class for testing the functionality of the RequestManager.
- *
- * Activity layout code based on the Lab 7 starter code: https://github.com/Jakaria08/ListCity
+ * Android Activity used only for unit testing the RequestManager.
  */
 public class RequestTestActivity extends AppCompatActivity implements RequestCallbackListener {
 

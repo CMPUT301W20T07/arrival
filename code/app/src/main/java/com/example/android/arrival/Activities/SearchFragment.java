@@ -31,6 +31,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DialogFragment displayed when searching for locations.
+ */
 public class SearchFragment extends DialogFragment {
     private ListView list;
     private ArrayList<Place> arrayList = new ArrayList<>();

@@ -120,6 +120,11 @@ public class RequestManager {
                 });
     }
 
+    /**
+     * Retrieves the request with the given ID from the FireStore Cloud Database.
+     * @param id
+     * @param listener
+     */
     public void getRequest(String id, final RequestCallbackListener listener) {
         requestRef.document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -137,6 +142,7 @@ public class RequestManager {
 
     /**
      * Retrieves all currently open requests from the FireStore Cloud Database.
+     * @param listener
      */
     public void getOpenRequests(final RequestCallbackListener listener) {
         requestRef.whereEqualTo("status", Request.OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -152,6 +158,8 @@ public class RequestManager {
 
     /**
      * Retrieves all the requests made by the given rider from the FireStore Cloud Database.
+     * @param rider
+     * @param listener
      */
     public void getRiderRequests(String rider, final RequestCallbackListener listener) {
         requestRef.whereEqualTo("rider", rider).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -166,6 +174,32 @@ public class RequestManager {
                 } else {
                     Log.d(TAG + "-getRider", "No Requests matched the username provided. ");
                 }
+            }
+        });
+    }
+
+    /**
+     * Retrieves all the active requests made by the given rider from the FireStore Cloud Database.
+     */
+    public void getRiderOpenRequests(String rider, final RequestCallbackListener listener) {
+        Log.d(TAG, "Getting open rider requests....");
+        requestRef.whereEqualTo("rider", rider).whereLessThanOrEqualTo("status", Request.AWAITING_PAYMENT).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d(TAG + "-getRider", "Successfully retrieved rider " + rider + "'s OPEN requests from DB. ");
+                List<Request> userRequests = queryDocumentSnapshots.toObjects(Request.class);
+                if(userRequests.size() > 0) {
+                    Log.d(TAG + "-getRider", userRequests.toString());
+
+                    listener.onGetRiderOpenRequestsSuccess(queryDocumentSnapshots);
+                } else {
+                    Log.d(TAG + "-getRider", "The user provided has no open requests!");
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, e.toString());
             }
         });
     }

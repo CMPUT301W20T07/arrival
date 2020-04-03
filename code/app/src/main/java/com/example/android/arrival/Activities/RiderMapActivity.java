@@ -83,6 +83,10 @@ import java.util.Date;
 import java.util.List;
 
 
+/**
+ * Android Activity that displays the Rider's Map. Allows Riders to make requests,
+ * view their request's status, cancel requests, make payments, and rate drivers
+ */
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
@@ -244,6 +248,20 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
+    /**
+     * Refreshes the app the every REFRESH_INTERVAL seconds
+     */
+    Runnable runner =  new Runnable() {
+        @Override
+        public void run() {
+            refresh();
+            if(currRequest == null) {
+                handler.postDelayed(runner, REFRESH_INTERVAL * 3 * 1000);
+            } else {
+                handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
+            }
+        }
+    };
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -260,14 +278,26 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         return true;
     }
 
+    /**
+     * Fetches information relative to the current user and current request
+     */
     public void refresh() {
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
             Log.d(TAG, currRequest.toString());
+<<<<<<< HEAD
+        } else {
+            rm.getRiderOpenRequests(uid, this);
+            updateInfo();
+=======
+>>>>>>> master
         }
     }
 
+    /**
+     * Updates the UI relative the current request's status
+     */
     public void updateInfo() {
         if (currRequest == null) {
             txtStatus.setText("");

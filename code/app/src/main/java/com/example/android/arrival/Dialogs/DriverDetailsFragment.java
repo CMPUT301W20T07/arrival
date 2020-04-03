@@ -21,8 +21,27 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.bumptech.glide.Glide;
+import com.example.android.arrival.Model.Car;
+import com.example.android.arrival.Model.Driver;
+import com.example.android.arrival.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
+import java.util.List;
 
+/**
+ * DialogFragment displayed when clicking 'Driver Details' button.
+ * Shows driver information such as name, phone number, etc. and allows
+ * Riders to contact their driver by linking to the Device's phone app.
+ */
 public class DriverDetailsFragment extends DialogFragment {
     private static final String TAG = "driver_fragment";
 

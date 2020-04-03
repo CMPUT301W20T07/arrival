@@ -1,16 +1,10 @@
 package com.example.android.arrival.Activities;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -23,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -34,12 +27,6 @@ import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,6 +40,10 @@ import com.google.firebase.iid.InstanceIdResult;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Android Activity for the login page.
+ * Users with existing accounts can login from here, or
+ */
 public class LoginActivity extends AppCompatActivity implements AccountCallbackListener {
 
     private Button signIn;

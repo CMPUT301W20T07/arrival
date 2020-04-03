@@ -5,14 +5,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Data Object class that represents Requests
+ */
 public class Request implements Serializable {
 
-//    public static final String STATUS_OPEN = "OPEN";
-//    public static final String STATUS_ACCEPTED = "ACCEPTED";
-//    public static final String STATUS_CANCELLED = "CANCELLED";
-//    public static final String STATUS_COMPLETED = "COMPLETED";
-//    public static final String STATUS_DENIED = "DENIED";
-
+    // Request status identifiers
     public static final int OPEN = 0;
     public static final int ACCEPTED = 1;
     public static final int PICKED_UP = 2;
@@ -20,8 +18,8 @@ public class Request implements Serializable {
     public static final int COMPLETED = 4;
     public static final int CANCELLED = 5;
 
+    // Dictionary of status identifier text
     public static final Map<Integer, String> STATUS;
-
     static {
         Map<Integer, String> tmap = new HashMap<>();
         tmap.put(OPEN, "OPEN");
@@ -32,7 +30,6 @@ public class Request implements Serializable {
         tmap.put(CANCELLED, "CANCELLED");
         STATUS = Collections.unmodifiableMap(tmap);
     }
-
 
     private String id;
     private int status;
@@ -73,8 +70,9 @@ public class Request implements Serializable {
     }
 
     /**
-     * Return a random, unique id.
-     *
+     * Return a random, unique ID based off the system's nano-time.
+     * Should be updated in the future to generate a more reliable
+     * unique ID.
      * @return
      */
     public String generateID() {

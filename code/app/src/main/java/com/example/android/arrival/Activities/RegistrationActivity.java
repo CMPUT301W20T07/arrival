@@ -3,11 +3,8 @@ package com.example.android.arrival.Activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Patterns;
@@ -36,13 +33,11 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
 
+/**
+ * Android Activity for creating new Driver and Rider accounts.
+ */
 public class RegistrationActivity extends AppCompatActivity implements CarDetailsDialog.OnFragmentInteractionListener, AccountCallbackListener {
 
     private static final String TAG = "Registration";
@@ -155,7 +150,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (requestCode == GALLERY_RC &&data != null) {
             try {
                 filePath = data.getData();
-                Bitmap bitmap = null;
+                Bitmap bitmap;
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filePath);
                 profileImage.setImageBitmap(bitmap);
             } catch (IOException e) {
@@ -194,7 +189,8 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (filePath == null) {
             Snackbar.make(profileImage, "Please input a photo", Snackbar.LENGTH_SHORT).show();
         }
-        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty() && filePath == null)) {
+        if (!em.isEmpty() && !pwd.isEmpty() && !uName.isEmpty() && !uPhoneNumber.isEmpty() && filePath != null) {
+            Log.d(TAG, "riderSignUp: " + filePath);
             Rider rider = new Rider(em, uName, uPhoneNumber, uTokenId);
             accountManager.createRiderAccount(rider, pwd, this);
         } else {
@@ -223,7 +219,7 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         if (uPhoneNumber.isEmpty()) {
             txtPhoneNumber.setError("Please input your phoneNumber");
         }
-        if (!(em.isEmpty() && pwd.isEmpty() && uName.isEmpty() && uPhoneNumber.isEmpty())) {
+        if (!em.isEmpty() && !pwd.isEmpty() && !uName.isEmpty() && !uPhoneNumber.isEmpty() && filePath != null){
             Driver driver = new Driver(em, uName, uPhoneNumber, uTokenId, driverCar);
             accountManager.createDriverAccount(driver, pwd, this);
         }

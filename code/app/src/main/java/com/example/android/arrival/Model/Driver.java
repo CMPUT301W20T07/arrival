@@ -2,6 +2,9 @@ package com.example.android.arrival.Model;
 
 import java.io.Serializable;
 
+/**
+ * Data Object class that represents Drivers
+ */
 public class Driver extends User implements Serializable {
 
     private Car car;

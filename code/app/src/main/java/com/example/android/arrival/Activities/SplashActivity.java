@@ -1,35 +1,28 @@
 package com.example.android.arrival.Activities;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Rider;
-import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Android Activity displayed upon app startup. Authenticates
+ * user and decides which activity to send them to.
+ */
 public class SplashActivity extends AppCompatActivity implements AccountCallbackListener {
 
     public static final String TAG = "SplashActivity";
@@ -50,29 +43,29 @@ public class SplashActivity extends AppCompatActivity implements AccountCallback
         accountManager = AccountManager.getInstance();
 
         // Makes sure the account is still valid
-        if(user != null) {
-            user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        // User still exits
-                        Log.d(TAG, "User = " + user.getEmail());
-                        accountManager.getAccountType(user.getUid(), SplashActivity.this);
-                    } else {
-                        // User no longer exists, send to login screen
-                        Log.d(TAG, "User is null.");
-                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-            });
-        } else {
+//        if(user != null) {
+//            user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//                    if (task.isSuccessful()) {
+//                        // User still exits
+//                        Log.d(TAG, "User = " + user.getEmail());
+//                        accountManager.getAccountType(user.getUid(), SplashActivity.this);
+//                    } else {
+//                        // User no longer exists, send to login screen
+//                        Log.d(TAG, "User is null.");
+//                        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }
+//                }
+//            });
+//        } else {
             Log.d(TAG, "User is null.");
             Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        }
+//        }
     }
 
     @Override

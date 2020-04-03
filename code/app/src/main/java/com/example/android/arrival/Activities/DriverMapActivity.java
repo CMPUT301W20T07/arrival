@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +56,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -78,10 +78,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-//Drivers map, contains the driver's locations, markers of open requests
-//when marker is pressed info pops up about marker
-//can accept requests, pick up riders, drop them off, and receive payment
-
+/**
+ * Android Activity that displays the Driver's Map. Allows Drivers
+ * to accept requests, pick up riders, drop them off, and receive payment
+ */
 public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, ScanQRDialog.OnFragmentInteractionListener, AccountCallbackListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "DriverMapActivity";
@@ -266,7 +266,16 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-    }
+    /**
+     * Refreshes the app the every REFRESH_INTERVAL seconds
+     */
+    Runnable runner =  new Runnable() {
+        @Override
+        public void run() {
+            refresh();
+            handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
+        }
+    };
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -283,19 +292,20 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         return true;
     }
 
+    /**
+     * Fetches information relative to the current user and current request
+     */
     public void refresh() {
         Log.d(TAG, "refreshing...");
         if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
-        } else {
-            // FOR TESTING: If you want to test and spare the time of
-            // creating a new request, uncomment this line. Then you
-            // can just manipulate it in FireBase and refresh with the
-            // refresh button. Ex. changing status. Doc w/ ID = 1
-//             rm.getRequest("1", this);
         }
     }
 
+
+    /**
+     * Updates the UI relative the current request's status
+     */
     public void updateInfo() {
         if (currRequest == null) {
             rm.getOpenRequests(this);

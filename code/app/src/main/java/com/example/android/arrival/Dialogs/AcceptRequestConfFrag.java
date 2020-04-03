@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Notification;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
@@ -32,10 +30,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-//Add open request information to fragment
+//Show current request info, this is different for riders and drivers. Rider side contains
+//driver name, while driver side contains distance from driver to rider.
 
+/**
+ * DialogFragment displayed when a Driver wants to accept a request.
+ * Displays request details and information.
+ */
 public class AcceptRequestConfFrag extends DialogFragment {
     private String TAG  = "acceptRequest";
 
@@ -116,6 +117,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void getRiderToken() {
+        Log.d("Notifications", "In getRiderToken");
         String uid = currRequest.getRider();
         final String[] token = new String[1];
 
@@ -124,14 +126,15 @@ public class AcceptRequestConfFrag extends DialogFragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Rider riderData = documentSnapshot.toObject(Rider.class);
+                Log.d("Notifications", "Rider: " + riderData.getName());
                 token[0] = riderData.getTokenId();
-                Log.d(TAG, "Token in getRiderToken: " + token[0]);
+                Log.d("Notifications", "Token in getRiderToken: " + token[0]);
                 notifyRider(token[0]);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "get data onFailure: " + e.toString());
+                Log.d("Notifications", "get data onFailure: " + e.toString());
             }
         });
     }
@@ -146,8 +149,9 @@ public class AcceptRequestConfFrag extends DialogFragment {
         }
     }
 
-
-    //GeeksforGeeks by Twinkl Bajaj, Program for distance between two points on earth, https://www.geeksforgeeks.org/program-distance-two-points-earth/
+    //GeeksforGeeks by Twinkl Bajaj (https://auth.geeksforgeeks.org/user/Twinkl%20Bajaj/articles)
+    // "Program for distance between two points on earth"
+    // https://www.geeksforgeeks.org/program-distance-two-points-earth/
     public static double distance(double lat1, double lat2, double lon1, double lon2) {
 
         // The math module contains a function named toRadians which converts from degrees to radians.
