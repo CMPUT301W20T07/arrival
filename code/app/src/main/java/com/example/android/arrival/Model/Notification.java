@@ -59,7 +59,9 @@ public class Notification {
 
 
 
-    //TODO cite the youtube tutorial
+    // Youtube video by The Android Classroom (https://www.youtube.com/channel/UCkYWYpMjzfnTQy22q2Z4gjA)
+    // "Firebase Push Notifications | How To Send Device To Device Notification In Android | Part 2"
+    // https://www.youtube.com/watch?v=hKGLCdSEi9Y&t=704s
     public void sendNotification() {
         JSONObject object = new JSONObject();
         try {
