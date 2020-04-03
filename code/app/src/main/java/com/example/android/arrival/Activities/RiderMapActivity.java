@@ -615,6 +615,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         int activityType = args.getInt("type");
         marks = (ArrayList<Place>) args.getSerializable("marks");
 
+
+
         if (selected == null){
             if (marks.get(1) != null){
                 addDestMarker(marks.get(1).getLatLng());

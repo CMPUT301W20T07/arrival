@@ -68,6 +68,7 @@ public class RequestManagerTest {
         assertTrue(!solo.waitForText(req.getID(), 1, 10000)); // Wait for entry
     }
 
+
     /**
      * Test opening a Request, updating a list of currently open requests
      * updating the request, and the deleting the request.
