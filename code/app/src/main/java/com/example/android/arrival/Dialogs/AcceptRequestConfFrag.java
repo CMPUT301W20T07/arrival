@@ -176,6 +176,7 @@ public class AcceptRequestConfFrag extends DialogFragment {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Rider riderData = documentSnapshot.toObject(Rider.class);
+                Log.d("Notifications", "Rider: " + riderData.getName());
                 token[0] = riderData.getTokenId();
                 Log.d("Notifications", "Token in getRiderToken: " + token[0]);
                 notifyRider(token[0]);
@@ -189,16 +190,12 @@ public class AcceptRequestConfFrag extends DialogFragment {
     }
 
     public void notifyRider(String riderToken) {
-        try {
-            Log.d("Notification", "Rider Token: " + riderToken);
+        Log.d("Notification", "Rider Token: " + riderToken);
 
-            if (riderToken != null) {
-                Notification notification = new Notification(context, riderToken,
-                        "Ride Request Status Update", "A driver has accepted your request");
-                notification.sendNotification();
-            }
-        } catch (Exception e) {
-
+        if (riderToken != null) {
+            Notification notification = new Notification(context, riderToken,
+                    "Ride Request Status Update", "A driver has accepted your request");
+            notification.sendNotification();
         }
     }
 
