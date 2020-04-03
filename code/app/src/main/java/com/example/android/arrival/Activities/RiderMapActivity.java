@@ -39,6 +39,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
+import com.example.android.arrival.Dialogs.AcceptRequestConfFrag;
 import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.example.android.arrival.Dialogs.DriverDetailsFragment;
 import com.example.android.arrival.Dialogs.RateDriverFrag;
@@ -92,6 +93,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private AccountManager accountManager;
     private FirebaseFirestore fb;
     private String uid;
+    private String accountType;
     private DrawerLayout drawer;
     private Rider myRiderObject;
     //Declaring variables for use later
@@ -122,6 +124,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private Button btnRequestRide;
     private Button btnCancelRide;
     private Button btnDriverDetails;
+    private Button btnRequestDetails;
     private Button btnMakePayment;
     private Button pickupActivity;
     private Button destActivity;
@@ -159,6 +162,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         uid = accountManager.getUID();
         accountManager.getProfilePhoto(this, uid);
         accountManager.getUserData(this);
+        accountManager.getAccountType(uid, this);
         setContentView(R.layout.rider_map_activity);
 
         //Location service that can get a users location
@@ -180,6 +184,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         btnRequestRide = findViewById(R.id.rideRequest);
         btnCancelRide = findViewById(R.id.cancelRideRequest);
         btnDriverDetails = findViewById(R.id.seeDriverDetails);
+        btnRequestDetails = findViewById(R.id.seeRequestDetails);
         btnMakePayment = findViewById(R.id.makePayment);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
@@ -245,6 +250,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnDriverDetails.setVisibility(View.INVISIBLE);
+            btnRequestDetails.setVisibility(View.INVISIBLE);
             btnMakePayment.setVisibility(View.INVISIBLE);
         } else {
             btnRequestRide.setVisibility(View.INVISIBLE);
@@ -315,6 +321,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnDriverDetails.setVisibility(View.INVISIBLE);
+            btnRequestDetails.setVisibility(View.INVISIBLE);
             btnMakePayment.setVisibility(View.INVISIBLE);
 
 
@@ -337,12 +344,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnRequestDetails.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
 
             } else if(currRequest.getStatus() == Request.ACCEPTED) {
                 mMap.clear();
 
                 btnDriverDetails.setVisibility(View.VISIBLE);
+                btnRequestDetails.setVisibility(View.VISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
@@ -355,6 +364,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 addDestMarker(currRequest.getEndLocation().getLatLng());
 
                 btnDriverDetails.setVisibility(View.VISIBLE);
+                btnRequestDetails.setVisibility(View.VISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
@@ -362,6 +372,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             } else if (currRequest.getStatus() == Request.AWAITING_PAYMENT){
                 btnMakePayment.setVisibility(View.VISIBLE);
                 btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnRequestDetails.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
 
@@ -371,11 +382,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 shouldDisplayRatingDialog = true;
                 getDriverDetails(currRequest);
                 currRequest = null;
+                updateInfo();
 
-//                currRequest = null;
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnRequestDetails.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
                 txtEndLocation.setText("");
             }
@@ -542,6 +554,24 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onClick(View v) {
                 getDriverDetails(currRequest);
+            }
+        }));
+
+        btnRequestDetails.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                Bundle args = new Bundle();
+                args.putSerializable("currentRequest", currRequest);
+                args.putSerializable("userType", accountType);
+
+                AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
+                acceptRequestConfFrag.setArguments(args);
+                fragmentTransaction.add(0, acceptRequestConfFrag);
+                fragmentTransaction.commit();
             }
         }));
 
@@ -952,6 +982,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onAccountTypeRetrieved(String userType) {
+        accountType = userType;
 
     }
 
