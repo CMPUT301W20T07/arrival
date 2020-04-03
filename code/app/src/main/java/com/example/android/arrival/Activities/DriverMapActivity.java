@@ -153,7 +153,7 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         rm = RequestManager.getInstance();
 
         // Get camera permissions
-        checkPermissions(getApplicationContext());
+//        checkPermissions(getApplicationContext());
 
         // Bind components
         btnCancelRide = findViewById(R.id.driverCancelRide);
@@ -441,8 +441,10 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
         findRequestsByLocation();
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public boolean onMarkerClick(Marker marker) {
+                checkPermissions(getApplicationContext());
                 //Share marker and requests with the fragment
                     for (int i = 0; i < requestsList.size(); i++) {
                         if (requestsList.get(i).getStartLocation().getLat() == marker.getPosition().latitude &&
