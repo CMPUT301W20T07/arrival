@@ -74,58 +74,40 @@ public class AccountManager {
      */
     public void getUserData(final AccountCallbackListener listener) {
 
-        String uid = firebaseAuth.getCurrentUser().getUid();
+        String uid = getUID();
 
         DocumentReference docRef = userRef.document(uid);
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
 
-                // find user type
-                String type = documentSnapshot.get("type").toString();
-                Log.d(TAG, "onSuccess: " + type);
+            // find user type
+            String type = documentSnapshot.get("type").toString();
+            Log.d(TAG, "onSuccess: " + type);
 
 
-                if (type.equals(RIDER_TYPE_STRING)) {
-                    DocumentReference documentReference = riderRef.document(uid);
-                    documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            Rider riderData = documentSnapshot.toObject(Rider.class);
-                            listener.onRiderDataRetrieved(riderData);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "get data onFailure: " + e.toString());
-                            listener.onDataRetrieveFail(e.toString());
-                        }
-                    });
-                }
-                else if (type.equals(DRIVER_TYPE_STRING)) {
-                    DocumentReference documentReference = driverRef.document(uid);
-                    documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            Driver driverData = documentSnapshot.toObject(Driver.class);
-                            listener.onDriverDataRetrieved(driverData);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "get data onFailure: " + e.toString());
-                            listener.onDataRetrieveFail(e.toString());
-
-                        }
-                    });
-                }
+            if (type.equals(RIDER_TYPE_STRING)) {
+                DocumentReference documentReference = riderRef.document(uid);
+                documentReference.get().addOnSuccessListener(documentSnapshot1 -> {
+                    Rider riderData = documentSnapshot1.toObject(Rider.class);
+                    listener.onRiderDataRetrieved(riderData);
+                }).addOnFailureListener(e -> {
+                    Log.d(TAG, "get data onFailure: " + e.toString());
+                    listener.onDataRetrieveFail(e.toString());
+                });
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: " + e.toString());
-                listener.onDataRetrieveFail(e.toString());
+            else if (type.equals(DRIVER_TYPE_STRING)) {
+                DocumentReference documentReference = driverRef.document(uid);
+                documentReference.get().addOnSuccessListener(documentSnapshot12 -> {
+                    Driver driverData = documentSnapshot12.toObject(Driver.class);
+                    listener.onDriverDataRetrieved(driverData);
+                }).addOnFailureListener(e -> {
+                    Log.d(TAG, "get data onFailure: " + e.toString());
+                    listener.onDataRetrieveFail(e.toString());
+
+                });
             }
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "onFailure: " + e.toString());
+            listener.onDataRetrieveFail(e.toString());
         });
 
 
@@ -140,53 +122,35 @@ public class AccountManager {
      */
     public void createDriverAccount(Driver driver, String password, final AccountCallbackListener listener) {
 
-        firebaseAuth.createUserWithEmailAndPassword(driver.getEmail(), password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    String userId = task.getResult().getUser().getUid();
-                    DocumentReference usersDocReference = userRef.document(userId);
+        firebaseAuth.createUserWithEmailAndPassword(driver.getEmail(), password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String userId = task.getResult().getUser().getUid();
+                DocumentReference usersDocReference = userRef.document(userId);
 
-                    // add user type to look up table "users"
-                    Map<String, String> user = new HashMap<>();
-                    user.put("type", DRIVER_TYPE_STRING);
-                    usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onSuccess: " + DRIVER_TYPE_STRING);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "User onFailure: " + e.toString());
-                            listener.onAccountCreationFailure(e.toString());
-                        }
-                    });
+                // add user type to look up table "users"
+                Map<String, String> user = new HashMap<>();
+                user.put("type", DRIVER_TYPE_STRING);
+                usersDocReference.set(user).addOnSuccessListener(aVoid -> Log.d(TAG, "onSuccess: " + DRIVER_TYPE_STRING))
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "User onFailure: " + e.toString());
+                    listener.onAccountCreationFailure(e.toString());
+                });
 
-                    driver.setID(userId);
+                driver.setID(userId);
 
-                    // add user data to driver table
-                    DocumentReference driverDocumentReference = driverRef.document(userId);
-                    driverDocumentReference.set(driver).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            listener.onAccountCreated(DRIVER_TYPE_STRING);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            listener.onAccountCreationFailure(e.toString());
-                            Log.d(TAG, "Driver onFailure: " + e);
+                // add user data to driver table
+                DocumentReference driverDocumentReference = driverRef.document(userId);
+                driverDocumentReference.set(driver).addOnSuccessListener(aVoid ->
+                        listener.onAccountCreated(DRIVER_TYPE_STRING))
+                .addOnFailureListener(e -> {
+                    listener.onAccountCreationFailure(e.toString());
+                    Log.d(TAG, "Driver onFailure: " + e);
 
-                        }
-                    });
-                }
-                else {
-                    Log.d(TAG, "onComplete: create driver:" + task.getException().toString());
-                    listener.onAccountCreationFailure(task.getException().toString());
-                }
+                });
+            }
+            else {
+                Log.d(TAG, "onComplete: create driver:" + task.getException().toString());
+                listener.onAccountCreationFailure(task.getException().toString());
             }
         });
     }
@@ -209,34 +173,19 @@ public class AccountManager {
                     // add user type to look up table "users"
                     Map<String, String> user = new HashMap<>();
                     user.put("type", RIDER_TYPE_STRING);
-                    usersDocReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onSuccess: " + RIDER_TYPE_STRING);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "User onFailure: " + e);
-                            listener.onAccountCreationFailure(e.toString());
-                        }
-                    });
+                    usersDocReference.set(user).addOnSuccessListener(aVoid ->
+                            Log.d(TAG, "onSuccess: " + RIDER_TYPE_STRING)).addOnFailureListener(e -> {
+                                Log.d(TAG, "User onFailure: " + e);
+                                listener.onAccountCreationFailure(e.toString());
+                            });
 
                     rider.setID(userId);
 
                     // add user data to rider table
                     DocumentReference riderDocumentReference = riderRef.document(userId);
-                    riderDocumentReference.set(rider).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            listener.onAccountCreated(RIDER_TYPE_STRING);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Rider onFailure: " + e);
-                            listener.onAccountCreationFailure(e.toString());
-                        }
+                    riderDocumentReference.set(rider).addOnSuccessListener(aVoid -> listener.onAccountCreated(RIDER_TYPE_STRING)).addOnFailureListener(e -> {
+                        Log.d(TAG, "Rider onFailure: " + e);
+                        listener.onAccountCreationFailure(e.toString());
                     });
                 }
                 else {
@@ -257,20 +206,14 @@ public class AccountManager {
 
         final String[] accountType = new String[1];
         DocumentReference documentReference = userRef.document(uid);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String docData = documentSnapshot.get("type").toString();
-                accountType[0] = docData;
-                listener.onAccountTypeRetrieved(accountType[0]);
-                Log.d(TAG, "onSuccess: " + docData);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: getAccountType: " + e.toString());
-                accountType[0] = null;
-            }
+        documentReference.get().addOnSuccessListener(documentSnapshot -> {
+            String docData = documentSnapshot.get("type").toString();
+            accountType[0] = docData;
+            listener.onAccountTypeRetrieved(accountType[0]);
+            Log.d(TAG, "onSuccess: " + docData);
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "onFailure: getAccountType: " + e.toString());
+            accountType[0] = null;
         });
 
     }
@@ -285,12 +228,9 @@ public class AccountManager {
     public void signInUser(String email, String password, final AccountCallbackListener listener) {
 
 
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                Log.d(TAG, "onSuccess: " + authResult.getUser().getUid());
-                getAccountType(authResult.getUser().getUid(), listener);
-            }
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(authResult -> {
+            Log.d(TAG, "onSuccess: " + authResult.getUser().getUid());
+            getAccountType(authResult.getUser().getUid(), listener);
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
@@ -315,91 +255,57 @@ public class AccountManager {
 
         AuthCredential authCredential = EmailAuthProvider.getCredential(email, password);
 
-        user.reauthenticate(authCredential).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+        user.reauthenticate(authCredential).addOnSuccessListener(aVoid -> {
+            FirebaseUser user1 = firebaseAuth.getCurrentUser();
 
-                // delete user account in firebase auth
-                user.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
+            // delete user account in firebase auth
+            user1.delete().addOnSuccessListener(aVoid1 -> {
 
-                        // find user type
-                        userRef.document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                String type = documentSnapshot.get("type").toString();
+                // find user type
+                userRef.document(uid).get().addOnSuccessListener(documentSnapshot -> {
+                    String type = documentSnapshot.get("type").toString();
 
-                                // delete user in Users look up table
-                                userRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                    // delete user in Users look up table
+                    userRef.document(uid).delete().addOnSuccessListener(aVoid11 -> {
 
-                                        // delete driver
-                                        if (type.equals(DRIVER_TYPE_STRING)) {
-                                            driverRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    listener.onAccountDeleted();
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d(TAG, "onFailure: " + e.toString());
-                                                    listener.onAccountDeleteFailure(e.toString());
-                                                }
-                                            });
-                                        }
+                        // delete driver
+                        if (type.equals(DRIVER_TYPE_STRING)) {
+                            driverRef.document(uid).delete().addOnSuccessListener(aVoid111 -> listener.onAccountDeleted()).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: " + e.toString());
+                                    listener.onAccountDeleteFailure(e.toString());
+                                }
+                            });
+                        }
 
-                                        // delete rider
-                                        else if (type.equals(RIDER_TYPE_STRING)) {
-                                            riderRef.document(uid).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    listener.onAccountDeleted();
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d(TAG, "onFailure: " + e.toString());
-                                                    listener.onAccountDeleteFailure(e.toString());
-                                                }
-                                            });
-                                        }
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "onFailure: " + e.toString());
-                                        listener.onAccountDeleteFailure(e.toString());
-                                    }
-                                });
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure: " + e.toString());
-                                listener.onAccountDeleteFailure(e.toString());
-                            }
-                        });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        listener.onAccountDeleteFailure(e.toString());
+                        // delete rider
+                        else if (type.equals(RIDER_TYPE_STRING)) {
+                            riderRef.document(uid).delete().addOnSuccessListener(aVoid1112 -> listener.onAccountDeleted()).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "onFailure: " + e.toString());
+                                    listener.onAccountDeleteFailure(e.toString());
+                                }
+                            });
+                        }
+                    }).addOnFailureListener(e -> {
                         Log.d(TAG, "onFailure: " + e.toString());
-
-                    }
+                        listener.onAccountDeleteFailure(e.toString());
+                    });
+                }).addOnFailureListener(e -> {
+                    Log.d(TAG, "onFailure: " + e.toString());
+                    listener.onAccountDeleteFailure(e.toString());
                 });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+            }).addOnFailureListener(e -> {
                 listener.onAccountDeleteFailure(e.toString());
                 Log.d(TAG, "onFailure: " + e.toString());
 
-            }
+            });
+        }).addOnFailureListener(e -> {
+            listener.onAccountDeleteFailure(e.toString());
+            Log.d(TAG, "onFailure: " + e.toString());
+
         });
     }
 
@@ -411,20 +317,14 @@ public class AccountManager {
      */
     public void uploadProfilePhoto(@NonNull Uri filePath, AccountCallbackListener listener) {
 
-        String uid = firebaseAuth.getCurrentUser().getUid();
+        String uid = getUID();
         StorageReference ref = storage.getReference().child("images/" + uid);
-        ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Log.d(TAG, "onSuccess: " + ref.getPath());
-                listener.onImageUpload();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: " + e.toString());
-                listener.onImageUploadFailure(e.toString());
-            }
+        ref.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
+            Log.d(TAG, "onSuccess: " + ref.getPath());
+            listener.onImageUpload();
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "onFailure: " + e.toString());
+            listener.onImageUploadFailure(e.toString());
         });
     }
 
@@ -436,17 +336,9 @@ public class AccountManager {
     public void getProfilePhoto(final AccountCallbackListener listener, String uid) {
 
         StorageReference reference = storage.getReference().child("images/" + uid);
-        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                listener.onPhotoReceived(uri);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "onFailure: getProfilePhoto" + e.toString());
-                listener.onPhotoReceiveFailure(e.toString());
-            }
+        reference.getDownloadUrl().addOnSuccessListener(uri -> listener.onPhotoReceived(uri)).addOnFailureListener(e -> {
+            Log.d(TAG, "onFailure: getProfilePhoto" + e.toString());
+            listener.onPhotoReceiveFailure(e.toString());
         });
     }
 
@@ -462,17 +354,9 @@ public class AccountManager {
         String uid = firebaseUser.getUid();
 
         if (user.getEmail().equals(firebaseUser.getEmail())) {
-            riderRef.document(uid).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    listener.onAccountUpdated();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "onFailure: updateFailure: " + e.toString());
-                    listener.onAccountUpdateFailure(e.toString());
-                }
+            riderRef.document(uid).set(user).addOnSuccessListener(aVoid -> listener.onAccountUpdated()).addOnFailureListener(e -> {
+                Log.d(TAG, "onFailure: updateFailure: " + e.toString());
+                listener.onAccountUpdateFailure(e.toString());
             });
         }
         // if user wants to change email
@@ -481,43 +365,23 @@ public class AccountManager {
             // reauthorize user
             AuthCredential authCredential = EmailAuthProvider.getCredential(email, password);
 
-            firebaseUser.reauthenticate(authCredential).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
+            firebaseUser.reauthenticate(authCredential).addOnSuccessListener(aVoid -> {
 
-                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                    // change email in firebaseAuth
-                    firebaseUser.updateEmail(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            // update rider object
-                            riderRef.document(uid).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    listener.onAccountUpdated();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: " + e.toString());
-                                    listener.onAccountUpdateFailure(e.toString());
-                                }
-                            });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            listener.onAccountUpdateFailure(e.toString());
-                            Log.d(TAG, "onFailure: "+e.toString());
-                        }
+                FirebaseUser firebaseUser1 = firebaseAuth.getCurrentUser();
+                // change email in firebaseAuth
+                firebaseUser1.updateEmail(user.getEmail()).addOnSuccessListener(aVoid1 -> {
+                    // update rider object
+                    riderRef.document(uid).set(user).addOnSuccessListener(aVoid11 -> listener.onAccountUpdated()).addOnFailureListener(e -> {
+                        Log.d(TAG, "onFailure: " + e.toString());
+                        listener.onAccountUpdateFailure(e.toString());
                     });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
+                }).addOnFailureListener(e -> {
                     listener.onAccountUpdateFailure(e.toString());
-                    Log.d(TAG, "onFailure: update account: " + e.toString());
-                }
+                    Log.d(TAG, "onFailure: "+e.toString());
+                });
+            }).addOnFailureListener(e -> {
+                listener.onAccountUpdateFailure(e.toString());
+                Log.d(TAG, "onFailure: update account: " + e.toString());
             });
         }
 
@@ -528,17 +392,9 @@ public class AccountManager {
         String uid = firebaseUser.getUid();
 
         if (user.getEmail().equals(firebaseUser.getEmail())) {
-            driverRef.document(uid).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    listener.onAccountUpdated();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "onFailure: updateFailure: " + e.toString());
-                    listener.onAccountUpdateFailure(e.toString());
-                }
+            driverRef.document(uid).set(user).addOnSuccessListener(aVoid -> listener.onAccountUpdated()).addOnFailureListener(e -> {
+                Log.d(TAG, "onFailure: updateFailure: " + e.toString());
+                listener.onAccountUpdateFailure(e.toString());
             });
         }
         // if user wants to change email
@@ -547,43 +403,23 @@ public class AccountManager {
             // reauthorize user
             AuthCredential authCredential = EmailAuthProvider.getCredential(email, password);
 
-            firebaseUser.reauthenticate(authCredential).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
+            firebaseUser.reauthenticate(authCredential).addOnSuccessListener(aVoid -> {
 
-                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                    // change email in firebaseAuth
-                    firebaseUser.updateEmail(user.getEmail()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            // update rider object
-                            driverRef.document(uid).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    listener.onAccountUpdated();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: " + e.toString());
-                                    listener.onAccountUpdateFailure(e.toString());
-                                }
-                            });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            listener.onAccountUpdateFailure(e.toString());
-                            Log.d(TAG, "onFailure: "+e.toString());
-                        }
+                FirebaseUser firebaseUser1 = firebaseAuth.getCurrentUser();
+                // change email in firebaseAuth
+                firebaseUser1.updateEmail(user.getEmail()).addOnSuccessListener(aVoid1 -> {
+                    // update rider object
+                    driverRef.document(uid).set(user).addOnSuccessListener(aVoid11 -> listener.onAccountUpdated()).addOnFailureListener(e -> {
+                        Log.d(TAG, "onFailure: " + e.toString());
+                        listener.onAccountUpdateFailure(e.toString());
                     });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
+                }).addOnFailureListener(e -> {
                     listener.onAccountUpdateFailure(e.toString());
-                    Log.d(TAG, "onFailure: update account: " + e.toString());
-                }
+                    Log.d(TAG, "onFailure: "+e.toString());
+                });
+            }).addOnFailureListener(e -> {
+                listener.onAccountUpdateFailure(e.toString());
+                Log.d(TAG, "onFailure: update account: " + e.toString());
             });
         }
     }
@@ -595,18 +431,12 @@ public class AccountManager {
         }
 
         DocumentReference documentReference = driverRef.document(uid);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Driver driverData = documentSnapshot.toObject(Driver.class);
-                listener.onDriverDataRetrieved(driverData);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "get data onFailure: " + e.toString());
-                listener.onDataRetrieveFail(e.toString());
-            }
+        documentReference.get().addOnSuccessListener(documentSnapshot -> {
+            Driver driverData = documentSnapshot.toObject(Driver.class);
+            listener.onDriverDataRetrieved(driverData);
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "get data onFailure: " + e.toString());
+            listener.onDataRetrieveFail(e.toString());
         });
     }
 
@@ -616,18 +446,12 @@ public class AccountManager {
         }
 
         DocumentReference documentReference = riderRef.document(uid);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Rider riderData = documentSnapshot.toObject(Rider.class);
-                listener.onRiderDataRetrieved(riderData);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(TAG, "get data onFailure: " + e.toString());
-                listener.onDataRetrieveFail(e.toString());
-            }
+        documentReference.get().addOnSuccessListener(documentSnapshot -> {
+            Rider riderData = documentSnapshot.toObject(Rider.class);
+            listener.onRiderDataRetrieved(riderData);
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "get data onFailure: " + e.toString());
+            listener.onDataRetrieveFail(e.toString());
         });
     }
 
