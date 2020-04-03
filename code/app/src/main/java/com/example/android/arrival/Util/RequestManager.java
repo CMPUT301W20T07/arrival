@@ -172,7 +172,8 @@ public class RequestManager {
      *
      */
     public void getRiderOpenRequests(String rider, final RequestCallbackListener listener) {
-        requestRef.whereEqualTo("rider", rider).whereEqualTo("status", Request.OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        Log.d(TAG, "Getting open rider requests....");
+        requestRef.whereEqualTo("rider", rider).whereLessThanOrEqualTo("status", Request.AWAITING_PAYMENT).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getRider", "Successfully retrieved rider " + rider + "'s OPEN requests from DB. ");
@@ -184,6 +185,11 @@ public class RequestManager {
                 } else {
                     Log.d(TAG + "-getRider", "The user provided has no open requests!");
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, e.toString());
             }
         });
     }

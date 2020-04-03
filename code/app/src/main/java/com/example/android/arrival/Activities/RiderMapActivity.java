@@ -257,9 +257,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     Runnable runner =  new Runnable() {
         @Override
         public void run() {
-            if (currRequest != null) {
-                refresh();
-            }
+            refresh();
             handler.postDelayed(runner, REFRESH_INTERVAL * 1000);
         }
     };
@@ -364,7 +362,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 getDriverDetails(currRequest);
                 currRequest = null;
 
-//                currRequest = null;
                 btnRequestRide.setVisibility(View.VISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnDriverDetails.setVisibility(View.INVISIBLE);
