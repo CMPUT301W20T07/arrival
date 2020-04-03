@@ -77,6 +77,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -266,8 +267,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.ride_history:
-                startActivity(new Intent(RiderMapActivity.this, RideHistoryActivity.class));
-                break;
+                if (currRequest != null) {
+                    Toast.makeText(this, "Cannot view past rides while riding", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                else {
+                    Log.d(TAG, "onNavigationItemSelected: " + uid);
+                    rm.getRiderRequests(uid, this);
+                    break;
+                }
             case R.id.sign_out_button:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
@@ -902,9 +910,24 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
-        List<Request> riderCurrRequests = snapshot.toObjects(Request.class);
-        Log.d(TAG, "onGetRiderRequestSuccess" + riderCurrRequests);
-        currRequest = riderCurrRequests.get(0);
+        ArrayList<Request> requests= new ArrayList<>();
+
+        for (QueryDocumentSnapshot document : snapshot) {
+            Request request = document.toObject(Request.class);
+            Log.d(TAG, "onGetDriverRequestsSuccess: " + request.getDriver());
+            requests.add(request);
+        }
+
+        if (!requests.isEmpty()) {
+            Intent intent = new Intent(RiderMapActivity.this, RideHistoryActivity.class);
+            intent.putExtra("list", requests);
+            intent.putExtra("accountType", AccountManager.RIDER_TYPE_STRING);
+            startActivity(intent);
+        }
+        else {
+            Log.d(TAG, "onGetDriverRequestsSuccess: no requests found");
+            Toast.makeText(this, "You have no requests", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -940,12 +963,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         myRiderObject = rider;
 
         //rm.getRiderRequests("usr-map-test", this);
-        rm.getRiderRequests(uid, this);
+
     }
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-        if(currRequest.getStatus() == Request.COMPLETED) {
+        Log.d(TAG, "onDriverDataRetrieved: " + currRequest);
+        if(currRequest != null && currRequest.getStatus() == Request.COMPLETED) {
             currRequest = null;
             Log.d(TAG, "onDriverDataRetrieved: " + currRequest.getStatus());
             displayRateDriverDialog(driver);

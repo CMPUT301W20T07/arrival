@@ -35,8 +35,8 @@ public class AccountManager {
 
     public static final String TAG = "AccountManager: ";
     private static AccountManager instance;
-    private static final String RIDER_TYPE_STRING = "rider";
-    private static final String DRIVER_TYPE_STRING = "driver";
+    public static final String RIDER_TYPE_STRING = "rider";
+    public static final String DRIVER_TYPE_STRING = "driver";
     private FirebaseAuth firebaseAuth;
     private CollectionReference userRef;
     private CollectionReference riderRef;
