@@ -13,34 +13,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Make"
-        android:inputType="textCapWords" />
+        android:inputType="textCapWords"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edit_model"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Model"
-        android:inputType="textCapWords" />
+        android:inputType="textCapWords"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edit_year"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Year"
-        android:inputType="number"/>
+        android:inputType="number"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edit_color"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Color"
-        android:inputType="textCapWords" />
+        android:inputType="textCapWords"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edit_plate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="License Plate Number"
-        android:inputType="textCapCharacters" />
+        android:inputType="textCapCharacters"
+        android:autofillHints="" />
 
 </LinearLayout>
