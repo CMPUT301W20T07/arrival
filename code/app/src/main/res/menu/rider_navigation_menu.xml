@@ -7,17 +7,18 @@
         <item android:id="@+id/ride_history"
             android:icon="@drawable/ic_ride_history"
             android:title="Ride History"/>
-        <item
-            android:id="@+id/sign_out_button"
-            android:icon="@drawable/ic_sign_out"
-            android:title="Sign Out"
-            >
-        </item>
     </group>
 
+    <item android:title="Status">
+        <menu>
+            <item
+                android:id="@+id/sign_out_button"
+                android:icon="@drawable/ic_sign_out"
+                android:title="Sign Out"
+                >
+            </item>
 
-
-
-
+        </menu>
+    </item>
 
 </menu>

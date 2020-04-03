@@ -7,7 +7,6 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
 
-    private String id;
     private String email;
     private String name;
     private String phoneNumber;
@@ -22,14 +21,6 @@ public class User implements Serializable {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.tokenId = tokenId;
-    }
-
-    public void setID(String id) {
-        this.id = id;
-    }
-
-    public String getID() {
-        return this.id;
     }
 
     public String getEmail() {

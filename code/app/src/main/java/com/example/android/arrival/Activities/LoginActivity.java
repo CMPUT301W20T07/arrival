@@ -76,8 +76,6 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
         signIn = findViewById(R.id.sign_in_button);
         forgot_password = findViewById(R.id.forgot_password);
 
-        // set as onclick listeners
-
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -154,7 +152,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
 
 
     @Override
-    public void onAccountTypeRetrieved(String accountType) {
+    public void onAccountSignIn(String accountType) {
         Log.d("TOKEN", "calling to check for token");
         checkForToken(accountType);
         Log.d(TAG, "onAccountSignIn: " + accountType);
@@ -176,7 +174,7 @@ public class LoginActivity extends AppCompatActivity implements AccountCallbackL
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
         Toast.makeText(this, "Incorrect email or password", Toast.LENGTH_SHORT).show();
     }
 

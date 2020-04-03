@@ -1,5 +1,7 @@
 package com.example.android.arrival.Activities;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,13 +11,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
-import com.example.android.arrival.R;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
+import com.example.android.arrival.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -101,14 +101,13 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
 
     @Override
     public void update() {
-
+        rm.getOpenRequests(this);
     }
 
     @Override
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
         Log.d(TAG + "-getReq", req.toString());
-        rm.getOpenRequests(this);
     }
 
     @Override
@@ -126,11 +125,6 @@ public class RequestTestActivity extends AppCompatActivity implements RequestCal
         // Convert the snapshot to objects that can be used to display information
         List<Request> userRequests = snapshot.toObjects(Request.class);
         Log.d(TAG + "-getReqs", userRequests.toString());
-    }
-
-    @Override
-    public void onGetRiderOpenRequestsSuccess(QuerySnapshot snapshot) {
-
     }
 
     @Override

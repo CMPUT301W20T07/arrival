@@ -59,6 +59,9 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
 
     private String uTokenId = "";
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,8 +118,6 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
         });
     }
 
-    // demonuts article by EDITORIAL TEAM (https://demonuts.com/author/editorial-team/)
-    // "Pick Image From Gallery Or Camera In Android Studio Programmatically"
     // https://demonuts.com/pick-image-gallery-camera-android/
     private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
@@ -235,12 +236,12 @@ public class RegistrationActivity extends AppCompatActivity implements CarDetail
     }
 
     @Override
-    public void onAccountTypeRetrieved(String userType) {
+    public void onAccountSignIn(String userType) {
 
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
 
     }
 

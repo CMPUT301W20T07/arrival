@@ -1,7 +1,6 @@
 package com.example.android.arrival;
 
-
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -12,7 +11,7 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
     @Test
-    public void testAddition() {
+    public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
 }

@@ -1,5 +1,17 @@
 package com.example.android.arrival.Activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,7 +24,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
@@ -26,35 +37,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
-import com.example.android.arrival.Dialogs.AcceptRequestConfFrag;
 import com.example.android.arrival.Dialogs.DisplayQRDialog;
 import com.example.android.arrival.Dialogs.DriverDetailsFragment;
-import com.example.android.arrival.Dialogs.RateDriverFrag;
 import com.example.android.arrival.Dialogs.RideRequestConfFrag;
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.Model.Request;
+
 import com.example.android.arrival.Model.Rider;
 import com.example.android.arrival.R;
 import com.example.android.arrival.Util.AccountCallbackListener;
 import com.example.android.arrival.Util.AccountManager;
 import com.example.android.arrival.Util.RequestCallbackListener;
 import com.example.android.arrival.Util.RequestManager;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
+//import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -66,15 +66,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -82,7 +82,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-//import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Android Activity that displays the Rider's Map. Allows Riders to make requests,
@@ -91,13 +90,11 @@ import java.util.List;
 public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCallback, RequestCallbackListener, NavigationView.OnNavigationItemSelectedListener, AccountCallbackListener {
 
     private static final String TAG = "RiderMapActivity";
-    private static final int REFRESH_INTERVAL = 10; // How often the application should auto refresh in seconds
 
     private RequestManager rm;
     private AccountManager accountManager;
     private FirebaseFirestore fb;
-    private String uid;
-    private String accountType;
+    private FirebaseAuth auth;
     private DrawerLayout drawer;
     private Rider myRiderObject;
     //Declaring variables for use later
@@ -120,7 +117,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     //ArrayList that holds the markers so we can add them again when the map reloads
     private ArrayList<Place> marks = new ArrayList<>();
 
-    private Handler handler;
     private Request currRequest;
 
     private EditText txtStartLocation;
@@ -128,7 +124,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private Button btnRequestRide;
     private Button btnCancelRide;
     private Button btnDriverDetails;
-    private Button btnRequestDetails;
     private Button btnMakePayment;
     private Button pickupActivity;
     private Button destActivity;
@@ -139,9 +134,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     private TextView userName;
     private TextView userEmailAddress;
     private ImageView profilePhoto;
-    private MenuItem rideHistory;
-
-    private boolean shouldDisplayRatingDialog = false;
 
     @Override
     public void onBackPressed() {
@@ -153,6 +145,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
+
     /**
      * When activity is initially called we set up some basic location items needed later
      *
@@ -162,10 +155,8 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountManager = AccountManager.getInstance();
-        uid = accountManager.getUID();
-        accountManager.getProfilePhoto(this, uid);
+        accountManager.getProfilePhoto(this);
         accountManager.getUserData(this);
-        accountManager.getAccountType(uid, this);
         setContentView(R.layout.rider_map_activity);
 
         //Location service that can get a users location
@@ -179,15 +170,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
         rm = RequestManager.getInstance();
         fb = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
-
-        // Bind components
         txtStartLocation = findViewById(R.id.riderStartLocation);
         txtEndLocation = findViewById(R.id.riderEndLocation);
         btnRequestRide = findViewById(R.id.rideRequest);
         btnCancelRide = findViewById(R.id.cancelRideRequest);
         btnDriverDetails = findViewById(R.id.seeDriverDetails);
-        btnRequestDetails = findViewById(R.id.seeRequestDetails);
         btnMakePayment = findViewById(R.id.makePayment);
         btnRefresh = findViewById(R.id.btnRiderRefresh);
         txtStatus = findViewById(R.id.txtRiderStatus);
@@ -196,8 +185,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         pickupActivity = findViewById(R.id.pickupButtonRed);
         destActivity = findViewById(R.id.destinationButton);
 
-        // Runtime Handler
-        handler = new Handler();
 
         NavigationView navigationView = findViewById(R.id.rider_navigation_view);
         View headerView = navigationView.getHeaderView(0);
@@ -217,7 +204,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         //Setting Navigation View click listener
         navigationView.setNavigationItemSelectedListener(this);
 
-
         //Set transparent toolbar
         toolbar2.setBackgroundColor(Color.TRANSPARENT);
         setSupportActionBar(toolbar2);
@@ -236,10 +222,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setPeekHeight(140);
 
-        //Don't show keyboard when EditTexts are clicked.
+        //Don't show keyboard when edittexts are clicked.
         txtStartLocation.setInputType(InputType.TYPE_NULL);
         txtEndLocation.setInputType(InputType.TYPE_NULL);
-
 
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
@@ -249,19 +234,18 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
+
+
         if(currRequest == null) {
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnDriverDetails.setVisibility(View.INVISIBLE);
-            btnRequestDetails.setVisibility(View.INVISIBLE);
             btnMakePayment.setVisibility(View.INVISIBLE);
         } else {
             btnRequestRide.setVisibility(View.INVISIBLE);
             btnCancelRide.setVisibility(View.VISIBLE);
             Log.d(TAG, "CurrRequest: " + currRequest.toString());
         }
-
-        rm.getRiderOpenRequests(uid, this);
     }
 
     /**
@@ -282,16 +266,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.ride_history:
-                if (currRequest != null) {
-                    Toast.makeText(this, "Cannot view past rides while riding", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                else {
-                    Log.d(TAG, "onNavigationItemSelected: " + uid);
-                    rm.getRiderRequests(uid, this);
-                    break;
-                }
             case R.id.sign_out_button:
                 Log.d(TAG, "btnSignOut Clicked");
                 Log.d(TAG, "Attempting to sign out user... ");
@@ -309,14 +283,15 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
      */
     public void refresh() {
         Log.d(TAG, "refreshing...");
-        if(currRequest != null) {
+        if(currRequest!=null) {
             rm.getRequest(currRequest.getID(), this);
-            accountManager.getProfilePhoto(this, uid);
-            accountManager.getUserData(this);
             Log.d(TAG, currRequest.toString());
+<<<<<<< HEAD
         } else {
             rm.getRiderOpenRequests(uid, this);
             updateInfo();
+=======
+>>>>>>> master
         }
     }
 
@@ -327,23 +302,24 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (currRequest == null) {
             txtStatus.setText("");
 
-            if(mMap!=null) {
-                mMap.clear();
-                addPickupMarker(pickup.getLatLng());
-                addDestMarker(destination.getLatLng());
-            }
+            mMap.clear();
+            addPickupMarker(pickup.getLatLng());
+            addDestMarker(destination.getLatLng());
 
             btnRequestRide.setVisibility(View.VISIBLE);
             btnCancelRide.setVisibility(View.INVISIBLE);
             btnDriverDetails.setVisibility(View.INVISIBLE);
-            btnRequestDetails.setVisibility(View.INVISIBLE);
             btnMakePayment.setVisibility(View.INVISIBLE);
 
 
             pickupActivity.setClickable(true);
             destActivity.setClickable(true);
             btnRequestRide.setClickable(true);
+
+
         } else {
+//            rm.getRequest(currRequest.getID(), this);
+
             Log.d(TAG, "currRequest is " + currRequest.toString());
             txtStatus.setText(Request.STATUS.get(currRequest.getStatus()));
 
@@ -359,56 +335,40 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
                 btnCancelRide.setVisibility(View.VISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnDriverDetails.setVisibility(View.INVISIBLE);
-                btnRequestDetails.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
+
+
+            } else if (currRequest.getStatus() == Request.PICKED_UP) {
+                mMap.clear();
+                addDestMarker(currRequest.getEndLocation().getLatLng());
+
+                btnRequestRide.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnDriverDetails.setVisibility(View.VISIBLE);
+                btnMakePayment.setVisibility(View.INVISIBLE);
+
+            } else if(currRequest.getStatus() == Request.COMPLETED) {
+                mMap.clear();
+                currRequest = null;
+                btnRequestRide.setVisibility(View.VISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                txtEndLocation.setText("");
+
+            } else if (currRequest.getStatus() == Request.AWAITING_PAYMENT){
+                btnMakePayment.setVisibility(View.VISIBLE);
+                btnDriverDetails.setVisibility(View.INVISIBLE);
+                btnCancelRide.setVisibility(View.INVISIBLE);
+                btnRequestRide.setVisibility(View.INVISIBLE);
 
             } else if(currRequest.getStatus() == Request.ACCEPTED) {
                 mMap.clear();
 
                 btnDriverDetails.setVisibility(View.VISIBLE);
-                btnRequestDetails.setVisibility(View.VISIBLE);
                 btnRequestRide.setVisibility(View.INVISIBLE);
                 btnCancelRide.setVisibility(View.INVISIBLE);
                 btnMakePayment.setVisibility(View.INVISIBLE);
 
-                addPickupMarker(currRequest.getStartLocation().getLatLng());
                 addDestMarker(currRequest.getEndLocation().getLatLng());
-
-            } else if (currRequest.getStatus() == Request.PICKED_UP) {
-                mMap.clear();
-                addPickupMarker(currRequest.getStartLocation().getLatLng());
-                addDestMarker(currRequest.getEndLocation().getLatLng());
-
-                btnDriverDetails.setVisibility(View.VISIBLE);
-                btnRequestDetails.setVisibility(View.VISIBLE);
-                btnRequestRide.setVisibility(View.INVISIBLE);
-                btnCancelRide.setVisibility(View.INVISIBLE);
-                btnMakePayment.setVisibility(View.INVISIBLE);
-
-            } else if (currRequest.getStatus() == Request.AWAITING_PAYMENT){
-                btnMakePayment.setVisibility(View.VISIBLE);
-                btnDriverDetails.setVisibility(View.INVISIBLE);
-                btnRequestDetails.setVisibility(View.INVISIBLE);
-                btnCancelRide.setVisibility(View.INVISIBLE);
-                btnRequestRide.setVisibility(View.INVISIBLE);
-
-            } else if(currRequest.getStatus() == Request.COMPLETED) {
-                Log.d(TAG, "Request is completed");
-                mMap.clear();
-
-                shouldDisplayRatingDialog = true;
-                getDriverDetails(currRequest.getDriver());
-                currRequest = null;
-
-                btnRequestRide.setVisibility(View.VISIBLE);
-                btnCancelRide.setVisibility(View.INVISIBLE);
-                btnDriverDetails.setVisibility(View.INVISIBLE);
-                btnRequestDetails.setVisibility(View.INVISIBLE);
-                btnMakePayment.setVisibility(View.INVISIBLE);
-                txtEndLocation.setText("");
-                pickupMarker.remove();
-                destMarker.remove();
-                line.remove();
             }
         }
     }
@@ -419,7 +379,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onResume() {
         super.onResume();
-        runner.run();
         if(mMap != null) {
             refresh();
         }
@@ -433,7 +392,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Log.d(TAG, "map on pause");
         super.onPause();
         //active = false;
-        handler.removeCallbacks(runner); // stop refreshing
     }
 
     /**
@@ -572,25 +530,7 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         btnDriverDetails.setOnClickListener((new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getDriverDetails(currRequest.getDriver());
-            }
-        }));
-
-        btnRequestDetails.setOnClickListener((new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                Bundle args = new Bundle();
-                args.putSerializable("currentRequest", currRequest);
-                args.putSerializable("userType", accountType);
-
-                AcceptRequestConfFrag acceptRequestConfFrag = new AcceptRequestConfFrag();
-                acceptRequestConfFrag.setArguments(args);
-                fragmentTransaction.add(0, acceptRequestConfFrag);
-                fragmentTransaction.commit();
+                getDriverDetails(currRequest);
             }
         }));
 
@@ -628,8 +568,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         Place selected = (Place) args.getSerializable("place");
         int activityType = args.getInt("type");
         marks = (ArrayList<Place>) args.getSerializable("marks");
-
-
 
         if (selected == null){
             if (marks.get(1) != null){
@@ -676,35 +614,22 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
      * @param latLng : set of lat/lon coordinates
      */
     public void addPickupMarker(LatLng latLng) {
-        if(mMap != null) {
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.draggable(false);
-            markerOptions.title("Pickup Location");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            pickupMarker = mMap.addMarker(markerOptions);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.draggable(false);
+        markerOptions.title("Pickup Location");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        pickupMarker = mMap.addMarker(markerOptions);
 
-            Address pickupAddress = getCurrentLocationAddress(pickupMarker);
-            pickup.setName(pickupAddress.getFeatureName());
-            pickup.setAddress(pickupAddress.getAddressLine(0));
-            pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-            txtStartLocation.setText(pickup.getAddress());
+        Address pickupAddress = getCurrentLocationAddress(pickupMarker);
+        pickup.setName(pickupAddress.getFeatureName());
+        pickup.setAddress(pickupAddress.getAddressLine(0));
+        pickup.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+        txtStartLocation.setText(pickup.getAddress());
 
-            if(marks.size() < 1) {
-                marks.add(pickup);
-            } else {
-                marks.set(0, pickup);
-            }
+        marks.set(0, pickup);
 
-
-        if(marks.size() < 1) {
-            marks.add(pickup);
-        } else {
-            marks.set(0, pickup);
-        }
-
-            addLine();
-        }
+        addLine();
     }
 
 
@@ -721,16 +646,14 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         destMarker = mMap.addMarker(markerOptions);
 
         Address pickupAddress = getCurrentLocationAddress(destMarker);
-        if(pickupAddress != null) {
-            destination.setName(pickupAddress.getFeatureName());
-            destination.setAddress(pickupAddress.getAddressLine(0));
-            destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
-            txtEndLocation.setText(destination.getAddress());
+        destination.setName(pickupAddress.getFeatureName());
+        destination.setAddress(pickupAddress.getAddressLine(0));
+        destination.setLatLng(pickupAddress.getLatitude(), pickupAddress.getLongitude());
+        txtEndLocation.setText(destination.getAddress());
 
-            marks.add(1, destination);
+        marks.add(1, destination);
 
-            addLine();
-        }
+        addLine();
     }
 
     public void addGenericMarker(LatLng latLng) {
@@ -872,41 +795,13 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-    public void getDriverDetails(String driverID) {
-        Log.d(TAG, "Getting driver details...");
-        accountManager.getRequestDriverData(driverID, this);
+
+    public void getDriverDetails(Request request) {
+        accountManager.getRequestDriverData(request.getDriver(), this);
+
     }
 
-    /**
-     * Opens the dialog fragment that allows the Rider to
-     * rate a driver.
-     */
-    public void displayRateDriverDialog(Driver driver) {
-        //Creates new instance of the search fragment that we pass variables to
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        DialogFragment fragment;
-        if(driver.getID() != null && driver.getID() != "") {
-            fragment = RateDriverFrag.newInstance(driver, driver.getID());
-        } else {
-            return;
-        }
-        fragmentTransaction.add(0, fragment);
-        fragmentTransaction.commit();
-    }
 
-    /**
-     * Opens the dialog fragment that allows the Rider to
-     * view the Driver's contact info and rating.
-     */
-    public void displayDriverDetailsDialog(Driver driver) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        DialogFragment fragment = DriverDetailsFragment.newInstance(driver, currRequest.getDriver());
-        fragmentTransaction.add(0, fragment);
-        fragmentTransaction.commit();
-    }
 
     /**
      * Gets the results of the location permissions and acts accordingly
@@ -949,10 +844,6 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     public void onGetRequestSuccess(DocumentSnapshot snapshot) {
         Request req = snapshot.toObject(Request.class);
 
-        if(req == null) {
-            return;
-        }
-
         txtStatus.setText(Request.STATUS.get(req.getStatus()));
 
         Log.d(TAG, "Retrieved request: " + req.toString());
@@ -965,6 +856,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 //            refresh();
         }
         updateInfo();
+
+
+
     }
 
     @Override
@@ -982,32 +876,9 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onGetRiderRequestsSuccess(QuerySnapshot snapshot) {
-        ArrayList<Request> requests= new ArrayList<>();
-
-        for (QueryDocumentSnapshot document : snapshot) {
-            Request request = document.toObject(Request.class);
-            Log.d(TAG, "onGetDriverRequestsSuccess: " + request.getDriver());
-            requests.add(request);
-        }
-
-        if (!requests.isEmpty()) {
-            Intent intent = new Intent(RiderMapActivity.this, RideHistoryActivity.class);
-            intent.putExtra("list", requests);
-            intent.putExtra("accountType", AccountManager.RIDER_TYPE_STRING);
-            startActivity(intent);
-        }
-        else {
-            Log.d(TAG, "onGetDriverRequestsSuccess: no requests found");
-            Toast.makeText(this, "You have no requests", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onGetRiderOpenRequestsSuccess(QuerySnapshot snapshot) {
         List<Request> riderCurrRequests = snapshot.toObjects(Request.class);
         Log.d(TAG, "onGetRiderRequestSuccess" + riderCurrRequests);
         currRequest = riderCurrRequests.get(0);
-        updateInfo();
     }
 
     @Override
@@ -1016,13 +887,12 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onAccountTypeRetrieved(String userType) {
-        accountType = userType;
+    public void onAccountSignIn(String userType) {
 
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
 
     }
 
@@ -1042,19 +912,31 @@ public class RiderMapActivity extends AppCompatActivity implements OnMapReadyCal
         userName.setText(rider.getName());
         userEmailAddress.setText(rider.getEmail());
         myRiderObject = rider;
+        FirebaseUser user = auth.getCurrentUser();
 
-        rm.getRiderOpenRequests(uid, this);
+        //rm.getRiderRequests("usr-map-test", this);
+        rm.getRiderRequests(user.getUid(), this);
     }
 
     @Override
     public void onDriverDataRetrieved(Driver driver) {
-        Log.d(TAG, "onDriverDataRetrieved");
-        if(shouldDisplayRatingDialog) {
-            displayRateDriverDialog(driver);
-            shouldDisplayRatingDialog = false;
-        } else {
-            displayDriverDetailsDialog(driver);
-        }
+//        String driverName = driver.getName();
+//        //String driverRating = driver.getRating();
+//        Car driverCar = driver.getCar();
+//        String vehicleDetails = driverCar.getYear() +  driverCar.getColor() +  driverCar.getMake() + driverCar.getModel();
+//        String licensePlate = driverCar.getPlate();
+//        String driverPhone = driver.getPhoneNumber();
+//        String driverEmail = driver.getEmail();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        DialogFragment fragment = DriverDetailsFragment.newInstance(driver);
+        fragmentTransaction.add(0, fragment);
+        fragmentTransaction.commit();
+
+
+
     }
 
     @Override

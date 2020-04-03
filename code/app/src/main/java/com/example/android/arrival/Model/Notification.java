@@ -35,6 +35,8 @@ public class Notification {
 
     final String TAG = "NOTIFICATION TAG";
 
+
+
     public Notification(Context ctx, String to, String subject, String message){
         context = ctx;
         token = to;
@@ -59,9 +61,7 @@ public class Notification {
 
 
 
-    // Youtube video by The Android Classroom (https://www.youtube.com/channel/UCkYWYpMjzfnTQy22q2Z4gjA)
-    // "Firebase Push Notifications | How To Send Device To Device Notification In Android | Part 2"
-    // https://www.youtube.com/watch?v=hKGLCdSEi9Y&t=704s
+    //TODO cite the youtube tutorial
     public void sendNotification() {
         JSONObject object = new JSONObject();
         try {
@@ -83,7 +83,8 @@ public class Notification {
                 public void onErrorResponse(VolleyError error) {
                     Log.e("Notifications", "Error: " + error.toString());
                 }
-            }){
+            }
+            ){
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String, String> header = new HashMap<>();

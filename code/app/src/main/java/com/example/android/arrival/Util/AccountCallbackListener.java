@@ -16,13 +16,13 @@ public interface AccountCallbackListener {
      * called when a user has been successfully signed in
      * @param userType rider or driver
      */
-    void onAccountTypeRetrieved(String userType);
+    void onAccountSignIn(String userType);
 
     /**
      * called when a user has been unsuccessfully signed in
      * @param e error
      */
-    void onAccountTypeRetrieveFailure(String e);
+    void onSignInFailure(String e);
 
     /**
      * called when a user account has been created

@@ -51,6 +51,8 @@ public class RequestManager {
                 if(e != null) {
                     return;
                 }
+
+                // Notify all
             }
         });
     }
@@ -147,6 +149,7 @@ public class RequestManager {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 Log.d(TAG + "-getOpen", "Successfully retrieved open requests from DB. ");
+
 
                 listener.onGetOpenSuccess(queryDocumentSnapshots);
             }

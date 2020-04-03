@@ -137,7 +137,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     }
 
     @Override
-    public void onAccountTypeRetrieveFailure(String e) {
+    public void onSignInFailure(String e) {
 
     }
 

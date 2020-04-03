@@ -23,8 +23,4 @@
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="password_prompt">Password</string>
     <string name="current_email_prompt">Enter current email</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="no_ratings_string">This driver has no ratings.</string>
 </resources>
