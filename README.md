@@ -2,9 +2,9 @@
 
 <img src="https://raw.githubusercontent.com/CMPUT301W20T07/arrival/master/code/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" align="left" width="200" hspace="10" vspace="10">
 
-<br>Arrival is an Edmonton-based ride sharing platform for Android. Users can sign up as a Rider, or Driver, depending on their needs. Riders are able to request rides between two locations within Edmonton city limits, while Drivers can view Rider's open requests in their area, and are able to accept the requests they wish to complete. 
+<br>Arrival is an Edmonton-based ride sharing platform for Android. Users can sign up as a Rider, or Driver, depending on their needs. Riders are able to request rides between two locations within Edmonton city limits, while Drivers can view Rider's open requests in their area, and are able to accept the requests they wish to complete. More information about the app's features and development can be found on the project's [Wiki](https://github.com/CMPUT301W20T07/arrival/wiki).
 
-<br><br><br>
+<br><br>
 
 ## Features
 - Geolocation : identifies user's current location <br>
@@ -22,9 +22,6 @@ Arrival requires the following permissions:
 - Location services
 - Storage
 - Notifications (optional) 
-
-## Wiki
-Wiki can be found here - https://github.com/CMPUT301W20T07/arrival/wiki
 
 ## Credits
 | [![](https://avatars2.githubusercontent.com/u/54957139?s=460&v=4)](https://github.com/reillykeele) | [![](https://avatars0.githubusercontent.com/u/59150487?s=460&v=4)](https://github.com/JessBrownell) | [![](https://avatars3.githubusercontent.com/u/20142047?s=460&v=4)](https://github.com/jasonexus) | [![](https://avatars2.githubusercontent.com/u/60719924?s=460&v=4)](https://github.com/crazyloco4) | [![](https://avatars0.githubusercontent.com/u/59236774?s=460&v=4)](https://github.com/deadpools-besty) | [![](https://avatars1.githubusercontent.com/u/44715881?s=460&v=4)](https://github.com/KeshineeM) |
