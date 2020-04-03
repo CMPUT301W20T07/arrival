@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import com.example.android.arrival.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -25,9 +24,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link DriverReviewFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * DialogFragment displayed to the Driver when selecting 'Reviews' from
+ * the navigation drawer. Displays the driver's number of likes and dislikes.
  */
 public class DriverReviewFragment extends DialogFragment {
 
@@ -77,6 +75,9 @@ public class DriverReviewFragment extends DialogFragment {
                 .create();
     }
 
+    /**
+     * Retrieves the current user's reviews and count the likes and dislikes.
+     */
     private void getReviews() {
         reviewsRef.whereEqualTo("driverID", auth.getCurrentUser().getUid()).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

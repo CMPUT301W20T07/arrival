@@ -32,12 +32,12 @@ import com.google.firebase.storage.StorageReference;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.List;
-/**
- * an alert dialog appears on the rider's screen when they click on Driver Details button
- * the alert dialog shows all the information of their driver (name, phone number, car details, driver rating etc)
- * the rider can contact the driver directly from the dialog view
- */
 
+/**
+ * DialogFragment displayed when clicking 'Driver Details' button.
+ * Shows driver information such as name, phone number, etc. and allows
+ * Riders to contact their driver by linking to the Device's phone app.
+ */
 public class DriverDetailsFragment extends DialogFragment {
     private static final String TAG = "driver_fragment";
 

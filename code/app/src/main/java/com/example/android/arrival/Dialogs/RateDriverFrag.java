@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import com.example.android.arrival.Model.Driver;
 import com.example.android.arrival.R;
@@ -22,9 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link RateDriverFrag#newInstance} factory method to
- * create an instance of this fragment.
+ * DialogFragment displayed to Riders upon ride completion.
+ * Prompts the user to optionally rate the driver with a like or dislike.
  */
 public class RateDriverFrag extends DialogFragment {
 
@@ -101,6 +99,10 @@ public class RateDriverFrag extends DialogFragment {
                 .create();
     }
 
+    /**
+     * Adds a new rating in the FireStore Cloud Database.
+     * @param rate
+     */
     public void addRating(int rate) {
         Map<String, Object> data = new HashMap<>();
         data.put("driverID", driverID);

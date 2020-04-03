@@ -1,30 +1,23 @@
 package com.example.android.arrival.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import com.example.android.arrival.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -32,14 +25,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
+/**
+ * Android Fragment Activity that runs the Google Maps Fragment
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;

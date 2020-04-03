@@ -33,8 +33,10 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
 
+/**
+ * RecyclerViewAdapter for the RideHistoryActivity's RecyclerView
+ */
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
-
 
     private Context context;
     private ArrayList<Request> requests;
@@ -125,11 +127,15 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 }
             });
         }
-
-
     }
+
+    /**
+     * Retrieves profile photo from storage.
+     * @param uid
+     * @param holder
+     * @param position
+     */
     private void getPhoto(String uid, RequestViewHolder holder, int position) {
-        //get photo
         StorageReference storageReference = storage.getReference().child("images/" + uid);
         storageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
@@ -144,16 +150,16 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                 }
             }
         });
-
-
     }
-
 
     @Override
     public int getItemCount() {
         return requests.size();
     }
 
+    /**
+     * ViewHolder for the RequestAdapter and RecyclerView
+     */
     class RequestViewHolder extends RecyclerView.ViewHolder{
 
         TextView name, startLoc, endLoc, fare;

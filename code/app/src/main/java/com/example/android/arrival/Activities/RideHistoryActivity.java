@@ -14,6 +14,10 @@ import com.example.android.arrival.Util.RequestAdapter;
 
 import java.util.ArrayList;
 
+/**
+ * Android Activity that displays the User's past ride
+ * requests in a RecyclerView
+ */
 public class RideHistoryActivity extends AppCompatActivity {
 
     private static final String TAG = "RideHistoryActivity";

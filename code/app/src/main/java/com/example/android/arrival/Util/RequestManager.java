@@ -118,6 +118,11 @@ public class RequestManager {
                 });
     }
 
+    /**
+     * Retrieves the request with the given ID from the FireStore Cloud Database.
+     * @param id
+     * @param listener
+     */
     public void getRequest(String id, final RequestCallbackListener listener) {
         requestRef.document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -135,6 +140,7 @@ public class RequestManager {
 
     /**
      * Retrieves all currently open requests from the FireStore Cloud Database.
+     * @param listener
      */
     public void getOpenRequests(final RequestCallbackListener listener) {
         requestRef.whereEqualTo("status", Request.OPEN).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -149,6 +155,8 @@ public class RequestManager {
 
     /**
      * Retrieves all the requests made by the given rider from the FireStore Cloud Database.
+     * @param rider
+     * @param listener
      */
     public void getRiderRequests(String rider, final RequestCallbackListener listener) {
         requestRef.whereEqualTo("rider", rider).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -168,7 +176,7 @@ public class RequestManager {
     }
 
     /**
-     *
+     * Retrieves all the active requests made by the given rider from the FireStore Cloud Database.
      */
     public void getRiderOpenRequests(String rider, final RequestCallbackListener listener) {
         Log.d(TAG, "Getting open rider requests....");

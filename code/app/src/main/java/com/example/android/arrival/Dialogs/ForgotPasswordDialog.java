@@ -14,8 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -27,6 +25,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * DialogFragment displayed when the user selects 'Forgot Password'
+ * from the sign-in screen. Allows the user to reset their password
+ * via email.
+ */
 public class ForgotPasswordDialog extends DialogFragment {
 
     public static final String TAG = "password_fragment";
