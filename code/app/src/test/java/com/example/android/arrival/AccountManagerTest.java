@@ -16,7 +16,9 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
+/**
+ *
+ */
 public class AccountManagerTest {
 
     private static final String TAG = "AccountManagerTest";
@@ -46,16 +48,17 @@ public class AccountManagerTest {
     }
 
     @Test
-    void addRider() {
+    void addRider() throws InterruptedException {
         assertNull(mockAccountManager.getUID());
         mockAccountManager.createRiderAccount(rider, password, mockAccountCallbackListener);
+
     }
 
     @Test
     void getData(){
         assertNull(mockAccountManager.getUID());
+        mockAccountManager.getUserData(mockAccountCallbackListener);
     }
-
 
     @AfterAll
     static void resetSingleton() throws Exception{
