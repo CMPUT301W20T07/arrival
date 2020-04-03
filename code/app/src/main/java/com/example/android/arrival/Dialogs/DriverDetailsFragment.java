@@ -1,13 +1,21 @@
 package com.example.android.arrival.Dialogs;
 
 
-import androidx.annotation.NonNull;
-
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.android.arrival.Model.Car;
@@ -18,25 +26,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.view.LayoutInflater;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-
 import java.util.List;
-import java.util.Map;
 /**
  * an alert dialog appears on the rider's screen when they click on Driver Details button
  * the alert dialog shows all the information of their driver (name, phone number, car details, driver rating etc)
@@ -139,8 +134,8 @@ public class DriverDetailsFragment extends DialogFragment {
                                 }
                             }
                             if(ds.size() > 0) {
-                                float ratio = ((float) up) / ds.size();
-                                rating.setText("" + (ratio * 100) + "%");
+                                int ratio = (int) ((((float) up) / ds.size()) * 100);
+                                rating.setText("" + ratio + "%");
                             } else {
                                 rating.setText("This driver has no ratings.");
                             }
