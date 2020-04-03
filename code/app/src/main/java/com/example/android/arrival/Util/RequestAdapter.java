@@ -31,8 +31,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import java.math.BigDecimal;
-import java.sql.RowId;
 import java.util.ArrayList;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
@@ -41,7 +39,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     private Context context;
     private ArrayList<Request> requests;
     private static final String TAG = "Request Adapter";
-    private AccountManager accountManager = AccountManager.getInstance();
     private RequestViewHolder rVHolder;
     private String type;
     private FirebaseFirestore db;

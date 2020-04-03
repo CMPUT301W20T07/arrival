@@ -22,10 +22,6 @@ import androidx.fragment.app.DialogFragment;
 import com.example.android.arrival.Model.CustomSuggestionList;
 import com.example.android.arrival.Model.Place;
 import com.example.android.arrival.R;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
